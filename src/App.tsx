@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const cirtWebsite = 'https://cirt.gov.mg/'
-const eventDate = new Date('2026-06-23T09:00:00+03:00')
+const eventDate = new Date('2026-05-23T00:00:00+03:00')
 
 const infoPages = [
   {
@@ -76,9 +76,9 @@ function useCountdown() {
   }, [now])
 }
 
-function BrandMark({ large = false }: { large?: boolean }) {
+function BrandMark() {
   return (
-    <div className={large ? 'brand-mark brand-mark-large' : 'brand-mark'}>
+    <div className="brand-mark">
       <img src="/cirt-mdg-logo.svg" alt="Logo CIRT MDG" />
     </div>
   )
@@ -121,49 +121,10 @@ function InfoDetailPage({ slug }: { slug: string }) {
   )
 }
 
-function MarkdownDocumentPage() {
-  const [content, setContent] = useState('Chargement du document...')
-
-  useEffect(() => {
-    fetch('/documents/CLAUDE.md')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Document indisponible')
-        }
-        return response.text()
-      })
-      .then(setContent)
-      .catch(() => setContent('Le document CLAUDE.md est indisponible.'))
-  }, [])
-
-  return (
-    <main className="document-page">
-      <a className="back-link" href="#accueil">
-        Retour au site vitrine
-      </a>
-      <article className="document-card">
-        <h1>Document CLAUDE.md</h1>
-        <p className="document-note">
-          Document technique conservé sur une page séparée. Il ne fait pas partie du rendu public principal.
-        </p>
-        <pre>{content}</pre>
-      </article>
-    </main>
-  )
-}
-
 function App() {
   const hash = useHashPage()
   const countdown = useCountdown()
   const detailMatch = hash.match(/^#\/informations\/(.+)$/)
-
-  if (hash === '#/documents/claude') {
-    return (
-      <div className="site-shell">
-        <MarkdownDocumentPage />
-      </div>
-    )
-  }
 
   if (detailMatch) {
     return (
@@ -196,40 +157,44 @@ function App() {
               <span>Sommet de la</span>
               <span>Cybersécurité</span>
               <span>Madagascar</span>
-              <span>1ère édition 2026</span>
+              <span>— 1ère édition 2026</span>
             </h1>
             <p className="positioning">Bâtir la confiance numérique pour un Madagascar cyber-résilient</p>
-            <p className="event-meta">Du 23 au 24 juin 2026, Novotel Convention & Spa, Antananarivo</p>
+            <p className="event-meta">
+              <span>23–24 Mai 2026</span>
+              <span>Novotel Convention & Spa</span>
+              <span>Antananarivo</span>
+            </p>
             <div className="hero-actions" aria-label="Actions principales">
-              <a className="button button-primary" href="#contact-inscription">
+              <a className="button button-primary" href="#contact">
                 S’inscrire
               </a>
-              <a className="button button-secondary" href="#contact-sponsor">
+              <a className="button button-secondary" href="#sponsor">
                 Devenir sponsor
               </a>
               <a className="button button-ghost" href="#programme">
-                Programme à venir
+                Télécharger le programme
               </a>
             </div>
           </div>
-          <aside className="hero-panel" aria-label="Compte à rebours">
-            <span className="panel-label">Compte à rebours</span>
-            <div className="countdown-line">
-              <span>
+          <aside className="countdown-panel" aria-label="Avant l’événement">
+            <span className="panel-label">Avant l’événement</span>
+            <div className="countdown-grid">
+              <span className="countdown-card">
                 <strong>{countdown.days}</strong>
-                jours
+                <small>Jours</small>
               </span>
-              <span>
+              <span className="countdown-card">
                 <strong>{countdown.hours}</strong>
-                heures
+                <small>Heures</small>
               </span>
-              <span>
+              <span className="countdown-card">
                 <strong>{countdown.minutes}</strong>
-                minutes
+                <small>Minutes</small>
               </span>
-              <span>
+              <span className="countdown-card">
                 <strong>{countdown.seconds}</strong>
-                secondes
+                <small>Secondes</small>
               </span>
             </div>
           </aside>
@@ -240,7 +205,7 @@ function App() {
             <h2>Présentation courte</h2>
           </div>
           <p className="intro-text">
-            Le Sommet de la Cybersécurité Madagascar - 1ère édition 2026 est un événement dédié à la
+            Le Sommet de la Cybersécurité Madagascar — 1ère édition 2026 est un événement dédié à la
             confiance numérique, à la sensibilisation cyber et au renforcement de la résilience numérique à
             Madagascar.
           </p>
@@ -298,7 +263,7 @@ function App() {
                 Consulter le CIRT
               </a>
             </article>
-            <article className="contact-card" id="contact-sponsor">
+            <article className="contact-card" id="sponsor">
               <h3>Sponsoring</h3>
               <p>Les demandes de partenariat peuvent être orientées vers l’équipe d’organisation.</p>
               <a className="button button-secondary" href={cirtWebsite} target="_blank" rel="noopener noreferrer">
@@ -321,7 +286,6 @@ function App() {
         <a href={cirtWebsite} target="_blank" rel="noopener noreferrer">
           cirt.gov.mg
         </a>
-        <a href="#/documents/claude">Document MD</a>
         <span>Sommet de la Cybersécurité Madagascar 2026</span>
         <span>Site vitrine en cours de préparation</span>
       </footer>

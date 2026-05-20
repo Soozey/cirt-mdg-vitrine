@@ -39,7 +39,6 @@ La page affiche uniquement les informations validées du projet :
 - axes thématiques ;
 - contact statique sans backend ;
 - lien vers le site officiel du CIRT MDG : https://cirt.gov.mg/
-- page séparée `#/documents/claude` pour consulter le fichier `CLAUDE.md`.
 
 Aucun backend, aucune base de données, aucun service Firebase et aucun système d’authentification ne sont utilisés.
 
@@ -47,8 +46,8 @@ Aucun backend, aucune base de données, aucun service Firebase et aucun système
 
 Le fichier `public/cirt-mdg-logo.svg` est utilisé comme logo principal, à partir du visuel CIRT MDG fourni dans la conversation.
 
-Le fichier `D:\cybersécurité\CLAUDE.md` a été copié dans `public/documents/CLAUDE.md` pour consultation sur une page dédiée. Il reste séparé de la page vitrine.
+Le fichier historique `CLAUDE.md` est conservé hors du dossier public dans `docs/archive/CLAUDE.md`. Il n’est pas rendu dans l’interface du site.
 
 ## Contact
 
-Les boutons `S’inscrire`, `Devenir sponsor` et `Programme à venir` sont actifs et pointent vers des sections internes. Les actions externes renvoient vers le site officiel du CIRT MDG tant qu’aucune adresse email ou URL spécialisée n’est fournie.
+Les boutons `S’inscrire`, `Devenir sponsor` et `Télécharger le programme` sont actifs et pointent vers des sections internes. Les actions externes renvoient vers le site officiel du CIRT MDG tant qu’aucune adresse email ou URL spécialisée n’est fournie.
