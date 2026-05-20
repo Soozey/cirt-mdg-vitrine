@@ -62,7 +62,7 @@ function useCountdown() {
   const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 60_000)
+    const timer = window.setInterval(() => setNow(new Date()), 1_000)
     return () => window.clearInterval(timer)
   }, [])
 
@@ -70,7 +70,9 @@ function useCountdown() {
     const diff = Math.max(eventDate.getTime() - now.getTime(), 0)
     const days = Math.floor(diff / 86_400_000)
     const hours = Math.floor((diff % 86_400_000) / 3_600_000)
-    return { days, hours }
+    const minutes = Math.floor((diff % 3_600_000) / 60_000)
+    const seconds = Math.floor((diff % 60_000) / 1_000)
+    return { days, hours, minutes, seconds }
   }, [now])
 }
 
@@ -119,10 +121,49 @@ function InfoDetailPage({ slug }: { slug: string }) {
   )
 }
 
+function MarkdownDocumentPage() {
+  const [content, setContent] = useState('Chargement du document...')
+
+  useEffect(() => {
+    fetch('/documents/CLAUDE.md')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Document indisponible')
+        }
+        return response.text()
+      })
+      .then(setContent)
+      .catch(() => setContent('Le document CLAUDE.md est indisponible.'))
+  }, [])
+
+  return (
+    <main className="document-page">
+      <a className="back-link" href="#accueil">
+        Retour au site vitrine
+      </a>
+      <article className="document-card">
+        <h1>Document CLAUDE.md</h1>
+        <p className="document-note">
+          Document technique conservé sur une page séparée. Il ne fait pas partie du rendu public principal.
+        </p>
+        <pre>{content}</pre>
+      </article>
+    </main>
+  )
+}
+
 function App() {
   const hash = useHashPage()
   const countdown = useCountdown()
   const detailMatch = hash.match(/^#\/informations\/(.+)$/)
+
+  if (hash === '#/documents/claude') {
+    return (
+      <div className="site-shell">
+        <MarkdownDocumentPage />
+      </div>
+    )
+  }
 
   if (detailMatch) {
     return (
@@ -135,21 +176,22 @@ function App() {
   return (
     <div className="site-shell">
       <header className="site-header">
-        <a className="brand-link" href="#accueil" aria-label="Accueil CIRT MDG">
-          <BrandMark />
-        </a>
-        <nav className="site-nav" aria-label="Navigation principale">
-          <a href="#accueil">Accueil</a>
-          <a href="#projet">Projet</a>
-          <a href="#informations">Informations</a>
-          <a href="#contact">Contact</a>
-        </nav>
+        <div className="header-main">
+          <a className="brand-link" href="#accueil" aria-label="Accueil CIRT MDG">
+            <BrandMark />
+          </a>
+          <nav className="site-nav" aria-label="Navigation principale">
+            <a href="#accueil">Accueil</a>
+            <a href="#projet">Projet</a>
+            <a href="#informations">Informations</a>
+            <a href="#contact">Contact</a>
+          </nav>
+        </div>
       </header>
 
       <main>
         <section className="hero-section" id="accueil">
           <div className="hero-content">
-            <BrandMark large />
             <h1>
               <span>Sommet de la</span>
               <span>Cybersécurité</span>
@@ -172,8 +214,24 @@ function App() {
           </div>
           <aside className="hero-panel" aria-label="Compte à rebours">
             <span className="panel-label">Compte à rebours</span>
-            <strong>{countdown.days} jours</strong>
-            <p>{countdown.hours} heures restantes avant l’ouverture</p>
+            <div className="countdown-line">
+              <span>
+                <strong>{countdown.days}</strong>
+                jours
+              </span>
+              <span>
+                <strong>{countdown.hours}</strong>
+                heures
+              </span>
+              <span>
+                <strong>{countdown.minutes}</strong>
+                minutes
+              </span>
+              <span>
+                <strong>{countdown.seconds}</strong>
+                secondes
+              </span>
+            </div>
           </aside>
         </section>
 
@@ -263,6 +321,7 @@ function App() {
         <a href={cirtWebsite} target="_blank" rel="noopener noreferrer">
           cirt.gov.mg
         </a>
+        <a href="#/documents/claude">Document MD</a>
         <span>Sommet de la Cybersécurité Madagascar 2026</span>
         <span>Site vitrine en cours de préparation</span>
       </footer>

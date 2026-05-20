@@ -10,12 +10,18 @@
   z-index: 20;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 16px clamp(20px, 5vw, 72px);
+  justify-content: flex-start;
+  padding: 10px clamp(20px, 5vw, 72px);
   border-bottom: 1px solid rgba(51, 70, 168, 0.12);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: clamp(28px, 5vw, 72px);
+  width: 100%;
 }
 
 .brand-link,
@@ -33,7 +39,7 @@
 
 .brand-mark img {
   display: block;
-  width: 172px;
+  width: 150px;
   height: auto;
 }
 
@@ -44,7 +50,8 @@
 .site-nav {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 3vw, 28px);
+  gap: clamp(18px, 4vw, 56px);
+  min-width: 0;
   font-size: 0.94rem;
 }
 
@@ -65,7 +72,7 @@
   grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.6fr);
   gap: clamp(28px, 5vw, 64px);
   align-items: center;
-  padding: clamp(48px, 7vw, 88px) clamp(20px, 5vw, 72px);
+  padding: clamp(56px, 7vw, 96px) clamp(20px, 5vw, 72px);
   background:
     radial-gradient(circle at 18% 12%, rgba(37, 213, 194, 0.18), transparent 28%),
     linear-gradient(180deg, #f5f7fa 0%, #ffffff 72%);
@@ -180,10 +187,10 @@ h3 {
 .hero-panel {
   display: grid;
   min-width: 0;
-  gap: 10px;
+  gap: 16px;
   align-self: stretch;
   align-content: center;
-  min-height: 260px;
+  min-height: 200px;
   border: 1px solid rgba(51, 70, 168, 0.14);
   border-radius: 8px;
   padding: clamp(24px, 4vw, 40px);
@@ -193,9 +200,26 @@ h3 {
   box-shadow: 0 22px 60px rgba(30, 43, 108, 0.1);
 }
 
-.hero-panel strong {
+.countdown-line {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  align-items: baseline;
   color: #1e2b6c;
-  font-size: clamp(2rem, 4vw, 3.25rem);
+  white-space: nowrap;
+}
+
+.countdown-line span {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+  color: #475467;
+  font-size: 0.9rem;
+}
+
+.countdown-line strong {
+  color: #1e2b6c;
+  font-size: clamp(1.35rem, 2vw, 2rem);
   line-height: 1;
 }
 
@@ -350,7 +374,8 @@ h3 {
   font-weight: 800;
 }
 
-.detail-page {
+.detail-page,
+.document-page {
   min-height: 100vh;
   padding: clamp(32px, 6vw, 72px);
   background:
@@ -370,6 +395,42 @@ h3 {
   box-shadow: 0 22px 60px rgba(30, 43, 108, 0.1);
 }
 
+.document-card {
+  display: grid;
+  gap: 18px;
+  max-width: 1040px;
+  margin-top: 32px;
+  border: 1px solid rgba(51, 70, 168, 0.14);
+  border-radius: 8px;
+  padding: clamp(24px, 5vw, 44px);
+  background: #ffffff;
+  box-shadow: 0 22px 60px rgba(30, 43, 108, 0.1);
+}
+
+.document-card h1 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.document-note {
+  max-width: 720px;
+  color: #475467;
+  line-height: 1.55;
+}
+
+.document-card pre {
+  max-height: 62vh;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid rgba(51, 70, 168, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  color: #1e2b6c;
+  background: #f5f7fa;
+  font: 0.88rem/1.55 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .detail-card p {
   color: #344054;
   font-size: 1.12rem;
@@ -383,14 +444,8 @@ h3 {
 }
 
 @media (max-width: 920px) {
-  .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
   .site-nav {
-    width: 100%;
-    justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .hero-section {
@@ -424,11 +479,17 @@ h3 {
 @media (max-width: 560px) {
   .site-header {
     align-items: center;
-    padding-inline: 18px;
+    padding-inline: 16px;
+  }
+
+  .header-main {
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
   }
 
   .brand-mark img {
-    width: 150px;
+    width: 128px;
   }
 
   .brand-mark-large img {
@@ -436,10 +497,25 @@ h3 {
   }
 
   .site-nav {
+    width: 100%;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px 16px;
+    gap: 8px 14px;
     font-size: 0.9rem;
+  }
+
+  .countdown-line {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .countdown-line span {
+    gap: 3px;
+    font-size: 0.78rem;
+  }
+
+  .countdown-line strong {
+    font-size: 1.08rem;
   }
 
   .hero-section {
@@ -485,10 +561,22 @@ h3 {
     padding: 24px;
   }
 
+  .document-page {
+    padding: 24px;
+  }
+
   .detail-card {
     width: 100%;
     max-width: 280px;
     margin-inline: auto;
     padding: 24px;
+  }
+
+  .document-card {
+    padding: 24px;
+  }
+
+  .document-card pre {
+    max-height: 58vh;
   }
 }
