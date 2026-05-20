@@ -33,6 +33,8 @@ Le template Vite initial contenait :
 
 Aucune donnée métier préexistante n’a été trouvée dans le dossier initial.
 
+Le fichier `D:\cybersécurité\CLAUDE.md` a été vérifié à la demande du 2026-05-20. Il décrit l’ancienne plateforme complète de quiz/jobdating avec Firebase, Anthropic, admin, jury, authentification et banque de questions. Ce fichier n’était pas présent dans le projet livré `D:\cirt-mdg-vitrine` et son contenu n’a pas été intégré à la vitrine.
+
 Les éléments suivants n’existaient pas dans le projet audité et n’ont pas été ajoutés :
 
 - quiz ;
@@ -56,9 +58,9 @@ Les éléments suivants n’existaient pas dans le projet audité et n’ont pas
 
 ## Assets logos
 
-- Aucun logo CIRT MDG fourni n’a été trouvé dans `public/` ou `src/assets/`.
+- Le logo CIRT MDG fourni en pièce jointe a été intégré sous forme de fichier `public/cirt-mdg-logo.svg`.
 - Aucun logo CERT fourni n’a été trouvé dans `public/` ou `src/assets/`.
-- Aucun faux logo image n’a été créé. La page utilise un marquage texte `CIRT MDG` sobre pour éviter d’inventer un asset officiel.
+- Aucun logo CERT n’a été inventé.
 
 ## Corrections réalisées
 
@@ -67,7 +69,11 @@ Les éléments suivants n’existaient pas dans le projet audité et n’ont pas
 - Suppression du rendu public des liens et éléments Vite/React.
 - Suppression des assets inutiles du template.
 - Ajout du SEO minimal dans `index.html`.
-- Ajout d’un bloc contact sans backend avec bouton désactivé `Contact à venir`.
+- Correction de la date de l’événement : 23 au 24 juin 2026.
+- Ajout d’un compte à rebours discret.
+- Ajout de pages de détail statiques pour les informations essentielles.
+- Préparation du point `CTF étudiant` comme lien externe à renseigner plus tard.
+- Ajout d’un bloc contact sans backend avec boutons actifs vers des ancres internes ou le site officiel du CIRT MDG.
 - Mise à jour du README avec les commandes exactes.
 
 ## Sécurité
@@ -77,8 +83,9 @@ Les éléments suivants n’existaient pas dans le projet audité et n’ont pas
 - Aucun script tiers ajouté.
 - Aucun appel API externe.
 - Aucun usage de `dangerouslySetInnerHTML`.
-- Les boutons pointent vers des ancres internes ou restent désactivés quand aucune fonction réelle n’existe.
+- Les liens externes utilisent `rel="noopener noreferrer"`.
+- Les boutons pointent vers des ancres internes ou vers `https://cirt.gov.mg/`.
 
 ## Notes
 
-Si les logos officiels CIRT MDG ou CERT sont fournis plus tard, les placer dans `public/` ou `src/assets/`, puis remplacer le marquage texte par les images officielles avec des attributs `alt` explicites.
+Si un logo CERT officiel ou une URL CTF officielle sont fournis plus tard, ils pourront être ajoutés sans créer de contenu fictif.

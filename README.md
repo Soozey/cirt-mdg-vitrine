@@ -1,6 +1,6 @@
 # CIRT MDG - Site vitrine
 
-Site vitrine simple et responsive pour le Sommet de la Cybersécurité Madagascar — 1ère édition 2026.
+Site vitrine simple et responsive pour le Sommet de la Cybersécurité Madagascar - 1ère édition 2026.
 
 ## Stack
 
@@ -34,12 +34,18 @@ La page affiche uniquement les informations validées du projet :
 - titre du sommet ;
 - phrase de positionnement ;
 - date et lieu ;
-- informations essentielles ;
+- compte à rebours discret ;
+- informations essentielles avec pages de détail statiques ;
 - axes thématiques ;
-- bloc contact sans backend.
+- contact statique sans backend ;
+- lien vers le site officiel du CIRT MDG : https://cirt.gov.mg/
 
 Aucun backend, aucune base de données, aucun service Firebase et aucun système d’authentification ne sont utilisés.
 
 ## Assets
 
-Aucun fichier de logo CIRT MDG ou CERT n’était présent dans le dossier au moment de l’audit. Le rendu utilise donc un marquage texte sobre `CIRT MDG` sans créer de faux logo image.
+Le fichier `public/cirt-mdg-logo.svg` est utilisé comme logo principal, à partir du visuel CIRT MDG fourni dans la conversation.
+
+## Contact
+
+Les boutons `S’inscrire`, `Devenir sponsor` et `Programme à venir` sont actifs et pointent vers des sections internes. Les actions externes renvoient vers le site officiel du CIRT MDG tant qu’aucune adresse email ou URL spécialisée n’est fournie.

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 420" role="img" aria-labelledby="title desc">
+  <title id="title">CIRT MDG</title>
+  <desc id="desc">Logo CIRT MDG inspiré du visuel fourni</desc>
+  <rect width="1120" height="420" fill="#ffffff"/>
+  <path d="M161 88C286 21 468 6 617 59c31 11 60 25 86 42l-4 79H646l2-46C510 71 333 80 215 143c-5 117 54 235 154 292 42-21 74-52 99-92h62c-35 72-89 122-161 154C229 432 146 276 161 88Z" fill="#3346A8"/>
+  <path d="M195 144c118-66 297-77 453-11l-3 45h14l3-53C515 60 338 66 205 133c-1 121 61 239 166 302l15-8C274 367 208 260 195 144Z" fill="#25D5C2"/>
+  <text x="340" y="252" fill="#3346A8" font-family="Arial, Helvetica, sans-serif" font-size="126" font-weight="800" letter-spacing="-4">CIRT</text>
+  <text x="646" y="252" fill="#3346A8" font-family="Arial, Helvetica, sans-serif" font-size="86" font-weight="800" letter-spacing="-2">MDG</text>
+  <text x="342" y="304" fill="#3346A8" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="800" letter-spacing="1">COMPUTER INCIDENT RESPONSE TEAM</text>
+</svg>
