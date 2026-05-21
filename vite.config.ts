@@ -11,8 +11,11 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
   ],
-  // Ajout de cette option pour corriger "React is not defined"
   esbuild: {
     jsx: 'automatic',
+  },
+  server: {
+    host: '0.0.0.0',   // écoute sur toutes les interfaces
+    port: 2220,        // tu peux changer le port si besoin
   },
 });
