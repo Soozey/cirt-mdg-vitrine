@@ -30,7 +30,7 @@ export const Reveal = forwardRef<HTMLDivElement, RevealProps>(
       ref={ref}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount }}
+      viewport={{ once: false, amount }}
       variants={fadeUp}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay, ...transition }}
       {...rest}
@@ -51,7 +51,7 @@ export const RevealGroup = forwardRef<HTMLDivElement, RevealGroupProps>(
       ref={ref}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount }}
+      viewport={{ once: false, amount }}
       variants={container(stagger, delayChildren)}
       {...rest}
     />

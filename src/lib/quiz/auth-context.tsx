@@ -8,6 +8,7 @@ type Ctx = {
   ready: boolean;
   loginWithEmail: (email: string, password: string) => Promise<QuizUser>;
   loginWithProvider: (p: "google" | "facebook") => Promise<QuizUser>;
+  signUp: (data: { firstName: string; lastName: string; email: string; password: string }) => Promise<QuizUser>;
   completeProfile: (patch: Partial<QuizUser>) => void;
   logout: () => void;
 };
@@ -61,6 +62,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return u;
   }, []);
 
+  const signUp = useCallback(async (data: { firstName: string; lastName: string; email: string; password: string }) => {
+    await new Promise((r) => setTimeout(r, 500));
+    const exists = MOCK_USERS.find((u) => u.email === data.email);
+    if (exists) throw new Error("Un compte existe déjà avec cet email");
+    const u: QuizUser = {
+      id: `signup-${Date.now()}`,
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: "candidate",
+      provider: "email",
+      registered: false,
+      avatarColor: "oklch(0.55 0.22 265)",
+    };
+    setUser(u);
+    persist(u);
+    return u;
+  }, []);
+
   const completeProfile = useCallback((patch: Partial<QuizUser>) => {
     setUser((prev) => {
       if (!prev) return prev;
@@ -76,8 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, ready, loginWithEmail, loginWithProvider, completeProfile, logout }),
-    [user, ready, loginWithEmail, loginWithProvider, completeProfile, logout],
+    () => ({ user, ready, loginWithEmail, loginWithProvider, signUp, completeProfile, logout }),
+    [user, ready, loginWithEmail, loginWithProvider, signUp, completeProfile, logout],
   );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 function GoogleIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true">
-      <path fill="white" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.5 14.6 2.5 12 2.5 6.7 2.5 2.5 6.7 2.5 12s4.2 9.5 9.5 9.5c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6L12 10.2z" />
+      <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.9-5.5 3.9-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.5 14.6 2.5 12 2.5 6.7 2.5 2.5 6.7 2.5 12s4.2 9.5 9.5 9.5c5.5 0 9.1-3.9 9.1-9.3 0-.6-.1-1.1-.2-1.6L12 10.2z" />
     </svg>
   );
 }
@@ -40,35 +40,36 @@ export function OAuthButtons({ mode = "login" }: { mode?: "login" | "register" }
   };
 
   return (
-    <div className="grid gap-2.5">
+    <div className="grid gap-2">
       <button
         type="button"
         onClick={() => handle("google")}
         disabled={loading !== null}
         className={cn(
-          "group inline-flex h-11 items-center justify-center gap-3 rounded-lg border border-input bg-red-500 px-4 text-sm font-medium text-foreground shadow-sm transition-all hover:bg-red-400 hover:shadow-md disabled:opacity-60",
+          "group inline-flex h-9 items-center justify-center gap-2.5 rounded-lg border border-input bg-background px-3 text-xs font-medium text-foreground shadow-sm transition-all hover:bg-muted hover:shadow-md disabled:opacity-60",
         )}
       >
         <GoogleIcon />
-        <span className="text-white">
+        <span>
           {mode === "login" ? "Continuer avec Google" : "S'inscrire avec Google"}
         </span>
         {loading === "google" && (
-          <span className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
         )}
       </button>
       <button
         type="button"
         onClick={() => handle("facebook")}
         disabled={loading !== null}
-        className="group inline-flex h-11 items-center justify-center gap-3 rounded-lg px-4 text-sm font-medium text-white shadow-sm transition-all bg-[#1877F2] hover:bg-blue-400 hover:shadow-md disabled:opacity-60"
+        className="group inline-flex h-9 items-center justify-center gap-2.5 rounded-lg px-3 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md disabled:opacity-60"
+        style={{ backgroundColor: "#1877F2" }}
       >
         <FacebookIcon />
         <span>
           {mode === "login" ? "Continuer avec Facebook" : "S'inscrire avec Facebook"}
         </span>
         {loading === "facebook" && (
-          <span className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          <span className="size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
         )}
       </button>
     </div>

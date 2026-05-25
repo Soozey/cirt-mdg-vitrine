@@ -3,6 +3,7 @@ import { ArrowUpRight, Handshake, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CIRT_WEBSITE } from "@/lib/event-data";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import contactBg from "@/assets/above-countdown.jpg";
 
 const CARDS = [
   {
@@ -33,14 +34,32 @@ const CARDS = [
 
 export function ContactSection() {
   return (
-    <section id="contact" className="bg-primary-deep text-primary-foreground">
+    <section id="contact" className="relative isolate overflow-hidden bg-white text-primary-deep">
+      <img
+        src={contactBg}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-60"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-white/30"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-80 opacity-25 bg-iris animate-iris"
+        style={{ maskImage: "linear-gradient(0deg, black, transparent)" }}
+      />
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 md:grid-cols-[1fr_2fr] md:gap-16 md:px-8 md:py-24">
         <Reveal className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-iris-violet">
             Restons en contact
           </p>
-          <h2 className="text-3xl font-bold text-primary-foreground md:text-4xl">Contact</h2>
-          <p className="max-w-md text-base text-primary-foreground/75">
+          <h2 className="font-display text-3xl font-bold text-primary-deep md:text-5xl">
+            Contact
+          </h2>
+          <div className="h-1 w-16 bg-iris" />
+          <p className="max-w-md text-base text-foreground/70">
             Pour toute demande d'information, de partenariat ou de sponsoring, contactez l'équipe
             d'organisation du sommet.
           </p>
@@ -51,14 +70,14 @@ export function ContactSection() {
             <RevealItem
               key={id}
               id={id}
-              className="flex flex-col rounded-xl border border-primary-foreground/15 bg-primary-foreground/5 p-6 backdrop-blur"
+              className="flex flex-col rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-iris-violet/50 hover:shadow-md"
             >
-              <span className="mb-4 inline-flex size-10 items-center justify-center rounded-lg bg-accent text-primary-deep">
+              <span className="mb-4 inline-flex size-11 items-center justify-center rounded-xl bg-iris-violet/10 text-iris-violet">
                 <Icon className="size-5" />
               </span>
-              <h3 className="mb-2 text-lg font-semibold text-primary-foreground">{title}</h3>
-              <p className="mb-6 flex-1 text-sm text-primary-foreground/75">{body}</p>
-              <Button asChild variant={variant} size="sm" className={variant === "outline" ? "border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" : ""}>
+              <h3 className="mb-2 text-lg font-semibold text-primary-deep">{title}</h3>
+              <p className="mb-6 flex-1 text-sm text-foreground/70">{body}</p>
+              <Button asChild variant={variant} size="sm">
                 <a href={CIRT_WEBSITE} target="_blank" rel="noopener noreferrer">
                   {cta} <ArrowUpRight className="size-4" />
                 </a>

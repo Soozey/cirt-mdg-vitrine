@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { Download, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
 import { ProtectedRoute } from "@/components/quiz/protected-route";
+import { SimplePagination } from "@/components/quiz/simple-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,11 +42,15 @@ function AdminPage() {
   const [items, setItems] = useState<Submission[]>([]);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | "pending" | "reviewed">("all");
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 3;
 
   useEffect(() => {
     seedDemoSubmissions();
     setItems(submissionsApi.list());
   }, []);
+
+  useEffect(() => { setPage(1); }, [q, status]);
 
   const filtered = useMemo(() => {
     return items.filter((s) => {
@@ -56,6 +62,9 @@ function AdminPage() {
       return true;
     });
   }, [items, q, status]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const pageItems = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const stats = useMemo(() => {
     const total = items.length;
@@ -98,15 +107,22 @@ function AdminPage() {
     <DashboardLayout title="Administration" subtitle="Vue d'ensemble des candidatures et évaluations.">
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Candidatures", value: stats.total },
-          { label: "En attente jury", value: stats.pending },
-          { label: "Score moyen", value: `${stats.avg}/100` },
-          { label: "Risque IA élevé", value: stats.aiRisk },
-        ].map((s) => (
-          <div key={s.label} className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
+          { label: "Candidatures", value: stats.total, accent: "from-primary to-iris-violet" },
+          { label: "En attente jury", value: stats.pending, accent: "from-iris-cyan to-primary" },
+          { label: "Score moyen", value: `${stats.avg}/100`, accent: "from-iris-violet to-iris-magenta" },
+          { label: "Risque IA élevé", value: stats.aiRisk, accent: "from-iris-magenta to-destructive" },
+        ].map((s, i) => (
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: i * 0.06 }}
+            className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] transition-shadow hover:shadow-[var(--shadow-card)]"
+          >
+            <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${s.accent}`} />
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</p>
             <p className="mt-1 font-display text-2xl font-bold text-foreground">{s.value}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
 
@@ -139,7 +155,7 @@ function AdminPage() {
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-primary/[0.04]">
                 <TableHead>Candidat</TableHead>
                 <TableHead>Profil</TableHead>
                 <TableHead>Score</TableHead>
@@ -150,15 +166,21 @@ function AdminPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.length === 0 ? (
+              {pageItems.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="py-12 text-center text-sm text-muted-foreground">
                     Aucune candidature.
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((s) => (
-                  <TableRow key={s.id}>
+                pageItems.map((s, i) => (
+                  <motion.tr
+                    key={s.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    className="border-b border-border transition-colors hover:bg-primary/[0.03]"
+                  >
                     <TableCell>
                       <Link
                         to="/detail/$id"
@@ -198,13 +220,15 @@ function AdminPage() {
                         <Trash2 className="size-4 text-muted-foreground" />
                       </Button>
                     </TableCell>
-                  </TableRow>
+                  </motion.tr>
                 ))
               )}
             </TableBody>
           </Table>
         </div>
       </div>
+
+      <SimplePagination page={page} pageCount={pageCount} onChange={setPage} />
     </DashboardLayout>
   );
 }

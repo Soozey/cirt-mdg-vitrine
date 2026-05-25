@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Loader2, Send, ShieldAlert, Sparkles } from "lucide-react";
 
+import quizPattern from "@/assets/hero-section.png";
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
 import { ProtectedRoute } from "@/components/quiz/protected-route";
 import { Badge } from "@/components/ui/badge";
@@ -170,8 +171,13 @@ function QuizPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)] md:p-8"
+        className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)] md:p-8"
       >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-12 -top-12 hidden h-48 w-48 rotate-12 opacity-[0.06] md:block"
+          style={{ backgroundImage: `url(${quizPattern})`, backgroundSize: "contain", backgroundRepeat: "no-repeat" }}
+        />
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <Badge variant="outline" className={cn("border", DOMAIN_COLORS[current.domain])}>
             {current.domain}

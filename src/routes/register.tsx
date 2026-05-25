@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { AuthShell } from "@/components/quiz/auth-shell";
 import { FloatingInput } from "@/components/quiz/floating-input";
+import { OAuthButtons } from "@/components/quiz/oauth-buttons";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -19,137 +20,226 @@ import { formatPhone } from "@/lib/quiz/format";
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Compléter mon profil · Quiz Jobdating" },
-      { name: "description", content: "Complétez votre profil pour accéder au quiz cybersécurité." },
+      { title: "Créer un compte · Quiz Jobdating" },
+      { name: "description", content: "Créez votre compte pour accéder au quiz cybersécurité du CIRT." },
     ],
   }),
   component: RegisterPage,
 });
 
 function RegisterPage() {
-  const { user, completeProfile } = useAuth();
+  const { user, signUp, completeProfile } = useAuth();
   const navigate = useNavigate();
 
+  // If a user is already logged in but not registered (OAuth flow), skip to step 2.
+  const [step, setStep] = useState<1 | 2>(user && !user.registered ? 2 : 1);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [agree, setAgree] = useState(false);
+
   const [phone, setPhone] = useState("");
   const [profile, setProfile] = useState<"Étudiant" | "Professionnel" | "Chercheur" | "Indépendant">("Étudiant");
   const [linkedin, setLinkedin] = useState("");
-  const [rgpd, setRgpd] = useState(false);
+
   const [err, setErr] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
+    if (user) {
+      setFirstName(user.firstName ?? "");
+      setLastName(user.lastName ?? "");
+      setEmail(user.email ?? "");
+      setPhone(user.phone ?? "");
+      if (user.profile) setProfile(user.profile);
+      setLinkedin(user.linkedin ?? "");
     }
-    setFirstName(user.firstName ?? "");
-    setLastName(user.lastName ?? "");
-    setEmail(user.email ?? "");
-    setPhone(user.phone ?? "");
-    if (user.profile) setProfile(user.profile);
-    setLinkedin(user.linkedin ?? "");
-  }, [user, navigate]);
+  }, [user]);
 
-  function validate() {
+  function validateStep1() {
     const e: Record<string, string> = {};
     if (!firstName.trim()) e.firstName = "Requis";
     if (!lastName.trim()) e.lastName = "Requis";
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email invalide";
-    if (!phone.trim() || phone.replace(/\D/g, "").length < 8) e.phone = "Téléphone invalide";
-    if (!rgpd) e.rgpd = "Vous devez accepter les conditions";
+    if (!user && password.length < 6) e.password = "6 caractères minimum";
+    if (!agree) e.agree = "Vous devez accepter les conditions";
     setErr(e);
     return Object.keys(e).length === 0;
   }
 
+  function validateStep2() {
+    const e: Record<string, string> = {};
+    if (!phone.trim() || phone.replace(/\D/g, "").length < 8) e.phone = "Téléphone invalide";
+    setErr(e);
+    return Object.keys(e).length === 0;
+  }
+
+  async function goNext() {
+    if (!validateStep1()) return;
+    setSubmitting(true);
+    try {
+      if (!user) {
+        await signUp({ firstName, lastName, email, password });
+      }
+      setStep(2);
+    } catch (e: any) {
+      setErr({ root: e.message ?? "Inscription impossible" });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function onSubmit(ev: React.FormEvent) {
     ev.preventDefault();
-    if (!validate()) return;
+    if (!validateStep2()) return;
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 350));
+    await new Promise((r) => setTimeout(r, 300));
     completeProfile({ firstName, lastName, email, phone, profile, linkedin });
-    toast.success("Profil enregistré");
+    toast.success("Profil enregistré — bienvenue !");
     navigate({ to: "/quiz" });
   }
 
-  if (!user) return null;
-
   return (
     <AuthShell
-      title="Complétez votre profil"
-      subtitle="Pour accéder au Quiz Cybersécurité et au matching jobdating."
+      title={step === 1 ? "Create your account" : "Complétez votre profil"}
+      subtitle={
+        step === 1
+          ? "Étape 1 / 2 — Vos informations de base"
+          : "Étape 2 / 2 — Informations complémentaires"
+      }
     >
-      <div className="mb-5 flex items-center gap-3 rounded-xl border border-accent/40 bg-accent-soft/60 px-4 py-3">
-        <CheckCircle2 className="size-4 shrink-0 text-primary" />
-        <p className="text-xs text-primary-deep">
-          Connecté via{" "}
-          <span className="font-semibold capitalize">{user.provider}</span> ·{" "}
-          {user.firstName} {user.lastName} · {user.email}
-        </p>
+      {/* Stepper */}
+      <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest">
+        <span className={step >= 1 ? "text-primary" : "text-slate-400"}>1. Identité</span>
+        <span className="h-px flex-1 bg-slate-200" />
+        <span className={step >= 2 ? "text-primary" : "text-slate-400"}>2. Profil</span>
       </div>
 
-      <form onSubmit={onSubmit} className="grid gap-4">
-        <div className="grid grid-cols-2 gap-3">
-          <FloatingInput label="Prénom *" value={firstName} onChange={(e) => setFirstName(e.target.value)} error={err.firstName} />
-          <FloatingInput label="Nom *" value={lastName} onChange={(e) => setLastName(e.target.value)} error={err.lastName} />
-        </div>
-        <FloatingInput type="email" label="Email *" value={email} onChange={(e) => setEmail(e.target.value)} error={err.email} />
-        <FloatingInput
-          label="Téléphone *"
-          value={phone}
-          onChange={(e) => setPhone(formatPhone(e.target.value))}
-          error={err.phone}
-          hint="Utilisé uniquement pour les opportunités jobdating."
-          placeholder="+261 34 12 345 67"
-        />
-
-        <div className="w-full">
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            Profil professionnel *
-          </label>
-          <Select value={profile} onValueChange={(v) => setProfile(v as typeof profile)}>
-            <SelectTrigger className="h-11">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Étudiant">Étudiant</SelectItem>
-              <SelectItem value="Professionnel">Professionnel</SelectItem>
-              <SelectItem value="Chercheur">Chercheur</SelectItem>
-              <SelectItem value="Indépendant">Indépendant</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <FloatingInput
-          label="LinkedIn (optionnel)"
-          value={linkedin}
-          onChange={(e) => setLinkedin(e.target.value)}
-          placeholder="linkedin.com/in/votre-profil"
-        />
-
-        <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-border bg-surface-muted/40 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-          <input
-            type="checkbox"
-            checked={rgpd}
-            onChange={(e) => setRgpd(e.target.checked)}
-            className="mt-0.5 size-4 accent-[var(--primary)]"
+      {step === 1 ? (
+        <div className="grid gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <FloatingInput label="Prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} error={err.firstName} placeholder="Jean" />
+            <FloatingInput label="Nom" value={lastName} onChange={(e) => setLastName(e.target.value)} error={err.lastName} placeholder="Dupont" />
+          </div>
+          <FloatingInput
+            type="email"
+            label="E-mail Adress"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={err.email}
+            disabled={!!user}
+            placeholder="Enter your email"
           />
-          <span>
-            J'accepte que mes données soient utilisées pour le matching avec des
-            recruteurs partenaires du CIRT.{" "}
-            <a href="#" className="font-medium text-primary underline-offset-2 hover:underline">
-              Lire la politique RGPD
-            </a>
-          </span>
-        </label>
-        {err.rgpd ? <p className="-mt-2 text-xs text-destructive">{err.rgpd}</p> : null}
+          {!user && (
+            <FloatingInput
+              type="password"
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={err.password}
+              placeholder="Enter your password"
+            />
+          )}
 
-        <Button type="submit" size="lg" disabled={submitting} className="mt-1">
-          {submitting ? "Enregistrement…" : "Continuer vers le quiz →"}
-        </Button>
-      </form>
+          <label className="flex cursor-pointer items-start gap-2 text-[11px] leading-snug text-slate-600">
+            <input
+              type="checkbox"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+              className="mt-0.5 size-3.5 accent-[var(--primary)]"
+            />
+            <span>
+              By signing Up, I agree with{" "}
+              <a href="#" className="font-semibold text-primary hover:underline">
+                Terms &amp; Conditions
+              </a>
+            </span>
+          </label>
+          {err.agree ? <p className="-mt-2 text-[11px] text-destructive">{err.agree}</p> : null}
+          {err.root ? (
+            <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">{err.root}</p>
+          ) : null}
+
+          <div className="mt-1 flex items-center gap-2">
+            <Button
+              type="button"
+              onClick={goNext}
+              disabled={submitting}
+              className="h-9 flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+            >
+              {submitting ? "…" : "Sign Up"} <ArrowRight className="ml-1 size-4" />
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="h-9 flex-1 rounded-full border-2 border-primary/40 bg-transparent text-sm font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+            >
+              <Link to="/login">Sign In</Link>
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="h-px flex-1 bg-slate-200" />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">ou</span>
+            <span className="h-px flex-1 bg-slate-200" />
+          </div>
+
+          <OAuthButtons mode="register" />
+        </div>
+      ) : (
+        <form onSubmit={onSubmit} className="grid gap-3">
+          <FloatingInput
+            label="Téléphone"
+            value={phone}
+            onChange={(e) => setPhone(formatPhone(e.target.value))}
+            error={err.phone}
+            placeholder="+261 34 12 345 67"
+          />
+
+          <div className="w-full">
+            <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
+              Profil professionnel
+            </label>
+            <Select value={profile} onValueChange={(v) => setProfile(v as typeof profile)}>
+              <SelectTrigger className="h-9 border-slate-200 bg-white text-xs text-slate-700">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Étudiant">Étudiant</SelectItem>
+                <SelectItem value="Professionnel">Professionnel</SelectItem>
+                <SelectItem value="Chercheur">Chercheur</SelectItem>
+                <SelectItem value="Indépendant">Indépendant</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <FloatingInput
+            label="LinkedIn (optionnel)"
+            value={linkedin}
+            onChange={(e) => setLinkedin(e.target.value)}
+            placeholder="linkedin.com/in/votre-profil"
+          />
+
+          <div className="mt-1 flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep(1)}
+              className="h-9 rounded-full border-2 border-slate-200 bg-transparent px-3 text-xs text-slate-600 hover:bg-slate-50"
+            >
+              <ArrowLeft className="size-4" /> Retour
+            </Button>
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="h-9 flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+            >
+              {submitting ? "Enregistrement…" : "Continuer vers le quiz →"}
+            </Button>
+          </div>
+        </form>
+      )}
     </AuthShell>
   );
 }

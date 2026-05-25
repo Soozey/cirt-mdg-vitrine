@@ -1,5 +1,5 @@
 export const CIRT_WEBSITE = "https://cirt.gov.mg/";
-export const EVENT_DATE = new Date("2026-05-23T00:00:00+03:00");
+export const EVENT_DATE = new Date("2026-06-22T00:00:00+03:00");
 
 export type InfoPage = {
   slug: string;

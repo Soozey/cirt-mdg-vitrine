@@ -5,8 +5,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { INFO_PAGES, CIRT_WEBSITE } from "@/lib/event-data";
+import infoBg from "@/assets/info-section.jpg";
+import contentBg from "@/assets/above-countdown.jpg";
 
 export const Route = createFileRoute("/informations/$slug")({
   head: ({ params }) => {
@@ -71,49 +72,64 @@ function DetailPage() {
 
       <main className="flex-1">
         <section
-          className="border-b border-border"
-          style={{
-            background:
-              "radial-gradient(ellipse at 15% 10%, color-mix(in oklch, var(--accent) 22%, transparent), transparent 45%), linear-gradient(180deg, var(--surface-muted), var(--background) 75%)",
-          }}
+          className="relative isolate overflow-hidden border-b border-white/10 bg-nav-deep text-nav-deep-foreground"
         >
+          <img
+            src={infoBg}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-20 hidden h-full w-full object-cover opacity-90 md:block"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10"
+            style={{
+              background:
+                "linear-gradient(180deg, oklch(0.20 0.14 295 / 0.55) 0%, oklch(0.22 0.16 290 / 0.70) 100%)",
+            }}
+          />
           <div className="mx-auto max-w-5xl px-4 py-12 md:px-8 md:py-20">
             <Link
               to="/"
               hash="informations"
-              className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary-deep"
+              className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-iris-lime transition-colors hover:text-iris-cyan"
             >
               <ArrowLeft className="size-4" /> Retour aux informations
             </Link>
-            <Badge variant="secondary" className="bg-accent-soft text-primary-deep border-transparent">
-              {page.kicker}
-            </Badge>
-            <h1 className="mt-4 font-display text-4xl font-bold leading-tight text-primary-deep md:text-5xl">
+            <h1 className="mt-4 font-display text-4xl font-bold leading-tight text-nav-deep-foreground md:text-5xl">
               {page.title}
             </h1>
-            <p className="mt-4 max-w-2xl text-lg text-muted-foreground">{page.summary}</p>
+            <p className="mt-4 max-w-2xl text-lg text-nav-deep-foreground/75">{page.summary}</p>
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-4 py-16 md:grid md:grid-cols-[2fr_1fr] md:gap-12 md:px-8">
+        <section className="relative isolate overflow-hidden">
+          <img
+            src={contentBg}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-20"
+          />
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-white/80" />
+          <div className="mx-auto max-w-5xl px-4 py-16 md:grid md:grid-cols-[2fr_1fr] md:gap-12 md:px-8">
           <article className="space-y-6">
             <p className="text-lg leading-relaxed text-foreground/80">{page.description}</p>
 
             <Card className="border-border/60 bg-surface-muted p-6">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-primary">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-iris-violet">
                 Ce qu'il faut retenir
               </h2>
               <ul className="space-y-3 text-sm text-foreground/80">
                 <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-accent" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
                   Événement organisé par le CIRT MDG.
                 </li>
                 <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-accent" />
-                  Les 23 et 24 mai 2026 au Novotel Convention &amp; Spa, Antananarivo.
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
+                  Les 22 et 23 juin 2026 au Novotel, Alarobia (Antananarivo).
                 </li>
                 <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-accent" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
                   Détails complémentaires publiés dès validation officielle.
                 </li>
               </ul>
@@ -161,6 +177,7 @@ function DetailPage() {
               ))}
             </ul>
           </aside>
+          </div>
         </section>
       </main>
 

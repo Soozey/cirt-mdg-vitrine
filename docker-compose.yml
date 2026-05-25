@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cybersec-summit
+    ports:
+      - "2220:2220"
+    environment:
+      - NODE_ENV=production
+      - PORT=2220
+      - HOST=0.0.0.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:2220/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
