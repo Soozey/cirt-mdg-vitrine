@@ -34,7 +34,7 @@ export default defineConfig({
       server: {
         // Use Node.js preset for Docker deployment
         preset: "node-server",
-        allowedHosts: true,
+        allowedHosts: ["cirt-mdg.soozey.com", "localhost", "127.0.0.1"]
 
       },
     }),
