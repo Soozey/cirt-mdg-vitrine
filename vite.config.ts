@@ -34,6 +34,8 @@ export default defineConfig({
       server: {
         // Use Node.js preset for Docker deployment
         preset: "node-server",
+        allowedHosts: true,
+
       },
     }),
     react(),
