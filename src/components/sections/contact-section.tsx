@@ -43,7 +43,7 @@ export function ContactSection() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-white/30"
+        className="pointer-events-none absolute inset-0 -z-10 bg-white/88"
       />
       <div
         aria-hidden
@@ -52,14 +52,14 @@ export function ContactSection() {
       />
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 md:grid-cols-[1fr_2fr] md:gap-16 md:px-8 md:py-24">
         <Reveal className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-iris-violet">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-iris-violet drop-shadow-sm">
             Restons en contact
           </p>
           <h2 className="font-display text-3xl font-bold text-primary-deep md:text-5xl">
             Contact
           </h2>
           <div className="h-1 w-16 bg-iris" />
-          <p className="max-w-md text-base text-foreground/70">
+          <p className="max-w-md text-base font-medium text-primary-deep/80">
             Pour toute demande d'information, de partenariat ou de sponsoring, contactez l'équipe
             d'organisation du sommet.
           </p>

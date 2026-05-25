@@ -4,7 +4,7 @@ import { CalendarDays, MapPin, Globe, Link as LinkIcon, Mail } from "lucide-reac
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-nav-deep text-nav-deep-foreground">
+    <footer className="overflow-hidden border-t border-white/10 bg-nav-deep text-nav-deep-foreground">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-3 md:px-8">
         <div className="space-y-3">
           <BrandMark variant="light" />

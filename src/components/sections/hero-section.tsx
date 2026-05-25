@@ -3,7 +3,8 @@ import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import heroBg from "@/assets/project-section.webp";
+import heroBgMobile from "@/assets/hero-version-mobile.png";
+import heroBgTablet from "@/assets/project-section.webp";
 
 export function HeroSection() {
   return (
@@ -11,13 +12,27 @@ export function HeroSection() {
       id="accueil"
       className="relative isolate overflow-hidden bg-deep text-primary-foreground"
     >
-      {/* Desktop background image */}
+      {/* Mobile background image */}
       <img
-        src={heroBg}
+        src={heroBgMobile}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-20 block h-full w-full object-cover opacity-90 md:hidden"
+      />
+      {/* Mobile background overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 block bg-gradient-to-b from-primary-deep/90 via-primary-deep/60 to-primary-deep/95 md:hidden"
+      />
+
+      {/* Desktop/Tablet background image */}
+      <img
+        src={heroBgTablet}
         alt=""
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-20 hidden h-full w-full object-cover opacity-90 md:block"
       />
+      {/* Desktop/Tablet background overlay */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 hidden md:block"
@@ -26,11 +41,11 @@ export function HeroSection() {
             "linear-gradient(90deg, oklch(0.15 0.12 295 / 0.92) 0%, oklch(0.15 0.12 295 / 0.55) 45%, oklch(0.15 0.12 295 / 0.25) 100%)",
         }}
       />
-      {/* Aurore iridescente (mobile fallback) */}
+      {/* Aurore iridescente (mobile glow overlay) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-70 bg-iris animate-iris mix-blend-screen md:hidden"
-        style={{ maskImage: "radial-gradient(ellipse at 0% 0%, black 0%, transparent 60%)" }}
+        className="pointer-events-none absolute inset-0 -z-10 opacity-45 bg-iris animate-iris mix-blend-screen md:hidden"
+        style={{ maskImage: "radial-gradient(ellipse at 50% 50%, black 0%, transparent 70%)" }}
       />
       {/* Grain léger */}
       <div
