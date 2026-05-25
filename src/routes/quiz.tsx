@@ -155,7 +155,7 @@ function QuizPage() {
   if (!draft || !current) return null;
 
   return (
-    <DashboardLayout title="Quiz cybersécurité" subtitle="Répondez en vos propres mots — vos réponses sont analysées en temps réel.">
+    <DashboardLayout title="Quiz cybersécurité" subtitle="Répondez en vos propres mots, vos réponses sont analysées en temps réel.">
       <div className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
         <div className="mb-3 flex items-center justify-between text-sm">
           <span className="font-medium text-foreground">

@@ -235,7 +235,7 @@ function RegisterPage() {
               disabled={submitting}
               className="h-9 flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
             >
-              {submitting ? "Enregistrement…" : "Continuer vers le quiz →"}
+              {submitting ? "Enregistrement…" : "Continuer vers le quiz"}
             </Button>
           </div>
         </form>

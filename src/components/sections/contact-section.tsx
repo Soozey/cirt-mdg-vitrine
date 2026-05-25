@@ -43,7 +43,7 @@ export function ContactSection() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-white/88"
+        className="pointer-events-none absolute inset-0 -z-10 bg-white/58"
       />
       <div
         aria-hidden

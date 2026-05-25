@@ -50,7 +50,7 @@ export function ProjectSection() {
             </div>
 
             {/* Bloc image */}
-            <div className="mt-6 md:mt-0 md:flex-1 md:flex md:justify-end">
+            <div className="md:hidden mt-6 md:mt-0 md:flex-1 md:flex md:justify-end">
               <img
                 src={casquette}
                 alt="Illustration du projet"
