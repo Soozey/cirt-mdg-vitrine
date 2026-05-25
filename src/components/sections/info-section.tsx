@@ -4,7 +4,7 @@ import { ArrowRight, ExternalLink } from "lucide-react";
 import { INFO_PAGES } from "@/lib/event-data";
 import { Card } from "@/components/ui/card";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import infoBg from "@/assets/info-section.jpg";
+import infoBg from "@/assets/info-section.webp";
 
 export function InfoSection() {
   return (

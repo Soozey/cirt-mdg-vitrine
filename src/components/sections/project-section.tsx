@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 import { CIRT_WEBSITE } from "@/lib/event-data";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import casquette from "@/assets/casquette-pour-presentation.png";
+import casquette from "@/assets/casquette-pour-presentation.webp";
 
 export function ProjectSection() {
   return (

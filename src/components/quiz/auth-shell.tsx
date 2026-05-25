@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 
-import loginBg from "@/assets/login-register.png";
+import loginBg from "@/assets/login-register.webp";
 import { CloudDivider, RocketLogo } from "./rocket-logo";
 
 export function AuthShell({

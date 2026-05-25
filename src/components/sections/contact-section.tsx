@@ -3,7 +3,7 @@ import { ArrowUpRight, Handshake, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CIRT_WEBSITE } from "@/lib/event-data";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import contactBg from "@/assets/above-countdown.jpg";
+import contactBg from "@/assets/above-countdown.webp";
 
 const CARDS = [
   {

@@ -2,7 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { LayoutDashboard, LogOut, ScrollText, ShieldCheck } from "lucide-react";
 
-import heroBanner from "@/assets/above-countdown.jpg";
+import heroBanner from "@/assets/above-countdown.webp";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/quiz/auth-context";

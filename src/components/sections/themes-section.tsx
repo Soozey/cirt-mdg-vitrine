@@ -7,7 +7,7 @@ import {
   Petal,
   UmbrellaDouble,
 } from "@/components/geometric-symbols";
-import themesBg from "@/assets/login-register.png";
+import themesBg from "@/assets/login-register.webp";
 
 const SYMS = [Lock, Token, StarMalagasy, Petal, UmbrellaDouble];
 

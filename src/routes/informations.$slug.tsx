@@ -6,8 +6,8 @@ import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { INFO_PAGES, CIRT_WEBSITE } from "@/lib/event-data";
-import infoBg from "@/assets/info-section.jpg";
-import contentBg from "@/assets/above-countdown.jpg";
+import infoBg from "@/assets/info-section.webp";
+import contentBg from "@/assets/above-countdown.webp";
 
 export const Route = createFileRoute("/informations/$slug")({
   head: ({ params }) => {

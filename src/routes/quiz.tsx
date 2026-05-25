@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Loader2, Send, ShieldAlert, Sparkles } from "lucide-react";
 
-import quizPattern from "@/assets/hero-section.png";
+import quizPattern from "@/assets/hero-section.webp";
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
 import { ProtectedRoute } from "@/components/quiz/protected-route";
 import { Badge } from "@/components/ui/badge";
