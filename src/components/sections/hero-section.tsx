@@ -3,7 +3,7 @@ import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
-import heroBgMobile from "@/assets/hero-version-mobile.png";
+import heroBgMobile from "@/assets/hero-version-mobile.webp";
 import heroBgTablet from "@/assets/project-section.webp";
 
 export function HeroSection() {
