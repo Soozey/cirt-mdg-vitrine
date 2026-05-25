@@ -1,5 +1,6 @@
 import { BrandMark } from "@/components/brand-mark";
 import { CIRT_WEBSITE } from "@/lib/event-data";
+import { CalendarDays, MapPin, Globe, Link as LinkIcon, Mail } from "lucide-react"
 
 export function SiteFooter() {
   return (
@@ -12,38 +13,58 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-nav-deep-foreground">Événement</h3>
-          <ul className="space-y-2 text-sm text-nav-deep-foreground/70">
-            <li>22 – 23 juin 2026</li>
-            <li>Novotel, Alarobia</li>
-            <li>Antananarivo, Madagascar</li>
-          </ul>
-        </div>
 
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-nav-deep-foreground">Liens</h3>
-          <ul className="space-y-2 text-sm">
-            <li>
-              <a
-                href={CIRT_WEBSITE}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-nav-deep-foreground/70 transition-colors hover:text-iris-lime"
-              >
-                cirt.gov.mg
-              </a>
-            </li>
-            <li>
-              <a
-                href="/#contact"
-                className="text-nav-deep-foreground/70 transition-colors hover:text-iris-lime"
-              >
-                Contact organisation
-              </a>
-            </li>
-          </ul>
-        </div>
+<div className="space-y-3">
+  <h3 className="text-sm font-semibold text-nav-deep-foreground">Événement</h3>
+  <ul className="space-y-2 text-sm text-nav-deep-foreground/70">
+    <li className="inline-flex items-center gap-2">
+      <CalendarDays className="size-4 text-iris-cyan" />
+      <span>22 – 23 juin 2026</span>
+    </li>
+    <li>
+      <a
+        href="https://maps.app.goo.gl/ma6nBSgNvnjG5o39A"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline inline-flex items-center gap-2"
+      >
+        <MapPin className="size-4 text-iris-cyan" />
+        <span>Novotel Convention, Alarobia</span>
+      </a>
+    </li>
+    <li className="inline-flex items-center gap-2">
+      <Globe className="size-4 text-iris-cyan" />
+      <span>Antananarivo, Madagascar</span>
+    </li>
+  </ul>
+</div>
+
+<div className="space-y-3">
+  <h3 className="text-sm font-semibold text-nav-deep-foreground">Liens</h3>
+  <ul className="space-y-2 text-sm">
+    <li>
+      <a
+        href={CIRT_WEBSITE}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-nav-deep-foreground/70 transition-colors hover:text-iris-lime inline-flex items-center gap-2"
+      >
+        <LinkIcon className="size-4 text-iris-lime" />
+        <span>cirt.gov.mg</span>
+      </a>
+    </li>
+    <li>
+      <a
+        href="/#contact"
+        className="text-nav-deep-foreground/70 transition-colors hover:text-iris-lime inline-flex items-center gap-2"
+      >
+        <Mail className="size-4 text-iris-lime" />
+        <span>Contact organisation</span>
+      </a>
+    </li>
+  </ul>
+</div>
+
       </div>
 
       <div className="border-t border-white/10">

@@ -126,7 +126,7 @@ function DetailPage() {
                 </li>
                 <li className="flex gap-2">
                   <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
-                  Les 22 et 23 juin 2026 au Novotel, Alarobia (Antananarivo).
+                  Les 22 et 23 juin 2026 au Novotel Convention, Alarobia (Antananarivo).
                 </li>
                 <li className="flex gap-2">
                   <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />

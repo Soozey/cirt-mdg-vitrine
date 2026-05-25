@@ -42,7 +42,7 @@ export function SiteHeader() {
             </Button>
             <Button asChild size="sm" className="bg-iris-lime text-primary-deep hover:bg-iris-lime/90">
               <Link to="/quiz">
-                <ShieldCheck className="size-4" /> Quiz Jobdating
+                <ShieldCheck className="size-4" /> Quiz cybersécurité
               </Link>
             </Button>
           </div>
@@ -81,7 +81,7 @@ export function SiteHeader() {
           </Button>
           <Button asChild size="sm" className="mt-1 bg-iris-lime text-primary-deep hover:bg-iris-lime/90">
             <Link to="/quiz" onClick={() => setOpen(false)}>
-              <ShieldCheck className="size-4" /> Quiz Jobdating
+              <ShieldCheck className="size-4" /> Quiz cybersécurité
             </Link>
           </Button>
         </nav>

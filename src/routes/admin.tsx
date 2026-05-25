@@ -30,7 +30,7 @@ import { formatRelative } from "@/lib/quiz/format";
 import type { Submission } from "@/lib/quiz/types";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Administration · Jobdating CIRT" }] }),
+  head: () => ({ meta: [{ title: "Administration · CIRT" }] }),
   component: () => (
     <ProtectedRoute roles={["admin"]}>
       <AdminPage />

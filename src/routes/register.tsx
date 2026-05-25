@@ -20,7 +20,7 @@ import { formatPhone } from "@/lib/quiz/format";
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Créer un compte · Quiz Jobdating" },
+      { title: "Créer un compte · Quiz cybersécurité" },
       { name: "description", content: "Créez votre compte pour accéder au quiz cybersécurité du CIRT." },
     ],
   }),

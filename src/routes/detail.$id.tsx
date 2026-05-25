@@ -16,7 +16,7 @@ import type { Submission } from "@/lib/quiz/types";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/detail/$id")({
-  head: () => ({ meta: [{ title: "Détail candidat · Jobdating CIRT" }] }),
+  head: () => ({ meta: [{ title: "Détail candidat · CIRT" }] }),
   component: () => (
     <ProtectedRoute roles={["juror", "admin"]}>
       <DetailPage />

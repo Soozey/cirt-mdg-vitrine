@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 
+import { ArrowLeft } from "lucide-react";
+
 import loginBg from "@/assets/login-register.webp";
 import { CloudDivider, RocketLogo } from "./rocket-logo";
 
@@ -90,12 +92,15 @@ export function AuthShell({
             className="w-full max-w-sm"
           >
             <div className="mb-4 text-center lg:text-left">
-              <Link
-                to="/"
-                className="mb-2 inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/70 hover:text-primary"
-              >
-                ← Retour à l'accueil
-              </Link>
+
+            <Link
+              to="/"
+              className="mb-2 inline-flex items-center text-[10px] font-semibold uppercase tracking-[0.2em] text-primary/70 hover:text-primary"
+            >
+              <ArrowLeft className="mr-1 h-3 w-3" />
+              Retour à l'accueil
+            </Link>
+
               <h1 className="font-display text-xl font-bold tracking-tight text-slate-900 lg:text-2xl">
                 {title}
               </h1>

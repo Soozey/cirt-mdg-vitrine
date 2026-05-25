@@ -14,7 +14,7 @@ const search = z.object({ id: z.string().optional() });
 export const Route = createFileRoute("/done")({
   validateSearch: (s) => search.parse(s),
   head: () => ({
-    meta: [{ title: "Quiz terminé · Jobdating CIRT" }],
+    meta: [{ title: "Quiz terminé · CIRT" }],
   }),
   component: DonePage,
 });
@@ -48,7 +48,7 @@ function DonePage() {
         ) : null}
 
         <p className="text-sm text-muted-foreground">
-          Vous serez recontacté par email si votre profil correspond aux opportunités jobdating.
+          Vous serez recontacté par email si votre profil correspond.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-2">

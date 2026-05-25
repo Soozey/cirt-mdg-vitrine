@@ -70,10 +70,16 @@ export function HeroSection() {
                 <CalendarDays className="size-4 text-iris-lime" />
                 <span className="tabular-nums">22 – 23 Juin 2026</span>
               </div>
-              <div className="inline-flex items-center gap-2">
+              <a
+                href="https://maps.app.goo.gl/ma6nBSgNvnjG5o39A"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:underline"
+              >
                 <MapPin className="size-4 text-iris-cyan" />
-                <span>Novotel, Alarobia</span>
-              </div>
+                <span>Novotel Convention, Alarobia</span>
+              </a>
+
             </dl>
           </RevealItem>
 

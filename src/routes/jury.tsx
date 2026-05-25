@@ -14,7 +14,7 @@ import type { Submission } from "@/lib/quiz/types";
 const PER_PAGE = 3;
 
 export const Route = createFileRoute("/jury")({
-  head: () => ({ meta: [{ title: "Espace juré · Jobdating CIRT" }] }),
+  head: () => ({ meta: [{ title: "Espace juré · CIRT" }] }),
   component: () => (
     <ProtectedRoute roles={["juror", "admin"]}>
       <JuryPage />

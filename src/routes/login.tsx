@@ -25,8 +25,8 @@ const TEST_ACCOUNTS = [
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Connexion · Quiz Jobdating Cybersécurité" },
-      { name: "description", content: "Accédez au Quiz Jobdating Cybersécurité du CIRT Madagascar." },
+      { title: "Connexion · Quiz Cybersécurité" },
+      { name: "description", content: "Accédez au Quiz Cybersécurité du CIRT Madagascar." },
     ],
   }),
   component: LoginPage,
