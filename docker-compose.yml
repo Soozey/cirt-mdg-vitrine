@@ -6,10 +6,15 @@ services:
     container_name: cybersec-summit
     ports:
       - "2220:2220"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=2220
       - HOST=0.0.0.0
+      - GOOGLE_APPLICATION_CREDENTIALS=/run/secrets/firebase-adminsdk.json
+    volumes:
+      - ./jobdating-cybersec-firebase-adminsdk-fbsvc-772b247bba.json:/run/secrets/firebase-adminsdk.json:ro
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:2220/"]
