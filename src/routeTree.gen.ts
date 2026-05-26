@@ -9,16 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperadminRouteImport } from './routes/superadmin'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JuryRouteImport } from './routes/jury'
 import { Route as DoneRouteImport } from './routes/done'
+import { Route as BootstrapRouteImport } from './routes/bootstrap'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InformationsSlugRouteImport } from './routes/informations.$slug'
 import { Route as DetailIdRouteImport } from './routes/detail.$id'
 
+const SuperadminRoute = SuperadminRouteImport.update({
+  id: '/superadmin',
+  path: '/superadmin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -42,6 +49,11 @@ const JuryRoute = JuryRouteImport.update({
 const DoneRoute = DoneRouteImport.update({
   id: '/done',
   path: '/done',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BootstrapRoute = BootstrapRouteImport.update({
+  id: '/bootstrap',
+  path: '/bootstrap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -68,22 +80,26 @@ const DetailIdRoute = DetailIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/bootstrap': typeof BootstrapRoute
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
+  '/superadmin': typeof SuperadminRoute
   '/detail/$id': typeof DetailIdRoute
   '/informations/$slug': typeof InformationsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/bootstrap': typeof BootstrapRoute
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
+  '/superadmin': typeof SuperadminRoute
   '/detail/$id': typeof DetailIdRoute
   '/informations/$slug': typeof InformationsSlugRoute
 }
@@ -91,11 +107,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/bootstrap': typeof BootstrapRoute
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
+  '/superadmin': typeof SuperadminRoute
   '/detail/$id': typeof DetailIdRoute
   '/informations/$slug': typeof InformationsSlugRoute
 }
@@ -104,33 +122,39 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/bootstrap'
     | '/done'
     | '/jury'
     | '/login'
     | '/quiz'
     | '/register'
+    | '/superadmin'
     | '/detail/$id'
     | '/informations/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/bootstrap'
     | '/done'
     | '/jury'
     | '/login'
     | '/quiz'
     | '/register'
+    | '/superadmin'
     | '/detail/$id'
     | '/informations/$slug'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/bootstrap'
     | '/done'
     | '/jury'
     | '/login'
     | '/quiz'
     | '/register'
+    | '/superadmin'
     | '/detail/$id'
     | '/informations/$slug'
   fileRoutesById: FileRoutesById
@@ -138,17 +162,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  BootstrapRoute: typeof BootstrapRoute
   DoneRoute: typeof DoneRoute
   JuryRoute: typeof JuryRoute
   LoginRoute: typeof LoginRoute
   QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
+  SuperadminRoute: typeof SuperadminRoute
   DetailIdRoute: typeof DetailIdRoute
   InformationsSlugRoute: typeof InformationsSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/superadmin': {
+      id: '/superadmin'
+      path: '/superadmin'
+      fullPath: '/superadmin'
+      preLoaderRoute: typeof SuperadminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -182,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/done'
       fullPath: '/done'
       preLoaderRoute: typeof DoneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bootstrap': {
+      id: '/bootstrap'
+      path: '/bootstrap'
+      fullPath: '/bootstrap'
+      preLoaderRoute: typeof BootstrapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -218,11 +258,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  BootstrapRoute: BootstrapRoute,
   DoneRoute: DoneRoute,
   JuryRoute: JuryRoute,
   LoginRoute: LoginRoute,
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
+  SuperadminRoute: SuperadminRoute,
   DetailIdRoute: DetailIdRoute,
   InformationsSlugRoute: InformationsSlugRoute,
 }

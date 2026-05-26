@@ -6,21 +6,9 @@ import { AuthShell } from "@/components/quiz/auth-shell";
 import { FloatingInput } from "@/components/quiz/floating-input";
 import { OAuthButtons } from "@/components/quiz/oauth-buttons";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { redirectForRole } from "@/lib/access-control";
 import { useAuth } from "@/lib/quiz/auth-context";
-
-const TEST_ACCOUNTS = [
-  { id: "candidate", label: "Candidat — accès quiz", email: "candidate@test.io", password: "candidate123" },
-  { id: "jury", label: "Jury — espace évaluation", email: "jury@test.io", password: "jury123" },
-  { id: "admin", label: "Administrateur — pilotage", email: "admin@test.io", password: "admin123" },
-  { id: "new", label: "Nouveau profil OAuth", email: "new@test.io", password: "new12345" },
-];
+import { getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -57,47 +45,16 @@ function LoginPage() {
     try {
       const u = await loginWithEmail(em, pw);
       toast.success(`Bienvenue ${u.firstName}`);
-      navigate({
-        to: u.role === "admin" ? "/admin" : u.role === "juror" ? "/jury" : u.registered ? "/quiz" : "/register",
-      });
-    } catch (e: any) {
-      setErr({ root: e.message ?? "Connexion impossible" });
+      navigate({ to: redirectForRole(u.role, u.registered) });
+    } catch (error) {
+      setErr({ root: getErrorMessage(error, "Connexion impossible") });
     } finally {
       setLoading(false);
     }
   }
 
-  async function pickTestAccount(id: string) {
-    const acc = TEST_ACCOUNTS.find((a) => a.id === id);
-    if (!acc) return;
-    setEmail(acc.email);
-    setPassword(acc.password);
-    await doLogin(acc.email, acc.password);
-  }
-
   return (
-    <AuthShell
-      title="Sign In"
-      subtitle="Connectez-vous pour accéder au quiz cybersécurité."
-    >
-      <div className="mb-3 rounded-lg border border-primary/15 bg-primary/[0.04] p-2">
-        <label className="mb-1 block text-[10px] font-semibold uppercase tracking-widest text-primary">
-          Comptes de démonstration
-        </label>
-        <Select onValueChange={pickTestAccount} disabled={loading}>
-          <SelectTrigger className="h-8 border-slate-200 bg-white text-xs text-slate-700">
-            <SelectValue placeholder="Choisir un profil…" />
-          </SelectTrigger>
-          <SelectContent>
-            {TEST_ACCOUNTS.map((a) => (
-              <SelectItem key={a.id} value={a.id} className="text-xs">
-                {a.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
+    <AuthShell title="Sign In" subtitle="Connectez-vous pour accéder au quiz cybersécurité.">
       <form onSubmit={onSubmit} className="grid gap-3">
         <FloatingInput
           type="email"

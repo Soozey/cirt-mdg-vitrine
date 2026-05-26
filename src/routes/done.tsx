@@ -6,7 +6,7 @@ import { z } from "zod";
 import { AuthShell } from "@/components/quiz/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { submissionsApi } from "@/lib/quiz/firestore";
+import { getSubmission } from "@/lib/firebase/server-api";
 import type { Submission } from "@/lib/quiz/types";
 
 const search = z.object({ id: z.string().optional() });
@@ -24,11 +24,21 @@ function DonePage() {
   const [sub, setSub] = useState<Submission | null>(null);
 
   useEffect(() => {
-    if (id) setSub(submissionsApi.get(id) ?? null);
+    if (!id) return;
+    let active = true;
+    getSubmission(id).then((next) => {
+      if (active) setSub(next.submission);
+    });
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   return (
-    <AuthShell title="Quiz envoyé !" subtitle="Merci pour votre participation. Le jury va évaluer vos réponses.">
+    <AuthShell
+      title="Quiz envoyé !"
+      subtitle="Merci pour votre participation. Le jury va évaluer vos réponses."
+    >
       <div className="grid gap-5 text-center">
         <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-accent-soft text-primary-deep">
           <CheckCircle2 className="size-8" />
@@ -42,7 +52,8 @@ function DonePage() {
             </div>
             <Progress value={sub.finalScore} />
             <p className="mt-3 text-xs text-muted-foreground">
-              Probabilité IA moyenne : {(sub.aiAverage * 100).toFixed(0)}% · {sub.questions.length} questions
+              Probabilité IA moyenne : {(sub.aiAverage * 100).toFixed(0)}% · {sub.questions.length}{" "}
+              questions
             </p>
           </div>
         ) : null}

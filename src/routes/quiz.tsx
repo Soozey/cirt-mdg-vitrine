@@ -11,19 +11,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { submitQuizSubmission } from "@/lib/firebase/server-api";
 import { useAuth } from "@/lib/quiz/auth-context";
 import { computeFinalScore, contentScore, detectAI } from "@/lib/quiz/ai-detect";
-import { ANSWER_MAX, AUTOSAVE_KEY, DOMAIN_COLORS, LEVEL_COLORS, QUIZ_LENGTH } from "@/lib/quiz/constants";
-import { submissionsApi } from "@/lib/quiz/firestore";
+import {
+  ANSWER_MAX,
+  AUTOSAVE_KEY,
+  DOMAIN_COLORS,
+  LEVEL_COLORS,
+  QUIZ_LENGTH,
+} from "@/lib/quiz/constants";
 import { pickQuestions } from "@/lib/quiz/questions";
 import type { Question, Submission } from "@/lib/quiz/types";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/quiz")({
   head: () => ({
     meta: [
       { title: "Quiz Cybersécurité · Jobdating CIRT" },
-      { name: "description", content: "Passez le quiz cybersécurité pour participer au jobdating." },
+      {
+        name: "description",
+        content: "Passez le quiz cybersécurité pour participer au jobdating.",
+      },
     ],
   }),
   component: () => (
@@ -139,10 +148,15 @@ function QuizPage() {
       submittedAt: new Date().toISOString(),
       status: "pending",
     };
-    submissionsApi.save(sub);
-    localStorage.removeItem(AUTOSAVE_KEY);
-    setSubmitting(false);
-    navigate({ to: "/done", search: { id: sub.id } });
+    try {
+      await submitQuizSubmission(sub);
+      localStorage.removeItem(AUTOSAVE_KEY);
+      navigate({ to: "/done", search: { id: sub.id } });
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Envoi impossible"));
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   const aiBadge = useMemo(() => {
@@ -155,7 +169,10 @@ function QuizPage() {
   if (!draft || !current) return null;
 
   return (
-    <DashboardLayout title="Quiz cybersécurité" subtitle="Répondez en vos propres mots, vos réponses sont analysées en temps réel.">
+    <DashboardLayout
+      title="Quiz cybersécurité"
+      subtitle="Répondez en vos propres mots, vos réponses sont analysées en temps réel."
+    >
       <div className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
         <div className="mb-3 flex items-center justify-between text-sm">
           <span className="font-medium text-foreground">
@@ -176,7 +193,11 @@ function QuizPage() {
         <div
           aria-hidden
           className="pointer-events-none absolute -right-12 -top-12 hidden h-48 w-48 rotate-12 opacity-[0.06] md:block"
-          style={{ backgroundImage: `url(${quizPattern})`, backgroundSize: "contain", backgroundRepeat: "no-repeat" }}
+          style={{
+            backgroundImage: `url(${quizPattern})`,
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+          }}
         />
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <Badge variant="outline" className={cn("border", DOMAIN_COLORS[current.domain])}>
@@ -217,7 +238,11 @@ function QuizPage() {
                         : "border-accent/40 bg-accent-soft/60 text-primary-deep",
                   )}
                 >
-                  {aiBadge.risk === "high" ? <ShieldAlert className="size-3" /> : <Sparkles className="size-3" />}
+                  {aiBadge.risk === "high" ? (
+                    <ShieldAlert className="size-3" />
+                  ) : (
+                    <Sparkles className="size-3" />
+                  )}
                   Probabilité IA : {(aiBadge.score * 100).toFixed(0)}%
                 </span>
               ) : (
@@ -242,16 +267,23 @@ function QuizPage() {
             </Button>
           ) : (
             <Button onClick={submitAll} disabled={submitting}>
-              {submitting ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+              {submitting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Send className="size-4" />
+              )}
               Soumettre le quiz
             </Button>
           )}
         </div>
       </div>
 
-      <p className="mt-5 text-center text-xs text-muted-foreground">
-        Vos réponses sont sauvegardées automatiquement dans ce navigateur.
-      </p>
+       {/* <p className="mt-5 text-center text-xs text-muted-foreground">
+         Vos réponses sont sauvegardées automatiquement dans ce navigateur.
+       </p> */}
+       <p className="mt-2 text-center text-xs text-destructive">
+         L'utilisation d'IA pour répondre est détectée et entraîne une pénalité.
+       </p>
     </DashboardLayout>
   );
 }

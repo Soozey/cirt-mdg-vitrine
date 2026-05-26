@@ -1,4 +1,4 @@
-export type UserRole = "candidate" | "juror" | "admin";
+export type UserRole = "candidate" | "juror" | "admin" | "superadmin";
 
 export type QuizUser = {
   id: string;
@@ -43,6 +43,9 @@ export type Submission = {
   aiAverage: number;
   juryNote?: string;
   juryScore?: number;
+  reviewedBy?: string;
+  reviewedByEmail?: string;
+  reviewedByName?: string;
   submittedAt: string;
   status: "pending" | "reviewed";
 };

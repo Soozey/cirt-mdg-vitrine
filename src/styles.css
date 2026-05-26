@@ -173,6 +173,10 @@
     overflow-x: hidden;
   }
 
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
@@ -181,6 +185,7 @@
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    scrollbar-gutter: stable;
   }
 }
 

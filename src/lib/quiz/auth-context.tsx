@@ -1,6 +1,22 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { MOCK_USERS } from "./mock-users";
+import { auth } from "@/lib/firebase/config";
+import {
+  getUserRole,
+  loginUser,
+  loginWithFacebook,
+  loginWithGoogle,
+  logoutUser,
+  onAuthChange,
+  registerUser,
+  type AuthUser,
+} from "@/lib/firebase/auth";
+import { usersApi, type UserDoc } from "@/lib/firebase/firestore";
+import {
+  createSuperadminWithGoogle,
+  ensureAuthenticatedUser,
+  finalizeUserProfile,
+} from "@/lib/firebase/server-api";
 import type { QuizUser, UserRole } from "./types";
 
 type Ctx = {
@@ -8,96 +24,188 @@ type Ctx = {
   ready: boolean;
   loginWithEmail: (email: string, password: string) => Promise<QuizUser>;
   loginWithProvider: (p: "google" | "facebook") => Promise<QuizUser>;
-  signUp: (data: { firstName: string; lastName: string; email: string; password: string }) => Promise<QuizUser>;
-  completeProfile: (patch: Partial<QuizUser>) => void;
-  logout: () => void;
+  bootstrapWithGoogle: () => Promise<QuizUser>;
+  signUp: (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) => Promise<QuizUser>;
+  completeProfile: (patch: Partial<QuizUser>) => Promise<QuizUser | null>;
+  logout: () => Promise<void>;
 };
 
 const AuthCtx = createContext<Ctx | null>(null);
-const STORAGE = "quiz_user_v1";
+
+async function hydrate(authUser: AuthUser): Promise<QuizUser> {
+  const claimedRole = await getUserRole();
+
+  if (authUser.provider === "google" || authUser.provider === "facebook") {
+    const session = await ensureAuthenticatedUser();
+    return session.user;
+  }
+
+  const existing = await usersApi.get(authUser.uid);
+
+  if (existing) {
+    return {
+      id: existing.uid,
+      email: existing.email,
+      firstName: existing.firstName,
+      lastName: existing.lastName,
+      phone: existing.phone,
+      profile: existing.profile,
+      linkedin: existing.linkedinUrl,
+      role: (existing.role ?? claimedRole) as UserRole,
+      provider: existing.provider,
+      registered: existing.registered ?? Boolean(existing.phone && existing.profile),
+    };
+  }
+
+  const [firstName, ...lastNameParts] = (authUser.displayName || "").trim().split(/\s+/);
+  const profile: UserDoc = {
+    uid: authUser.uid,
+    email: authUser.email,
+    firstName: firstName || "",
+    lastName: lastNameParts.join(" "),
+    photoURL: authUser.photoURL,
+    provider: authUser.provider,
+    role: claimedRole,
+    registered: false,
+    quizDone: false,
+  };
+
+  await usersApi.upsert(authUser.uid, profile);
+
+  return {
+    id: authUser.uid,
+    email: authUser.email,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    role: claimedRole,
+    provider: authUser.provider,
+    registered: false,
+  };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<QuizUser | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE);
-      if (raw) setUser(JSON.parse(raw));
-    } catch {
-      // ignore
-    }
-    setReady(true);
+    const unsubscribe = onAuthChange(async (authUser) => {
+      if (!authUser) {
+        setUser(null);
+        setReady(true);
+        return;
+      }
+
+      try {
+        setUser(await hydrate(authUser));
+      } catch (error) {
+        console.error("[auth] user hydration failed:", error);
+        setUser(null);
+      } finally {
+        setReady(true);
+      }
+    });
+
+    return unsubscribe;
   }, []);
 
-  const persist = (u: QuizUser | null) => {
-    if (typeof window === "undefined") return;
-    if (u) localStorage.setItem(STORAGE, JSON.stringify(u));
-    else localStorage.removeItem(STORAGE);
-  };
-
   const loginWithEmail = useCallback(async (email: string, password: string) => {
-    await new Promise((r) => setTimeout(r, 500));
-    const found = MOCK_USERS.find((u) => u.email === email && u.password === password);
-    if (!found) throw new Error("Identifiants invalides");
-    const { password: _p, ...safe } = found;
-    setUser(safe);
-    persist(safe);
-    return safe;
+    const authUser = await loginUser(email, password);
+    const next = await hydrate(authUser);
+    setUser(next);
+    return next;
   }, []);
 
   const loginWithProvider = useCallback(async (p: "google" | "facebook") => {
-    await new Promise((r) => setTimeout(r, 600));
-    const u: QuizUser = {
-      id: `oauth-${p}-${Date.now()}`,
-      email: p === "google" ? "jean.google@cyber.io" : "jean.fb@cyber.io",
-      firstName: "Jean",
-      lastName: "Dupont",
-      role: "candidate",
-      provider: p,
-      registered: false,
-    };
-    setUser(u);
-    persist(u);
-    return u;
+    const authUser = p === "google" ? await loginWithGoogle() : await loginWithFacebook();
+    const next = await hydrate(authUser);
+    setUser(next);
+    return next;
   }, []);
 
-  const signUp = useCallback(async (data: { firstName: string; lastName: string; email: string; password: string }) => {
-    await new Promise((r) => setTimeout(r, 500));
-    const exists = MOCK_USERS.find((u) => u.email === data.email);
-    if (exists) throw new Error("Un compte existe déjà avec cet email");
-    const u: QuizUser = {
-      id: `signup-${Date.now()}`,
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      role: "candidate",
-      provider: "email",
-      registered: false,
-      avatarColor: "oklch(0.55 0.22 265)",
-    };
-    setUser(u);
-    persist(u);
-    return u;
+  const bootstrapWithGoogle = useCallback(async () => {
+    await loginWithGoogle();
+    const finalized = await createSuperadminWithGoogle();
+    await auth.currentUser?.getIdToken(true);
+    setUser(finalized.user);
+    return finalized.user;
   }, []);
 
-  const completeProfile = useCallback((patch: Partial<QuizUser>) => {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const next = { ...prev, ...patch, registered: true };
-      persist(next);
+  const signUp = useCallback(
+    async (data: { firstName: string; lastName: string; email: string; password: string }) => {
+      const authUser = await registerUser(
+        data.email,
+        data.password,
+        `${data.firstName} ${data.lastName}`,
+      );
+      await usersApi.upsert(authUser.uid, {
+        uid: authUser.uid,
+        email: authUser.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        provider: "email",
+        role: "candidate",
+        registered: false,
+        quizDone: false,
+      });
+      const next = await hydrate(authUser);
+      setUser(next);
       return next;
-    });
-  }, []);
+    },
+    [],
+  );
 
-  const logout = useCallback(() => {
+  const completeProfile = useCallback(
+    async (patch: Partial<QuizUser>) => {
+      if (!user) return null;
+
+      const finalized = await finalizeUserProfile({
+        email: patch.email ?? user.email,
+        firstName: patch.firstName ?? user.firstName,
+        lastName: patch.lastName ?? user.lastName,
+        phone: patch.phone ?? user.phone,
+        profile: patch.profile ?? user.profile,
+        linkedin: patch.linkedin ?? user.linkedin,
+        provider: patch.provider ?? user.provider,
+      });
+
+      await auth.currentUser?.getIdToken(true);
+      setUser(finalized.user);
+      return finalized.user;
+    },
+    [user],
+  );
+
+  const logout = useCallback(async () => {
+    await logoutUser();
     setUser(null);
-    persist(null);
   }, []);
 
   const value = useMemo(
-    () => ({ user, ready, loginWithEmail, loginWithProvider, signUp, completeProfile, logout }),
-    [user, ready, loginWithEmail, loginWithProvider, signUp, completeProfile, logout],
+    () => ({
+      user,
+      ready,
+      loginWithEmail,
+      loginWithProvider,
+      bootstrapWithGoogle,
+      signUp,
+      completeProfile,
+      logout,
+    }),
+    [
+      user,
+      ready,
+      loginWithEmail,
+      loginWithProvider,
+      bootstrapWithGoogle,
+      signUp,
+      completeProfile,
+      logout,
+    ],
   );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;

@@ -15,12 +15,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "1ère édition du Sommet de la Cybersécurité Madagascar. 23–24 mai 2026, Novotel Convention & Spa, Antananarivo. Bâtir la confiance numérique pour un Madagascar cyber-résilient.",
+          "1ère édition du Sommet de la Cybersécurité Madagascar. 22–23 Juin 2026, Novotel Convention & Spa, Antananarivo. Bâtir la confiance numérique pour un Madagascar cyber-résilient.",
       },
       { property: "og:title", content: "Sommet de la Cybersécurité Madagascar 2026" },
       {
         property: "og:description",
-        content: "1ère édition · 23–24 mai 2026 · Antananarivo. Organisé par le CIRT MDG.",
+        content: "1ère édition · 22–23 Juin 2026 · Antananarivo. Organisé par le CIRT MDG.",
       },
     ],
   }),

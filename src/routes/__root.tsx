@@ -78,11 +78,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Sommet de la Cybersécurité Madagascar — 1ère édition, 23–24 mai 2026, Antananarivo.",
+          "Sommet de la Cybersécurité Madagascar — 1ère édition, 22–23 Juin 2026, Antananarivo.",
       },
       { name: "author", content: "CIRT MDG" },
       { property: "og:title", content: "Sommet de la Cybersécurité Madagascar 2026" },
-      { property: "og:description", content: "1ère édition · 23–24 mai 2026 · Antananarivo." },
+      { property: "og:description", content: "1ère édition · 22–23 Juin 2026 · Antananarivo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

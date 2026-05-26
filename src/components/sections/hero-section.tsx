@@ -1,4 +1,5 @@
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
@@ -100,9 +101,9 @@ export function HeroSection() {
 
           <RevealItem className="flex flex-wrap gap-3 pt-2">
             <Button asChild size="lg" className="bg-iris-lime text-primary-deep hover:bg-iris-lime/90 shadow-[var(--shadow-iris)]">
-              <a href="#contact">
+              <Link to="/register">
                 S'inscrire <ArrowRight className="ml-1" />
-              </a>
+              </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
               <a href="#sponsor">Devenir sponsor</a>

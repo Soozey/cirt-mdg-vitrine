@@ -1,0 +1,60 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return request.auth.token.role;
+    }
+
+    function isStaff() {
+      return role() in ['superadmin', 'admin', 'juror'];
+    }
+
+    function isSuperadmin() {
+      return role() == 'superadmin';
+    }
+
+    match /users/{uid} {
+      allow read: if isAuth() && (request.auth.uid == uid || isStaff());
+      allow create: if isAuth()
+                    && request.auth.uid == uid
+                    && request.resource.data.role == 'candidate';
+      allow update: if isAuth()
+                    && (
+                      role() in ['superadmin', 'admin']
+                      || (
+                        request.auth.uid == uid
+                        && request.resource.data.role == resource.data.role
+                      )
+                    );
+      allow delete: if role() in ['superadmin', 'admin'];
+    }
+
+    match /quiz/{id} {
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuth() && (resource.data.userId == request.auth.uid || isStaff());
+      allow update: if role() == 'admin' || role() == 'juror';
+      allow delete: if role() in ['superadmin', 'admin'];
+    }
+
+    match /jury/{id} {
+      allow read, write: if isStaff();
+    }
+
+    match /admin/{id} {
+      allow read, write: if role() in ['superadmin', 'admin'];
+    }
+
+    match /roleInvites/{id} {
+      allow read, write: if isSuperadmin();
+    }
+
+    match /appConfig/{id} {
+      allow read, write: if isSuperadmin();
+    }
+  }
+}

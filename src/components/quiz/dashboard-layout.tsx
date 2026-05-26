@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { LayoutDashboard, LogOut, ScrollText, ShieldCheck } from "lucide-react";
+import { Crown, LayoutDashboard, LogOut, ScrollText, ShieldCheck } from "lucide-react";
 
 import heroBanner from "@/assets/above-countdown.webp";
 import { BrandMark } from "@/components/brand-mark";
@@ -9,15 +9,29 @@ import { useAuth } from "@/lib/quiz/auth-context";
 import { initials } from "@/lib/quiz/format";
 import { cn } from "@/lib/utils";
 
-type Item = { to: string; label: string; icon: React.ComponentType<{ className?: string }>; roles: Array<"candidate" | "juror" | "admin"> };
+type Item = {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: Array<"candidate" | "juror" | "admin" | "superadmin">;
+};
 
 const ITEMS: Item[] = [
   { to: "/quiz", label: "Mon quiz", icon: ScrollText, roles: ["candidate"] },
-  { to: "/admin", label: "Administration", icon: LayoutDashboard, roles: ["admin"] },
-  { to: "/jury", label: "Évaluations", icon: ShieldCheck, roles: ["juror", "admin"] },
+  { to: "/superadmin", label: "Superadmin", icon: Crown, roles: ["superadmin"] },
+  { to: "/admin", label: "Administration", icon: LayoutDashboard, roles: ["admin", "superadmin"] },
+  { to: "/jury", label: "Évaluations", icon: ShieldCheck, roles: ["juror", "admin", "superadmin"] },
 ];
 
-export function DashboardLayout({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {
+export function DashboardLayout({
+  children,
+  title,
+  subtitle,
+}: {
+  children: React.ReactNode;
+  title: string;
+  subtitle?: string;
+}) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -33,7 +47,7 @@ export function DashboardLayout({ children, title, subtitle }: { children: React
               to="/"
               className="flex items-center justify-center border-b border-border bg-primary from-primary/[0.08] via-iris-violet/[0.06] to-iris-cyan/[0.06] px-4 py-4"
             >
-              <BrandMark variant="light"/>
+              <BrandMark variant="light" />
             </Link>
 
             <div className="px-4 pt-4">
@@ -50,7 +64,13 @@ export function DashboardLayout({ children, title, subtitle }: { children: React
                       {user?.firstName} {user?.lastName}
                     </p>
                     <p className="truncate text-[11px] uppercase tracking-wider text-muted-foreground">
-                      {user?.role === "candidate" ? "Candidat" : user?.role === "juror" ? "Juré" : "Administrateur"}
+                      {user?.role === "candidate"
+                        ? "Candidat"
+                        : user?.role === "juror"
+                          ? "Juré"
+                          : user?.role === "admin"
+                            ? "Administrateur"
+                            : "Superadministrateur"}
                     </p>
                   </div>
                 </div>
@@ -84,8 +104,8 @@ export function DashboardLayout({ children, title, subtitle }: { children: React
                 variant="ghost"
                 size="sm"
                 className="w-full justify-start text-muted-foreground"
-                onClick={() => {
-                  logout();
+                onClick={async () => {
+                  await logout();
                   navigate({ to: "/login" });
                 }}
               >

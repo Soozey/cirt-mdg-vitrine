@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
 import { ProtectedRoute } from "@/components/quiz/protected-route";
 import { SimplePagination } from "@/components/quiz/simple-pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { seedDemoSubmissions, submissionsApi } from "@/lib/quiz/firestore";
+import { listSubmissionsForStaff } from "@/lib/firebase/server-api";
 import { formatRelative } from "@/lib/quiz/format";
 import type { Submission } from "@/lib/quiz/types";
+import { getErrorMessage } from "@/lib/utils";
 
 const PER_PAGE = 3;
 
 export const Route = createFileRoute("/jury")({
   head: () => ({ meta: [{ title: "Espace juré · CIRT" }] }),
   component: () => (
-    <ProtectedRoute roles={["juror", "admin"]}>
+    <ProtectedRoute roles={["juror", "admin", "superadmin"]}>
       <JuryPage />
     </ProtectedRoute>
   ),
@@ -26,10 +28,24 @@ function JuryPage() {
   const [items, setItems] = useState<Submission[]>([]);
   const [pagePending, setPagePending] = useState(1);
   const [pageReviewed, setPageReviewed] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    seedDemoSubmissions();
-    setItems(submissionsApi.list());
+    let active = true;
+    setLoading(true);
+    listSubmissionsForStaff()
+      .then((data) => {
+        if (active) setItems(data.submissions);
+      })
+      .catch((error: unknown) =>
+        toast.error(getErrorMessage(error, "Chargement des évaluations impossible")),
+      )
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const pending = items.filter((s) => s.status === "pending");
@@ -41,7 +57,10 @@ function JuryPage() {
   const reviewedItems = reviewed.slice((pageReviewed - 1) * PER_PAGE, pageReviewed * PER_PAGE);
 
   return (
-    <DashboardLayout title="Évaluations" subtitle="Examinez les réponses, notez et laissez votre commentaire.">
+    <DashboardLayout
+      title="Évaluations"
+      subtitle="Examinez les réponses, notez et laissez votre commentaire."
+    >
       <section className="mb-10">
         <div className="mb-3 flex items-center gap-2">
           <span className="size-2 rounded-full bg-iris-magenta" />
@@ -50,7 +69,11 @@ function JuryPage() {
           </h2>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {pendingItems.length === 0 ? (
+          {loading ? (
+            <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground md:col-span-2">
+              Chargement des candidatures…
+            </p>
+          ) : pendingItems.length === 0 ? (
             <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground md:col-span-2">
               Aucune candidature à évaluer pour le moment.
             </p>
@@ -58,7 +81,11 @@ function JuryPage() {
             pendingItems.map((s, i) => <Card key={s.id} s={s} index={i} />)
           )}
         </div>
-        <SimplePagination page={pagePending} pageCount={pendingPageCount} onChange={setPagePending} />
+        <SimplePagination
+          page={pagePending}
+          pageCount={pendingPageCount}
+          onChange={setPagePending}
+        />
       </section>
 
       <section>
@@ -69,7 +96,11 @@ function JuryPage() {
           </h2>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {reviewedItems.length === 0 ? (
+          {loading ? (
+            <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground md:col-span-2">
+              Chargement des évaluations…
+            </p>
+          ) : reviewedItems.length === 0 ? (
             <p className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground md:col-span-2">
               Aucune évaluation pour le moment.
             </p>
@@ -77,7 +108,11 @@ function JuryPage() {
             reviewedItems.map((s, i) => <Card key={s.id} s={s} index={i} />)
           )}
         </div>
-        <SimplePagination page={pageReviewed} pageCount={reviewedPageCount} onChange={setPageReviewed} />
+        <SimplePagination
+          page={pageReviewed}
+          pageCount={reviewedPageCount}
+          onChange={setPageReviewed}
+        />
       </section>
     </DashboardLayout>
   );
@@ -97,7 +132,11 @@ function Card({ s, index }: { s: Submission; index: number }) {
         <div className="flex items-center gap-3">
           <div
             className="flex size-10 items-center justify-center rounded-full text-sm font-semibold text-white shadow-md"
-            style={{ background: s.user.avatarColor ?? "linear-gradient(135deg, oklch(0.55 0.22 265), oklch(0.42 0.22 285))" }}
+            style={{
+              background:
+                s.user.avatarColor ??
+                "linear-gradient(135deg, oklch(0.55 0.22 265), oklch(0.42 0.22 285))",
+            }}
           >
             {(s.user.firstName?.[0] ?? "?") + (s.user.lastName?.[0] ?? "")}
           </div>
@@ -108,18 +147,30 @@ function Card({ s, index }: { s: Submission; index: number }) {
             <p className="text-xs text-muted-foreground">{s.user.email}</p>
           </div>
         </div>
-        <Badge variant={s.status === "reviewed" ? "secondary" : "outline"} className={s.status === "pending" ? "border-iris-magenta/40 bg-iris-magenta/10 text-iris-magenta" : ""}>
+        <Badge
+          variant={s.status === "reviewed" ? "secondary" : "outline"}
+          className={
+            s.status === "pending"
+              ? "border-iris-magenta/40 bg-iris-magenta/10 text-iris-magenta"
+              : ""
+          }
+        >
           {s.status === "reviewed" ? "Évalué" : "À évaluer"}
         </Badge>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2 rounded-lg bg-primary/[0.04] p-3 text-xs">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Score</p>
-          <p className="font-mono font-semibold text-foreground">{s.finalScore}<span className="text-muted-foreground">/100</span></p>
+          <p className="font-mono font-semibold text-foreground">
+            {s.finalScore}
+            <span className="text-muted-foreground">/100</span>
+          </p>
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">IA</p>
-          <p className="font-mono font-semibold text-foreground">{(s.aiAverage * 100).toFixed(0)}%</p>
+          <p className="font-mono font-semibold text-foreground">
+            {(s.aiAverage * 100).toFixed(0)}%
+          </p>
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Date</p>

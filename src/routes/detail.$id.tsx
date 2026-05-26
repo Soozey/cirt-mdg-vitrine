@@ -9,16 +9,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { getSubmission, reviewSubmission } from "@/lib/firebase/server-api";
+import { useAuth } from "@/lib/quiz/auth-context";
 import { DOMAIN_COLORS, LEVEL_COLORS } from "@/lib/quiz/constants";
-import { submissionsApi } from "@/lib/quiz/firestore";
 import { initials } from "@/lib/quiz/format";
 import type { Submission } from "@/lib/quiz/types";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/detail/$id")({
   head: () => ({ meta: [{ title: "Détail candidat · CIRT" }] }),
   component: () => (
-    <ProtectedRoute roles={["juror", "admin"]}>
+    <ProtectedRoute roles={["juror", "admin", "superadmin"]}>
       <DetailPage />
     </ProtectedRoute>
   ),
@@ -26,38 +27,60 @@ export const Route = createFileRoute("/detail/$id")({
 
 function DetailPage() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [sub, setSub] = useState<Submission | null>(null);
   const [note, setNote] = useState("");
   const [score, setScore] = useState<number>(0);
+  const canEvaluate = user?.role === "juror";
 
   useEffect(() => {
-    const s = submissionsApi.get(id);
-    if (!s) {
-      toast.error("Candidature introuvable");
-      navigate({ to: "/admin" });
-      return;
-    }
-    setSub(s);
-    setNote(s.juryNote ?? "");
-    setScore(s.juryScore ?? s.finalScore);
+    let active = true;
+    getSubmission(id)
+      .then((data) => {
+        if (!active) return;
+        const s = data.submission;
+        if (!s) {
+          toast.error("Candidature introuvable");
+          navigate({ to: "/admin" });
+          return;
+        }
+        setSub(s);
+        setNote(s.juryNote ?? "");
+        setScore(s.juryScore ?? s.finalScore);
+      })
+      .catch((error: unknown) => {
+        toast.error(getErrorMessage(error, "Chargement impossible"));
+        navigate({ to: "/admin" });
+      });
+    return () => {
+      active = false;
+    };
   }, [id, navigate]);
 
-  function save() {
+  async function save() {
     if (!sub) return;
-    const next: Submission = { ...sub, juryNote: note, juryScore: score, status: "reviewed" };
-    submissionsApi.save(next);
-    setSub(next);
-    toast.success("Évaluation enregistrée");
+    try {
+      const next = await reviewSubmission(sub.id, { juryNote: note, juryScore: score });
+      setSub(next.submission);
+      toast.success("Évaluation enregistrée");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Enregistrement impossible"));
+    }
   }
 
   if (!sub) return null;
 
   return (
-    <DashboardLayout title="Évaluation candidat" subtitle="Réponses détaillées, scores IA et avis du jury.">
+    <DashboardLayout
+      title="Évaluation candidat"
+      subtitle="Réponses détaillées, scores IA et avis du jury."
+    >
       <div className="mb-6">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/admin"><ArrowLeft className="size-4" /> Retour</Link>
+          <Link to="/jury">
+            <ArrowLeft className="size-4" /> Retour
+          </Link>
         </Button>
       </div>
 
@@ -85,7 +108,10 @@ function DetailPage() {
                 ["LinkedIn", sub.user.linkedin ?? "—"],
                 ["Auth", sub.user.provider],
               ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3 border-b border-border/60 pb-1.5 last:border-0">
+                <div
+                  key={k}
+                  className="flex justify-between gap-3 border-b border-border/60 pb-1.5 last:border-0"
+                >
                   <dt className="text-muted-foreground">{k}</dt>
                   <dd className="text-right text-foreground">{v}</dd>
                 </div>
@@ -99,42 +125,69 @@ function DetailPage() {
               <div>
                 <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                   <span>Score final</span>
-                  <span className="font-mono font-semibold text-foreground">{sub.finalScore}/100</span>
+                  <span className="font-mono font-semibold text-foreground">
+                    {sub.finalScore}/100
+                  </span>
                 </div>
                 <Progress value={sub.finalScore} />
               </div>
               <div>
                 <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                   <span>Probabilité IA</span>
-                  <span className="font-mono font-semibold text-foreground">{(sub.aiAverage * 100).toFixed(0)}%</span>
+                  <span className="font-mono font-semibold text-foreground">
+                    {(sub.aiAverage * 100).toFixed(0)}%
+                  </span>
                 </div>
                 <Progress value={sub.aiAverage * 100} />
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-            <h3 className="text-sm font-semibold text-foreground">Notation du jury</h3>
-            <label className="mt-3 block text-xs text-muted-foreground">Score /100</label>
-            <input
-              type="number"
-              min={0}
-              max={100}
-              value={score}
-              onChange={(e) => setScore(Number(e.target.value))}
-              className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-            />
-            <label className="mt-3 block text-xs text-muted-foreground">Justification</label>
-            <Textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Vos commentaires pour l'équipe RH…"
-              className="mt-1 min-h-[110px]"
-            />
-            <Button onClick={save} className="mt-3 w-full">
-              Enregistrer l'évaluation
-            </Button>
-          </div>
+          {canEvaluate ? (
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+              <h3 className="text-sm font-semibold text-foreground">Notation du jury</h3>
+              <label className="mt-3 block text-xs text-muted-foreground">Score /100</label>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={score}
+                onChange={(e) => setScore(Number(e.target.value))}
+                className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+              />
+              <label className="mt-3 block text-xs text-muted-foreground">Justification</label>
+              <Textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Vos commentaires pour l'équipe RH…"
+                className="mt-1 min-h-[110px]"
+              />
+              <Button onClick={save} className="mt-3 w-full">
+                Enregistrer l'évaluation
+              </Button>
+            </div>
+          ) : sub.status === "reviewed" ? (
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+              <h3 className="text-sm font-semibold text-foreground">Évaluation du jury</h3>
+              <dl className="mt-4 grid gap-2 text-sm">
+                <div className="flex justify-between gap-3 border-b border-border/60 pb-1.5">
+                  <dt className="text-muted-foreground">Évalué par</dt>
+                  <dd className="text-right text-foreground">
+                    {sub.reviewedByEmail ?? "—"}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-3 border-b border-border/60 pb-1.5">
+                  <dt className="text-muted-foreground">Score jury</dt>
+                  <dd className="font-mono text-foreground">{sub.juryScore ?? "—"}/100</dd>
+                </div>
+              </dl>
+              {sub.juryNote ? (
+                <p className="mt-3 whitespace-pre-wrap rounded-lg border border-border bg-surface-muted/40 px-3 py-2.5 text-sm text-foreground">
+                  {sub.juryNote}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </aside>
 
         <section className="space-y-4 lg:col-span-2">
@@ -146,7 +199,10 @@ function DetailPage() {
             sub.questions.map((q, i) => {
               const a = sub.answers.find((x) => x.questionId === q.id);
               return (
-                <div key={q.id} className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+                <div
+                  key={q.id}
+                  className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]"
+                >
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <span className="text-xs font-mono text-muted-foreground">Q{i + 1}</span>
                     <Badge variant="outline" className={cn("border", DOMAIN_COLORS[q.domain])}>

@@ -7,6 +7,15 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Agents
+.agents
+
+.env
+.env.*
+!.env.example
+*firebase-adminsdk*.json
+service-account*.json
+
 node_modules
 dist
 dist-ssr

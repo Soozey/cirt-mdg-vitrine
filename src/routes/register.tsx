@@ -14,14 +14,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { redirectForRole } from "@/lib/access-control";
 import { useAuth } from "@/lib/quiz/auth-context";
 import { formatPhone } from "@/lib/quiz/format";
+import { getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
       { title: "Créer un compte · Quiz cybersécurité" },
-      { name: "description", content: "Créez votre compte pour accéder au quiz cybersécurité du CIRT." },
+      {
+        name: "description",
+        content: "Créez votre compte pour accéder au quiz cybersécurité du CIRT.",
+      },
     ],
   }),
   component: RegisterPage,
@@ -40,7 +45,9 @@ function RegisterPage() {
   const [agree, setAgree] = useState(false);
 
   const [phone, setPhone] = useState("");
-  const [profile, setProfile] = useState<"Étudiant" | "Professionnel" | "Chercheur" | "Indépendant">("Étudiant");
+  const [profile, setProfile] = useState<
+    "Étudiant" | "Professionnel" | "Chercheur" | "Indépendant"
+  >("Étudiant");
   const [linkedin, setLinkedin] = useState("");
 
   const [err, setErr] = useState<Record<string, string>>({});
@@ -83,8 +90,8 @@ function RegisterPage() {
         await signUp({ firstName, lastName, email, password });
       }
       setStep(2);
-    } catch (e: any) {
-      setErr({ root: e.message ?? "Inscription impossible" });
+    } catch (error) {
+      setErr({ root: getErrorMessage(error, "Inscription impossible") });
     } finally {
       setSubmitting(false);
     }
@@ -94,10 +101,22 @@ function RegisterPage() {
     ev.preventDefault();
     if (!validateStep2()) return;
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 300));
-    completeProfile({ firstName, lastName, email, phone, profile, linkedin });
-    toast.success("Profil enregistré — bienvenue !");
-    navigate({ to: "/quiz" });
+    try {
+      const nextUser = await completeProfile({
+        firstName,
+        lastName,
+        email,
+        phone,
+        profile,
+        linkedin,
+      });
+      toast.success("Profil enregistré — bienvenue !");
+      navigate({ to: redirectForRole(nextUser?.role ?? "candidate", true) });
+    } catch (error) {
+      setErr({ root: getErrorMessage(error, "Enregistrement impossible") });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -119,8 +138,20 @@ function RegisterPage() {
       {step === 1 ? (
         <div className="grid gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <FloatingInput label="Prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} error={err.firstName} placeholder="Jean" />
-            <FloatingInput label="Nom" value={lastName} onChange={(e) => setLastName(e.target.value)} error={err.lastName} placeholder="Dupont" />
+            <FloatingInput
+              label="Prénom"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              error={err.firstName}
+              placeholder="Jean"
+            />
+            <FloatingInput
+              label="Nom"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              error={err.lastName}
+              placeholder="Dupont"
+            />
           </div>
           <FloatingInput
             type="email"
@@ -150,15 +181,17 @@ function RegisterPage() {
               className="mt-0.5 size-3.5 accent-[var(--primary)]"
             />
             <span>
-              By signing Up, I agree with{" "}
+              En m'inscrivant, j'accepte les{" "}
               <a href="#" className="font-semibold text-primary hover:underline">
-                Terms &amp; Conditions
+                conditions générales d'utilisation
               </a>
             </span>
           </label>
           {err.agree ? <p className="-mt-2 text-[11px] text-destructive">{err.agree}</p> : null}
           {err.root ? (
-            <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">{err.root}</p>
+            <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">
+              {err.root}
+            </p>
           ) : null}
 
           <div className="mt-1 flex items-center gap-2">
@@ -181,7 +214,9 @@ function RegisterPage() {
 
           <div className="flex items-center gap-3">
             <span className="h-px flex-1 bg-slate-200" />
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">ou</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+              ou
+            </span>
             <span className="h-px flex-1 bg-slate-200" />
           </div>
 
@@ -220,6 +255,12 @@ function RegisterPage() {
             onChange={(e) => setLinkedin(e.target.value)}
             placeholder="linkedin.com/in/votre-profil"
           />
+
+          {err.root ? (
+            <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">
+              {err.root}
+            </p>
+          ) : null}
 
           <div className="mt-1 flex gap-2">
             <Button

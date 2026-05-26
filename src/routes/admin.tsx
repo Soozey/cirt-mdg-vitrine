@@ -7,6 +7,17 @@ import { toast } from "sonner";
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
 import { ProtectedRoute } from "@/components/quiz/protected-route";
 import { SimplePagination } from "@/components/quiz/simple-pagination";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,14 +36,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { seedDemoSubmissions, submissionsApi } from "@/lib/quiz/firestore";
+import { deleteSubmission, listSubmissionsForStaff } from "@/lib/firebase/server-api";
 import { formatRelative } from "@/lib/quiz/format";
 import type { Submission } from "@/lib/quiz/types";
+import { getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Administration · CIRT" }] }),
   component: () => (
-    <ProtectedRoute roles={["admin"]}>
+    <ProtectedRoute roles={["admin", "superadmin"]}>
       <AdminPage />
     </ProtectedRoute>
   ),
@@ -43,14 +55,30 @@ function AdminPage() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<"all" | "pending" | "reviewed">("all");
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const PER_PAGE = 3;
 
   useEffect(() => {
-    seedDemoSubmissions();
-    setItems(submissionsApi.list());
+    let active = true;
+    setLoading(true);
+    listSubmissionsForStaff()
+      .then((data) => {
+        if (active) setItems(data.submissions);
+      })
+      .catch((error: unknown) =>
+        toast.error(getErrorMessage(error, "Chargement des candidatures impossible")),
+      )
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
-  useEffect(() => { setPage(1); }, [q, status]);
+  useEffect(() => {
+    setPage(1);
+  }, [q, status]);
 
   const filtered = useMemo(() => {
     return items.filter((s) => {
@@ -76,7 +104,7 @@ function AdminPage() {
 
   function exportCsv() {
     const rows = [
-      ["id", "candidat", "email", "score", "ai", "statut", "date"],
+      ["id", "candidat", "email", "score", "ai", "statut", "evalué par", "date"],
       ...filtered.map((s) => [
         s.id,
         `${s.user.firstName} ${s.user.lastName}`,
@@ -84,6 +112,7 @@ function AdminPage() {
         String(s.finalScore),
         (s.aiAverage * 100).toFixed(0) + "%",
         s.status,
+        s.reviewedByEmail ?? "",
         s.submittedAt,
       ]),
     ];
@@ -97,20 +126,35 @@ function AdminPage() {
     toast.success("Export CSV téléchargé");
   }
 
-  function remove(id: string) {
-    submissionsApi.remove(id);
-    setItems(submissionsApi.list());
-    toast.success("Soumission supprimée");
+  async function remove(id: string) {
+    try {
+      await deleteSubmission(id);
+      setItems((current) => current.filter((item) => item.id !== id));
+      toast.success("Soumission supprimée");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Suppression impossible"));
+    }
   }
 
   return (
-    <DashboardLayout title="Administration" subtitle="Vue d'ensemble des candidatures et évaluations.">
+    <DashboardLayout
+      title="Administration"
+      subtitle="Vue d'ensemble des candidatures et évaluations."
+    >
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: "Candidatures", value: stats.total, accent: "from-primary to-iris-violet" },
           { label: "En attente jury", value: stats.pending, accent: "from-iris-cyan to-primary" },
-          { label: "Score moyen", value: `${stats.avg}/100`, accent: "from-iris-violet to-iris-magenta" },
-          { label: "Risque IA élevé", value: stats.aiRisk, accent: "from-iris-magenta to-destructive" },
+          {
+            label: "Score moyen",
+            value: `${stats.avg}/100`,
+            accent: "from-iris-violet to-iris-magenta",
+          },
+          {
+            label: "Risque IA élevé",
+            value: stats.aiRisk,
+            accent: "from-iris-magenta to-destructive",
+          },
         ].map((s, i) => (
           <motion.div
             key={s.label}
@@ -161,14 +205,27 @@ function AdminPage() {
                 <TableHead>Score</TableHead>
                 <TableHead>IA</TableHead>
                 <TableHead>Statut</TableHead>
+                <TableHead>Évalué par</TableHead>
                 <TableHead>Soumis</TableHead>
                 <TableHead className="w-[100px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pageItems.length === 0 ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center text-sm text-muted-foreground">
+                  <TableCell
+                    colSpan={8}
+                    className="py-12 text-center text-sm text-muted-foreground"
+                  >
+                    Chargement des candidatures…
+                  </TableCell>
+                </TableRow>
+              ) : pageItems.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    className="py-12 text-center text-sm text-muted-foreground"
+                  >
                     Aucune candidature.
                   </TableCell>
                 </TableRow>
@@ -191,9 +248,13 @@ function AdminPage() {
                       </Link>
                       <p className="text-xs text-muted-foreground">{s.user.email}</p>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{s.user.profile ?? "—"}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {s.user.profile ?? "—"}
+                    </TableCell>
                     <TableCell>
-                      <span className="font-mono font-semibold text-foreground">{s.finalScore}</span>
+                      <span className="font-mono font-semibold text-foreground">
+                        {s.finalScore}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -214,11 +275,41 @@ function AdminPage() {
                         {s.status === "reviewed" ? "Évalué" : "En attente"}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatRelative(s.submittedAt)}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {s.reviewedByEmail ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {formatRelative(s.submittedAt)}
+                    </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => remove(s.id)} aria-label="Supprimer">
-                        <Trash2 className="size-4 text-muted-foreground" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" aria-label="Supprimer">
+                            <Trash2 className="size-4 text-muted-foreground" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer cette soumission ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Cette action supprimera définitivement le quiz de{" "}
+                              <span className="font-medium text-foreground">
+                                {s.user.firstName} {s.user.lastName}
+                              </span>
+                              . Les réponses et l'évaluation associée ne seront plus disponibles.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => remove(s.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </motion.tr>
                 ))
