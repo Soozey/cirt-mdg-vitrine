@@ -98,16 +98,12 @@ export function OAuthButtons({ mode = "login" }: { mode?: "login" | "register" }
       </button>
       <button
         type="button"
-        onClick={() => handle("facebook")}
-        disabled={loading !== null}
+        disabled
         className="group inline-flex h-9 cursor-pointer items-center justify-center gap-2.5 rounded-lg px-3 text-xs font-medium text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
         style={{ backgroundColor: "#1877F2" }}
       >
         <FacebookIcon />
         <span>{mode === "login" ? "Continuer avec Facebook" : "S'inscrire avec Facebook"}</span>
-        {loading === "facebook" && (
-          <span className="size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        )}
       </button>
     </div>
   );
