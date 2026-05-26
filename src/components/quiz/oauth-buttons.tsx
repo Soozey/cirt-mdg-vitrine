@@ -16,6 +16,10 @@ function getOAuthErrorMessage(error: unknown, provider: "google" | "facebook") {
     return "Connexion annulée : la fenêtre d'authentification a été fermée.";
   }
 
+  if (message.includes("auth/unauthorized-domain")) {
+    return "Connexion OAuth impossible : ajoutez le domaine public de ce site dans Firebase Authentication > Settings > Authorized domains.";
+  }
+
   if (
     provider === "facebook" &&
     (message.includes("domain") ||
