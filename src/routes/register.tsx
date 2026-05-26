@@ -61,8 +61,10 @@ function RegisterPage() {
       setPhone(user.phone ?? "");
       if (user.profile) setProfile(user.profile);
       setLinkedin(user.linkedin ?? "");
+      if (!user.registered) setStep(2);
+      else navigate({ to: redirectForRole(user.role, true) });
     }
-  }, [user]);
+  }, [navigate, user]);
 
   function validateStep1() {
     const e: Record<string, string> = {};

@@ -3,8 +3,10 @@ import {
   FacebookAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
+  getRedirectResult,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   updateProfile,
   type User,
@@ -48,14 +50,30 @@ googleProvider.addScope("profile");
 
 const facebookProvider = new FacebookAuthProvider();
 
+function isMobileBrowser() {
+  if (typeof window === "undefined") return false;
+  const userAgent = navigator.userAgent || navigator.vendor || "";
+  return /android|iphone|ipad|ipod|mobile/i.test(userAgent);
+}
+
 export async function loginWithGoogle(): Promise<AuthUser> {
   const result = await signInWithPopup(auth, googleProvider);
   return normalize(result.user, "google");
 }
 
 export async function loginWithFacebook(): Promise<AuthUser> {
+  if (isMobileBrowser()) {
+    await signInWithRedirect(auth, facebookProvider);
+    return new Promise<AuthUser>(() => undefined);
+  }
+
   const result = await signInWithPopup(auth, facebookProvider);
   return normalize(result.user, "facebook");
+}
+
+export async function getOAuthRedirectUser(): Promise<AuthUser | null> {
+  const result = await getRedirectResult(auth);
+  return result?.user ? normalize(result.user) : null;
 }
 
 export async function loginUser(email: string, password: string): Promise<AuthUser> {

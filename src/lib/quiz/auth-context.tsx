@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { auth } from "@/lib/firebase/config";
 import {
   getUserRole,
+  getOAuthRedirectUser,
   loginUser,
   loginWithFacebook,
   loginWithGoogle,
@@ -93,7 +94,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let active = true;
+
+    getOAuthRedirectUser()
+      .then(async (authUser) => {
+        if (!authUser || !active) return;
+        setUser(await hydrate(authUser));
+      })
+      .catch((error) => {
+        console.error("[auth] oauth redirect hydration failed:", error);
+      });
+
     const unsubscribe = onAuthChange(async (authUser) => {
+      if (!active) return;
+
       if (!authUser) {
         setUser(null);
         setReady(true);
@@ -110,7 +124,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return unsubscribe;
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   const loginWithEmail = useCallback(async (email: string, password: string) => {

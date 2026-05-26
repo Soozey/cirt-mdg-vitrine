@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -21,12 +21,17 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
-  const { loginWithEmail } = useAuth();
+  const { loginWithEmail, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<{ email?: string; password?: string; root?: string }>({});
+
+  useEffect(() => {
+    if (!user) return;
+    navigate({ to: redirectForRole(user.role, user.registered) });
+  }, [navigate, user]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
