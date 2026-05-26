@@ -22,7 +22,7 @@ ENV HOST=0.0.0.0
 
 # Copy package files and install only production dependencies
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy the SSR server output (client assets + server bundle)
 COPY --from=builder /app/dist ./dist
