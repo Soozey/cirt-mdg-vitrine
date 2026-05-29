@@ -103,9 +103,9 @@ function DetailPage() {
             </div>
             <dl className="mt-5 grid gap-2 text-sm">
               {[
-                ["Profil", sub.user.profile ?? "—"],
-                ["Téléphone", sub.user.phone ?? "—"],
-                ["LinkedIn", sub.user.linkedin ?? "—"],
+                ["Profil", sub.user.profile ?? "Non renseigné"],
+                ["Téléphone", sub.user.phone ?? "Non renseigné"],
+                ["LinkedIn", sub.user.linkedin ?? "Non renseigné"],
                 ["Auth", sub.user.provider],
               ].map(([k, v]) => (
                 <div
@@ -173,12 +173,12 @@ function DetailPage() {
                 <div className="flex justify-between gap-3 border-b border-border/60 pb-1.5">
                   <dt className="text-muted-foreground">Évalué par</dt>
                   <dd className="text-right text-foreground">
-                    {sub.reviewedByEmail ?? "—"}
+                    {sub.reviewedByEmail ?? "Non renseigné"}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3 border-b border-border/60 pb-1.5">
                   <dt className="text-muted-foreground">Score jury</dt>
-                  <dd className="font-mono text-foreground">{sub.juryScore ?? "—"}/100</dd>
+                  <dd className="font-mono text-foreground">{sub.juryScore ?? "Non noté"}/100</dd>
                 </div>
               </dl>
               {sub.juryNote ? (
@@ -219,7 +219,7 @@ function DetailPage() {
                   </div>
                   <h4 className="font-semibold text-foreground">{q.text}</h4>
                   <p className="mt-3 whitespace-pre-wrap rounded-lg border border-border bg-surface-muted/40 px-3 py-2.5 text-sm leading-relaxed text-foreground">
-                    {a?.text ?? "—"}
+                    {a?.text ?? "Aucune réponse fournie."}
                   </p>
                 </div>
               );

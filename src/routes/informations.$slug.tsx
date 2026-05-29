@@ -8,13 +8,14 @@ import { Card } from "@/components/ui/card";
 import { INFO_PAGES, CIRT_WEBSITE } from "@/lib/event-data";
 import infoBg from "@/assets/info-section.webp";
 import contentBg from "@/assets/above-countdown.webp";
+import { RICH_PAGES } from "@/components/informations/rich-pages";
 
 export const Route = createFileRoute("/informations/$slug")({
   head: ({ params }) => {
     const page = INFO_PAGES.find((p) => p.slug === params.slug);
     return {
       meta: [
-        { title: page ? `${page.title} — CIRT MDG 2026` : "Information — CIRT MDG 2026" },
+        { title: page ? `${page.title}, CIRT MDG 2026` : "Information, CIRT MDG 2026" },
         {
           name: "description",
           content: page?.summary ?? "Informations du Sommet de la Cybersécurité Madagascar 2026.",
@@ -65,6 +66,30 @@ function NotFoundPage() {
 function DetailPage() {
   const { page } = Route.useLoaderData();
   const others = INFO_PAGES.filter((p) => p.slug !== page.slug).slice(0, 3);
+  const RichPage = RICH_PAGES[page.slug];
+
+  if (RichPage) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <SiteHeader />
+        <main className="flex-1">
+          <div className="bg-nav-deep">
+            <div className="mx-auto max-w-7xl px-4 pt-6 pb-2 md:px-8">
+              <Link
+                to="/"
+                hash="informations"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-iris-lime transition-colors hover:text-iris-cyan"
+              >
+                <ArrowLeft className="size-4" /> Retour aux informations
+              </Link>
+            </div>
+          </div>
+          <RichPage />
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

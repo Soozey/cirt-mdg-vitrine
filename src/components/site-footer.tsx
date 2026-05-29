@@ -69,7 +69,7 @@ export function SiteFooter() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-nav-deep-foreground/60 md:px-8">
-          © 2026 CIRT MDG — Sommet de la Cybersécurité Madagascar
+          © 2026 CIRT MDG, Sommet de la Cybersécurité Madagascar
         </div>
       </div>
     </footer>

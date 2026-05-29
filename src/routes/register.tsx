@@ -112,7 +112,7 @@ function RegisterPage() {
         profile,
         linkedin,
       });
-      toast.success("Profil enregistré — bienvenue !");
+      toast.success("Profil enregistré, bienvenue !");
       navigate({ to: redirectForRole(nextUser?.role ?? "candidate", true) });
     } catch (error) {
       setErr({ root: getErrorMessage(error, "Enregistrement impossible") });
@@ -126,8 +126,8 @@ function RegisterPage() {
       title={step === 1 ? "Create your account" : "Complétez votre profil"}
       subtitle={
         step === 1
-          ? "Étape 1 / 2 — Vos informations de base"
-          : "Étape 2 / 2 — Informations complémentaires"
+          ? "Étape 1 / 2 : vos informations de base"
+          : "Étape 2 / 2 : informations complémentaires"
       }
     >
       {/* Stepper */}

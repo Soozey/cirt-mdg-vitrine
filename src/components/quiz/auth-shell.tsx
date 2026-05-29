@@ -22,7 +22,7 @@ export function AuthShell({
 return (
   <div className="h-screen w-full overflow-hidden bg-slate-100/60 p-0 lg:p-4">
     <div className="mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden bg-white shadow-2xl lg:flex-row lg:rounded-3xl">
-      {/* LEFT — blue brand panel */}
+      {/* LEFT: blue brand panel */}
       <div
         className="relative flex w-full flex-col items-center justify-center overflow-hidden px-6 py-6 text-white lg:w-[44%] lg:py-10"
         style={{
@@ -71,7 +71,7 @@ return (
         </div>
       </div>
 
-      {/* RIGHT — form panel */}
+      {/* RIGHT: form panel */}
       <div className="relative flex w-full flex-1 md:items-center md:justify-center overflow-y-auto bg-white px-5 py-6 sm:px-8 lg:py-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}

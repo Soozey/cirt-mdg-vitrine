@@ -12,38 +12,6 @@ export type InfoPage = {
 
 export const INFO_PAGES: InfoPage[] = [
   {
-    slug: "2-jours",
-    title: "2 jours",
-    kicker: "Format",
-    summary: "Deux journées dédiées à la cybersécurité et à la confiance numérique.",
-    description:
-      "Deux journées consacrées à la cybersécurité, à la confiance numérique et aux échanges professionnels entre les acteurs publics, privés et académiques de Madagascar.",
-  },
-  {
-    slug: "5-axes-thematiques",
-    title: "5 axes thématiques",
-    kicker: "Programme",
-    summary: "Juridique, opérationnel, technique, sensibilisation et coopération.",
-    description:
-      "Les axes structurent les interventions autour des enjeux juridiques, opérationnels, techniques, pédagogiques et internationaux de la résilience numérique.",
-  },
-  {
-    slug: "experts",
-    title: "Experts nationaux et internationaux",
-    kicker: "Intervenants",
-    summary: "Un cadre pensé pour réunir expertises locales et internationales.",
-    description:
-      "Un cadre prévu pour réunir des expertises locales et internationales autour de la résilience numérique et du partage d'expérience opérationnelle.",
-  },
-  {
-    slug: "cyberdrill-national",
-    title: "Cyberdrill National",
-    kicker: "Exercice",
-    summary: "Un espace opérationnel de préparation aux incidents cyber.",
-    description:
-      "Un espace dédié à l'exercice opérationnel et à la préparation des acteurs face aux incidents cyber, en conditions proches du réel.",
-  },
-  {
     slug: "ctf-etudiant",
     title: "CTF étudiant",
     kicker: "Compétition",
@@ -59,6 +27,54 @@ export const INFO_PAGES: InfoPage[] = [
     summary: "Un espace pour les échanges et les rencontres partenaires.",
     description:
       "Un espace prévu pour les échanges, la visibilité institutionnelle et les rencontres avec les partenaires de l'écosystème cyber malgache.",
+  },
+  {
+    slug: "hackathon",
+    title: "Hackathon Cybersécurité",
+    kicker: "Challenge",
+    summary: "24 à 48 heures de challenge non-stop pour coder la résilience.",
+    description:
+      "Un marathon de code dédié à la cybersécurité où équipes pluridisciplinaires prototypent des solutions concrètes : détection, réponse à incident, sensibilisation, souveraineté numérique.",
+  },
+  {
+    slug: "job-dating",
+    title: "Job Dating Tech",
+    kicker: "Carrière",
+    summary: "Rencontres express entre talents et employeurs du secteur cyber.",
+    description:
+      "Des entretiens courts (10 à 15 min) entre candidats et recruteurs des entreprises engagées dans la cybersécurité à Madagascar et à l'international.",
+  },
+  {
+    slug: "conferences",
+    title: "Conférences & Panels",
+    kicker: "Programme",
+    summary: "Experts et tables rondes sur les enjeux du cyber-espace.",
+    description:
+      "Sessions plénières et panels thématiques pour décrypter les cybermenaces, l'IA défensive, la réglementation locale et la coopération régionale.",
+  },
+  {
+    slug: "ateliers",
+    title: "Ateliers Techniques",
+    kicker: "Pratique",
+    summary: "Sessions immersives : SIEM, forensic, hardening, malware.",
+    description:
+      "Des ateliers pratiques animés par des experts pour manipuler les outils du terrain : SIEM, EDR, forensic, hardening systèmes & réseaux, réponse à incident.",
+  },
+  {
+    slug: "village-partenaires",
+    title: "Village Partenaires",
+    kicker: "Exposition",
+    summary: "Démonstrations et innovations des acteurs du secteur.",
+    description:
+      "Un espace d'exposition où partenaires publics et privés présentent leurs solutions : EDR, SIEM, SOC, souveraineté numérique et services managés.",
+  },
+  {
+    slug: "networking",
+    title: "Networking",
+    kicker: "Rencontres",
+    summary: "Pauses café, déjeuners et matchmaking pour développer son réseau.",
+    description:
+      "Des moments dédiés aux rencontres entre étudiants, entreprises, institutions publiques et experts internationaux pour faire émerger les collaborations de demain.",
   },
 ];
 

@@ -10,7 +10,7 @@ export function ProjectSection() {
     <section id="projet" className="relative overflow-hidden bg-background">
       <div className="mx-auto max-w-7xl px-4 py-15 md:px-8 md:py-24">
         <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-16">
-          {/* Texte (gauche) — animation droite → gauche */}
+          {/* Texte gauche : animation droite vers gauche */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export function ProjectSection() {
           </motion.div>
 
 
-          {/* Image casquette (droite) — animation gauche → droite, desktop only */}
+          {/* Image casquette droite : animation gauche vers droite, desktop only */}
           <motion.div
             className="relative hidden md:block"
             initial={{ opacity: 0, x: -80 }}

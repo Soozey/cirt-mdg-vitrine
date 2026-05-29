@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Handshake, Mail, FileText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -5,14 +6,26 @@ import { CIRT_WEBSITE } from "@/lib/event-data";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import contactBg from "@/assets/above-countdown.webp";
 
-const CARDS = [
+type ContactCard = {
+  id: string;
+  icon: typeof Mail;
+  title: string;
+  body: string;
+  cta: string;
+  variant: "default" | "secondary" | "outline";
+  to?: string;
+  href?: string;
+};
+
+const CARDS: ContactCard[] = [
   {
     id: "contact-inscription",
     icon: Mail,
     title: "Inscription",
     body: "Le parcours d'inscription sera publié dès validation par l'équipe d'organisation.",
     cta: "Consulter le CIRT",
-    variant: "default" as const,
+    variant: "default",
+    href: CIRT_WEBSITE,
   },
   {
     id: "sponsor",
@@ -20,7 +33,8 @@ const CARDS = [
     title: "Sponsoring",
     body: "Les demandes de partenariat peuvent être orientées vers l'équipe d'organisation.",
     cta: "Devenir partenaire",
-    variant: "secondary" as const,
+    variant: "secondary",
+    to: "/partenaires",
   },
   {
     id: "programme",
@@ -28,7 +42,8 @@ const CARDS = [
     title: "Programme",
     body: "Le programme détaillé sera ajouté lorsqu'un fichier officiel sera disponible.",
     cta: "Suivre le programme",
-    variant: "outline" as const,
+    variant: "outline",
+    href: CIRT_WEBSITE,
   },
 ];
 
@@ -66,7 +81,7 @@ export function ContactSection() {
         </Reveal>
 
         <RevealGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" stagger={0.1}>
-          {CARDS.map(({ id, icon: Icon, title, body, cta, variant }) => (
+          {CARDS.map(({ id, icon: Icon, title, body, cta, variant, to, href }) => (
             <RevealItem
               key={id}
               id={id}
@@ -78,9 +93,15 @@ export function ContactSection() {
               <h3 className="mb-2 text-lg font-semibold text-primary-deep">{title}</h3>
               <p className="mb-6 flex-1 text-sm text-foreground/70">{body}</p>
               <Button asChild variant={variant} size="sm">
-                <a href={CIRT_WEBSITE} target="_blank" rel="noopener noreferrer">
-                  {cta} <ArrowUpRight className="size-4" />
-                </a>
+                {to ? (
+                  <Link to={to}>
+                    {cta} <ArrowUpRight className="size-4" />
+                  </Link>
+                ) : (
+                  <a href={href} target="_blank" rel="noopener noreferrer">
+                    {cta} <ArrowUpRight className="size-4" />
+                  </a>
+                )}
               </Button>
             </RevealItem>
           ))}

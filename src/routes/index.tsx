@@ -11,7 +11,7 @@ import { ContactSection } from "@/components/sections/contact-section";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sommet de la Cybersécurité Madagascar 2026 — CIRT MDG" },
+      { title: "Sommet de la Cybersécurité Madagascar 2026, CIRT MDG" },
       {
         name: "description",
         content:

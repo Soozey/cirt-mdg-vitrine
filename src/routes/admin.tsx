@@ -249,7 +249,7 @@ function AdminPage() {
                       <p className="text-xs text-muted-foreground">{s.user.email}</p>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {s.user.profile ?? "—"}
+                      {s.user.profile ?? "Non renseigné"}
                     </TableCell>
                     <TableCell>
                       <span className="font-mono font-semibold text-foreground">
@@ -276,7 +276,7 @@ function AdminPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {s.reviewedByEmail ?? "—"}
+                      {s.reviewedByEmail ?? "Non évalué"}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {formatRelative(s.submittedAt)}

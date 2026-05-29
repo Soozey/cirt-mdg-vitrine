@@ -194,8 +194,8 @@ function SuperadminPage() {
               items.map((invite) => (
                 <TableRow key={invite.id}>
                   <TableCell>
-                    <p className="font-medium text-foreground">{invite.email || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{invite.phone || "—"}</p>
+                    <p className="font-medium text-foreground">{invite.email || "Email non renseigné"}</p>
+                    <p className="text-xs text-muted-foreground">{invite.phone || "Téléphone non renseigné"}</p>
                   </TableCell>
                   <TableCell>{invite.role === "admin" ? "Administrateur" : "Juré"}</TableCell>
                   <TableCell>
@@ -204,7 +204,7 @@ function SuperadminPage() {
                     </span>
                   </TableCell>
                   {/* <TableCell className="text-xs text-muted-foreground">
-                    {invite.usedBy ?? "—"}
+                    {invite.usedBy ?? "Non utilisé"}
                   </TableCell> */}
                   <TableCell className="text-right">
                     <Button

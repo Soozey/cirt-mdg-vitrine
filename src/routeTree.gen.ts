@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperadminRouteImport } from './routes/superadmin'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as PartenairesRouteImport } from './routes/partenaires'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JuryRouteImport } from './routes/jury'
 import { Route as DoneRouteImport } from './routes/done'
@@ -34,6 +35,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartenairesRoute = PartenairesRouteImport.update({
+  id: '/partenaires',
+  path: '/partenaires',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
+  '/partenaires': typeof PartenairesRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/superadmin': typeof SuperadminRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
+  '/partenaires': typeof PartenairesRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/superadmin': typeof SuperadminRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
+  '/partenaires': typeof PartenairesRoute
   '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
   '/superadmin': typeof SuperadminRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/done'
     | '/jury'
     | '/login'
+    | '/partenaires'
     | '/quiz'
     | '/register'
     | '/superadmin'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/done'
     | '/jury'
     | '/login'
+    | '/partenaires'
     | '/quiz'
     | '/register'
     | '/superadmin'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/done'
     | '/jury'
     | '/login'
+    | '/partenaires'
     | '/quiz'
     | '/register'
     | '/superadmin'
@@ -166,6 +178,7 @@ export interface RootRouteChildren {
   DoneRoute: typeof DoneRoute
   JuryRoute: typeof JuryRoute
   LoginRoute: typeof LoginRoute
+  PartenairesRoute: typeof PartenairesRoute
   QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
   SuperadminRoute: typeof SuperadminRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partenaires': {
+      id: '/partenaires'
+      path: '/partenaires'
+      fullPath: '/partenaires'
+      preLoaderRoute: typeof PartenairesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -262,6 +282,7 @@ const rootRouteChildren: RootRouteChildren = {
   DoneRoute: DoneRoute,
   JuryRoute: JuryRoute,
   LoginRoute: LoginRoute,
+  PartenairesRoute: PartenairesRoute,
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
   SuperadminRoute: SuperadminRoute,
