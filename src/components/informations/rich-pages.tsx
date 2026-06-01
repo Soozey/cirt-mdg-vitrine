@@ -35,6 +35,68 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
 import detailHeroBg from "@/assets/info-section.webp";
 
+/* ---------- Stand plan (exposition floor map) ---------- */
+
+function StandPlan() {
+  const stands = [
+    { n: 1, x: 60, y: 120 }, { n: 2, x: 60, y: 240 }, { n: 3, x: 60, y: 360 },
+    { n: 6, x: 540, y: 120 }, { n: 7, x: 540, y: 240 }, { n: 8, x: 540, y: 360 },
+    { n: 4, x: 235, y: 310 }, { n: 5, x: 365, y: 310 },
+  ];
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-white/15 bg-[oklch(0.14_0.10_265)] 
+                    p-4 md:p-6 max-w-full md:max-w-3xl lg:max-w-2xl mx-auto">
+      <svg
+        viewBox="0 0 720 560"
+        className="h-auto w-full md:w-[90%] lg:w-[95%]"
+        role="img"
+        aria-label="Plan des stands"
+      >
+        {/* room outline */}
+        <rect x="30" y="30" width="660" height="430" rx="14"
+          fill="oklch(0.18 0.12 265)" stroke="var(--iris-cyan)" strokeWidth="2" />
+
+        {/* stage arc */}
+        <path d="M 200 70 Q 360 30 520 70" fill="none" stroke="var(--iris-lime)" strokeWidth="4" strokeLinecap="round" />
+
+        {/* seats in arc */}
+        {Array.from({ length: 5 }).map((_, r) =>
+          Array.from({ length: 12 }).map((_, c) => {
+            const angle = (c - 6) * 8; // angle de placement
+            const radius = 120 + r * 22;
+            const x = 360 + radius * Math.sin(angle * Math.PI / 180);
+            const y = 60 + radius * Math.cos(angle * Math.PI / 180);
+            return (
+              <rect key={`s-${r}-${c}`} x={x} y={y} width="8" height="6" rx="2"
+                fill="oklch(0.92 0.02 265)" opacity="0.85" />
+            );
+          })
+        )}
+
+        {/* stands */}
+        {stands.map((s) => (
+          <g key={s.n}>
+            <rect x={s.x} y={s.y} width="120" height="100" rx="8"
+              fill="oklch(0.10 0.08 265)" stroke="var(--iris-cyan)" strokeWidth="1.5" />
+            <text x={s.x + 60} y={s.y + 62} textAnchor="middle"
+              fill="white" fontSize="36" fontWeight="700" fontFamily="var(--font-display)">
+              {s.n}
+            </text>
+          </g>
+        ))}
+
+        {/* entrance */}
+        <rect x="320" y="470" width="80" height="50" rx="6" fill="var(--iris-magenta)" opacity="0.85" />
+        <text x="360" y="545" textAnchor="middle" fill="white" fontSize="14" fontWeight="600">
+          ↑ ENTRÉE
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+
 
 /* ---------- Shared layout primitives ---------- */
 
@@ -764,6 +826,27 @@ function VillagePage() {
           </div>
         </ContentContainer>
       </section>
+
+      <section className="bg-nav-deep text-nav-deep-foreground">
+        <ContentContainer className="flex flex-col md:flex-row md:items-start md:gap-8">
+          <Reveal className="mb-10 max-w-3xl md:mb-0 md:flex-1">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-iris-cyan">
+              Espace
+            </p>
+            <h2 className="font-display text-2xl font-bold md:text-4xl">Plan des stands</h2>
+            <p className="mt-3 text-sm text-nav-deep-foreground/75 md:text-base">
+              Disposition des 8 espaces partenaires autour de la zone plénière (scène + sièges), avec entrée centrale.
+            </p>
+            <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
+          </Reveal>
+
+          <Reveal className="md:flex-1">
+            <StandPlan />
+          </Reveal>
+        </ContentContainer>
+      </section>
+
+
 
       <section className="bg-surface-muted/50">
         <ContentContainer>
