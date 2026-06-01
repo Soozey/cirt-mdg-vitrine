@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Handshake, Mail, FileText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { CIRT_WEBSITE } from "@/lib/event-data";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import contactBg from "@/assets/above-countdown.webp";
 
@@ -21,11 +20,11 @@ const CARDS: ContactCard[] = [
   {
     id: "contact-inscription",
     icon: Mail,
-    title: "Inscription",
-    body: "Le parcours d'inscription sera publié dès validation par l'équipe d'organisation.",
-    cta: "Consulter le CIRT",
+    title: "Contact",
+    body: "Veuillez contacter l'équipe à l'adresse e-mail en cliquant sur le bouton en bas.",
+    cta: "Contacter",
     variant: "default",
-    href: CIRT_WEBSITE,
+    href: "mailto:contact@cybersecurite-madagascar.mg?subject=Inscription%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026",
   },
   {
     id: "sponsor",
@@ -36,15 +35,16 @@ const CARDS: ContactCard[] = [
     variant: "secondary",
     to: "/partenaires",
   },
-  {
-    id: "programme",
-    icon: FileText,
-    title: "Programme",
-    body: "Le programme détaillé sera ajouté lorsqu'un fichier officiel sera disponible.",
-    cta: "Suivre le programme",
-    variant: "outline",
-    href: CIRT_WEBSITE,
-  },
+{
+  id: "programme",
+  icon: FileText,
+  title: "Programme",
+  body: "2 jours de conférences, ateliers techniques, CTF, Hackathon, Jobdating,...",
+  cta: "Suivre le programme",
+  variant: "outline",
+  to: "/informations/programme",
+}
+
 ];
 
 export function ContactSection() {
@@ -92,7 +92,7 @@ export function ContactSection() {
               </span>
               <h3 className="mb-2 text-lg font-semibold text-primary-deep">{title}</h3>
               <p className="mb-6 flex-1 text-sm text-foreground/70">{body}</p>
-              <Button asChild variant={variant} size="sm">
+              <Button disabled={false} asChild variant={variant} size="sm">
                 {to ? (
                   <Link to={to}>
                     {cta} <ArrowUpRight className="size-4" />

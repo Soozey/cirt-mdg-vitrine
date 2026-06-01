@@ -60,7 +60,7 @@ function LoginPage() {
 
   return (
     <AuthShell title="Sign In" subtitle="Connectez-vous pour accéder au quiz cybersécurité.">
-      <form onSubmit={onSubmit} className="grid gap-3">
+      <form onSubmit={onSubmit} className="grid gap-4">
         <FloatingInput
           type="email"
           label="E-mail Adress"
@@ -86,18 +86,18 @@ function LoginPage() {
           </p>
         ) : null}
 
-        <div className="mt-1 flex items-center gap-2">
+        <div className="mt-1 grid gap-2 sm:grid-cols-2">
           <Button
             type="submit"
             disabled={loading}
-            className="h-9 flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+            className="h-10 w-full rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
           >
             {loading ? "Connexion…" : "Sign In"}
           </Button>
           <Button
             asChild
             variant="outline"
-            className="h-9 flex-1 rounded-full border-2 border-primary/40 bg-transparent text-sm font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+            className="h-10 w-full rounded-full border-2 border-primary/40 bg-transparent text-sm font-semibold text-primary hover:bg-primary/5 hover:text-primary"
           >
             <Link to="/register">Sign Up</Link>
           </Button>

@@ -52,17 +52,17 @@ export function SiteFooter() {
     Liens
   </h3>
   <ul className="space-y-2 text-sm">
-    <li>
-      <a
-        href={CIRT_WEBSITE}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-white transition-colors hover:text-iris-lime inline-flex items-center gap-2"
-      >
-        <LinkIcon className="size-4 text-iris-lime" />
-        <span>cirt.gov.mg</span>
-      </a>
-    </li>
+      {/* <li>
+        <a
+          href={CIRT_WEBSITE}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white transition-colors hover:text-iris-lime inline-flex items-center gap-2"
+        >
+          <LinkIcon className="size-4 text-iris-lime" />
+          <span>cirt.gov.mg</span>
+        </a>
+      </li> */}
     <li>
       <a
         href="/#contact"

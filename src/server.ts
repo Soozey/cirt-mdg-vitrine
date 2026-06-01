@@ -24,6 +24,7 @@ const APP_CONFIG_COLLECTION = "appConfig";
 const USERS_COLLECTION = "users";
 const ROLE_INVITES_COLLECTION = "roleInvites";
 const QUIZ_COLLECTION = "quiz";
+const PARTNERSHIP_LEADS_COLLECTION = "partnershipLeads";
 
 function json(data: unknown, init?: ResponseInit) {
   return new Response(JSON.stringify(data), {
@@ -610,6 +611,40 @@ async function handleSubmissions(request: Request) {
   }
 }
 
+async function handlePartnershipLeads(request: Request) {
+  const url = new URL(request.url);
+  if (url.pathname !== "/api/partnership-leads" || request.method !== "POST") return undefined;
+
+  try {
+    const body = await readJson(request);
+    const phone = assertString(body.phone, "phone");
+    const email = normalizeEmail(assertString(body.email, "email"));
+    const organization = assertString(body.organization, "organization");
+    const sector = assertString(body.sector, "sector");
+    const level = assertString(body.level, "level");
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    const sourcePackage = typeof body.sourcePackage === "string" ? body.sourcePackage.trim() : "";
+
+    const ref = await firestoreAdmin().collection(PARTNERSHIP_LEADS_COLLECTION).add({
+      phone,
+      email,
+      organization,
+      sector,
+      level,
+      message,
+      sourcePackage,
+      status: "new",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return json({ id: ref.id }, { status: 201 });
+  } catch (error) {
+    const status = (error as { status?: number }).status ?? 500;
+    return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
+  }
+}
+
 async function findPendingInvite(email: string, phone: string) {
   const db = firestoreAdmin();
   const emailKey = normalizeEmail(email);
@@ -790,6 +825,9 @@ export default {
 
       const submissionsResponse = await handleSubmissions(request);
       if (submissionsResponse) return submissionsResponse;
+
+      const partnershipLeadsResponse = await handlePartnershipLeads(request);
+      if (partnershipLeadsResponse) return partnershipLeadsResponse;
 
       const finalizeProfileResponse = await handleFinalizeProfile(request);
       if (finalizeProfileResponse) return finalizeProfileResponse;

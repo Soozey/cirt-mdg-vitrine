@@ -142,3 +142,20 @@ export async function submitQuizSubmission(submission: import("@/lib/quiz/types"
   });
   return readResponse<{ id: string }>(response);
 }
+
+export async function submitPartnershipLead(data: {
+  phone: string;
+  email: string;
+  organization: string;
+  sector: string;
+  level: string;
+  message?: string;
+  sourcePackage?: string;
+}) {
+  const response = await fetch("/api/partnership-leads", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return readResponse<{ id: string }>(response);
+}

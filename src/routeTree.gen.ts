@@ -16,6 +16,7 @@ import { Route as PartenairesRouteImport } from './routes/partenaires'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JuryRouteImport } from './routes/jury'
 import { Route as DoneRouteImport } from './routes/done'
+import { Route as ConditionsGeneralesUtilisationRouteImport } from './routes/conditions-generales-utilisation'
 import { Route as BootstrapRouteImport } from './routes/bootstrap'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -57,6 +58,12 @@ const DoneRoute = DoneRouteImport.update({
   path: '/done',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConditionsGeneralesUtilisationRoute =
+  ConditionsGeneralesUtilisationRouteImport.update({
+    id: '/conditions-generales-utilisation',
+    path: '/conditions-generales-utilisation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BootstrapRoute = BootstrapRouteImport.update({
   id: '/bootstrap',
   path: '/bootstrap',
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/bootstrap': typeof BootstrapRoute
+  '/conditions-generales-utilisation': typeof ConditionsGeneralesUtilisationRoute
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
@@ -101,6 +109,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/bootstrap': typeof BootstrapRoute
+  '/conditions-generales-utilisation': typeof ConditionsGeneralesUtilisationRoute
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/bootstrap': typeof BootstrapRoute
+  '/conditions-generales-utilisation': typeof ConditionsGeneralesUtilisationRoute
   '/done': typeof DoneRoute
   '/jury': typeof JuryRoute
   '/login': typeof LoginRoute
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/bootstrap'
+    | '/conditions-generales-utilisation'
     | '/done'
     | '/jury'
     | '/login'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/bootstrap'
+    | '/conditions-generales-utilisation'
     | '/done'
     | '/jury'
     | '/login'
@@ -160,6 +172,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/bootstrap'
+    | '/conditions-generales-utilisation'
     | '/done'
     | '/jury'
     | '/login'
@@ -175,6 +188,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   BootstrapRoute: typeof BootstrapRoute
+  ConditionsGeneralesUtilisationRoute: typeof ConditionsGeneralesUtilisationRoute
   DoneRoute: typeof DoneRoute
   JuryRoute: typeof JuryRoute
   LoginRoute: typeof LoginRoute
@@ -237,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DoneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/conditions-generales-utilisation': {
+      id: '/conditions-generales-utilisation'
+      path: '/conditions-generales-utilisation'
+      fullPath: '/conditions-generales-utilisation'
+      preLoaderRoute: typeof ConditionsGeneralesUtilisationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bootstrap': {
       id: '/bootstrap'
       path: '/bootstrap'
@@ -279,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   BootstrapRoute: BootstrapRoute,
+  ConditionsGeneralesUtilisationRoute: ConditionsGeneralesUtilisationRoute,
   DoneRoute: DoneRoute,
   JuryRoute: JuryRoute,
   LoginRoute: LoginRoute,

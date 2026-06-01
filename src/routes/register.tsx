@@ -143,15 +143,15 @@ function RegisterPage() {
       }
     >
       {/* Stepper */}
-      <div className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest">
-        <span className={step >= 1 ? "text-primary" : "text-slate-400"}>1. Identité</span>
+      <div className="mb-4 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest sm:text-[11px]">
+        <span className={step >= 1 ? "shrink-0 text-primary" : "shrink-0 text-slate-400"}>1. Identité</span>
         <span className="h-px flex-1 bg-slate-200" />
-        <span className={step >= 2 ? "text-primary" : "text-slate-400"}>2. Profil</span>
+        <span className={step >= 2 ? "shrink-0 text-primary" : "shrink-0 text-slate-400"}>2. Profil</span>
       </div>
 
       {step === 1 ? (
-        <div className="grid gap-3">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-4">
+          <div className="grid gap-3 sm:grid-cols-2">
             <FloatingInput
               label="Prénom"
               value={firstName}
@@ -187,18 +187,21 @@ function RegisterPage() {
             />
           )}
 
-          <label className="flex cursor-pointer items-start gap-2 text-[11px] leading-snug text-slate-600">
+          <label className="flex cursor-pointer items-start gap-2 text-[11px] leading-snug text-slate-600 sm:text-xs">
             <input
               type="checkbox"
               checked={agree}
               onChange={(e) => setAgree(e.target.checked)}
-              className="mt-0.5 size-3.5 accent-[var(--primary)]"
+              className="mt-0.5 size-4 shrink-0 accent-[var(--primary)]"
             />
             <span>
               En m'inscrivant, j'accepte les{" "}
-              <a href="#" className="font-semibold text-primary hover:underline">
+              <Link
+                to="/conditions-generales-utilisation"
+                className="font-semibold text-primary hover:underline"
+              >
                 conditions générales d'utilisation
-              </a>
+              </Link>
             </span>
           </label>
           {err.agree ? <p className="-mt-2 text-[11px] text-destructive">{err.agree}</p> : null}
@@ -208,19 +211,19 @@ function RegisterPage() {
             </p>
           ) : null}
 
-          <div className="mt-1 flex items-center gap-2">
+          <div className="mt-1 grid gap-2 sm:grid-cols-2">
             <Button
               type="button"
               onClick={goNext}
               disabled={submitting}
-              className="h-9 flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+              className="h-10 w-full rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
             >
               {submitting ? "…" : "Sign Up"} <ArrowRight className="ml-1 size-4" />
             </Button>
             <Button
               asChild
               variant="outline"
-              className="h-9 flex-1 rounded-full border-2 border-primary/40 bg-transparent text-sm font-semibold text-primary hover:bg-primary/5 hover:text-primary"
+              className="h-10 w-full rounded-full border-2 border-primary/40 bg-transparent text-sm font-semibold text-primary hover:bg-primary/5 hover:text-primary"
             >
               <Link to="/login">Sign In</Link>
             </Button>
@@ -237,12 +240,12 @@ function RegisterPage() {
           <OAuthButtons mode="register" />
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="grid gap-3">
+        <form onSubmit={onSubmit} className="grid gap-4">
           <div className="w-full">
             <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
               Téléphone
             </label>
-            <div className="grid grid-cols-[7rem_1fr] gap-2">
+            <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
               <Select
                 value={phonePrefix}
                 onValueChange={(value) => {
@@ -262,17 +265,17 @@ function RegisterPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <div>
-              <Input
-                type="tel"
-                value={phone}
-                onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
-                placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
-                className="h-9 border-slate-200 bg-white text-xs text-slate-700"
-              />
-              {err.phone ? (
-                <p className="mt-0.5 text-[11px] font-medium text-destructive">{err.phone}</p>
-              ) : null}
+              <div className="min-w-0">
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
+                  placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
+                  className="h-9 border-slate-200 bg-white text-xs text-slate-700"
+                />
+                {err.phone ? (
+                  <p className="mt-0.5 text-[11px] font-medium text-destructive">{err.phone}</p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -307,19 +310,19 @@ function RegisterPage() {
             </p>
           ) : null}
 
-          <div className="mt-1 flex gap-2">
+          <div className="mt-1 grid gap-2 sm:grid-cols-[auto_1fr]">
             <Button
               type="button"
               variant="outline"
               onClick={() => setStep(1)}
-              className="h-9 rounded-full border-2 border-slate-200 bg-transparent px-3 text-xs text-slate-600 hover:bg-slate-50"
+              className="h-10 w-full rounded-full border-2 border-slate-200 bg-transparent px-4 text-xs text-slate-600 hover:bg-slate-50 sm:w-auto"
             >
               <ArrowLeft className="size-4" /> Retour
             </Button>
             <Button
               type="submit"
               disabled={submitting}
-              className="h-9 flex-1 rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+              className="h-10 w-full rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
             >
               {submitting ? "Enregistrement…" : "Continuer vers le quiz"}
             </Button>

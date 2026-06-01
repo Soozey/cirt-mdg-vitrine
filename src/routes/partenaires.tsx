@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  ArrowRight,
   Mail,
   Building2,
   Cpu,
@@ -14,17 +16,28 @@ import {
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { submitPartnershipLead } from "@/lib/firebase/server-api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import infoBg from "@/assets/info-section.webp";
 
@@ -85,42 +98,187 @@ const PACKAGES = [
   {
     name: "Sponsor Officiel & Gold",
     price: "80 000 000 Ar",
-    highlighted: true,
-    inclusions: [
-      "Visibilité maximale",
-      "Prise de parole plénière / atelier",
-      "Conférence de presse",
-      "PAD",
-      "Espace Partenaire",
-      "100 invitations",
-    ],
+    description:
+      "Visibilité maximale • Prise de parole plénière/atelier • Conférence de presse • PAD • Espace Partenaire • 100 invitations",
   },
   {
     name: "Partenaire",
     price: "50 000 000 Ar",
-    inclusions: [
-      "Logo sur tous supports",
-      "Pose visuels",
-      "Prise de parole atelier",
-      "50 invitations",
-    ],
+    description: "Logo sur tous supports • Pose visuels • Prise de parole atelier • 50 invitations",
   },
   {
     name: "Conférence / Masterclass",
     price: "1 000 000 Ar",
-    inclusions: [
-      "Animation d'un atelier ou masterclass",
-      "Visibilité programme",
-      "Accès réseau spécialisé",
-      "25 invitations",
-    ],
+    description:
+      "Animation d'un atelier ou masterclass • Visibilité programme • Accès réseau spécialisé • 25 invitations",
   },
   {
     name: "Billet Visiteur",
-    price: "Sur invitation uniquement",
-    inclusions: ["Accès participant avec distribution gérée par l'organisation"],
+    price: "1 000 000 Ar",
+    description: "Sur invitation uniquement",
   },
 ];
+
+const PARTNERSHIP_LEVELS = [
+  "Sponsor Officiel & Gold",
+  "Partenaire",
+  "Partenaire Technique (Atelier/Masterclass)",
+];
+
+function PackageRequestDialog({ packageName }: { packageName?: string }) {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const defaultLevel =
+    packageName === "Conférence / Masterclass"
+      ? "Partenaire Technique (Atelier/Masterclass)"
+      : PARTNERSHIP_LEVELS.includes(packageName ?? "")
+        ? packageName
+        : undefined;
+
+  return (
+    <Dialog
+      onOpenChange={(open) => {
+        if (open) {
+          setStatus("idle");
+          setErrorMessage("");
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90">
+          Demander un package <ArrowRight className="size-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-h-[92vh] overflow-y-auto border-iris-cyan/20 sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl text-primary-deep">
+            Devenir Partenaire / Sponsor
+          </DialogTitle>
+          <DialogDescription>
+            Envoyez votre demande de package. L'équipe prendra contact avec vous pour qualifier
+            l'opportunité.
+          </DialogDescription>
+        </DialogHeader>
+
+        {status === "success" ? (
+          <div className="rounded-md border border-iris-lime/40 bg-iris-lime/10 p-4 text-sm text-primary-deep">
+            Merci, votre demande a bien été enregistrée. L'équipe du Sommet vous recontactera pour
+            finaliser le package.
+          </div>
+        ) : (
+          <form
+            className="grid gap-4"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              setStatus("submitting");
+              setErrorMessage("");
+
+              const formData = new FormData(event.currentTarget);
+              try {
+                await submitPartnershipLead({
+                  phone: String(formData.get("phone") ?? ""),
+                  email: String(formData.get("email") ?? ""),
+                  organization: String(formData.get("organization") ?? ""),
+                  sector: String(formData.get("sector") ?? ""),
+                  level: String(formData.get("level") ?? ""),
+                  message: String(formData.get("message") ?? ""),
+                  sourcePackage: packageName ?? "",
+                });
+                setStatus("success");
+              } catch (error) {
+                setStatus("error");
+                setErrorMessage(
+                  error instanceof Error
+                    ? error.message
+                    : "Impossible d'enregistrer la demande pour le moment.",
+                );
+              }
+            }}
+          >
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="partner-phone">Numéro</Label>
+                <Input id="partner-phone" name="phone" type="tel" required placeholder="+261 ..." />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="partner-email">Email</Label>
+                <Input
+                  id="partner-email"
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="contact@organisation.mg"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="partner-organization">Nom de la société</Label>
+                <Input
+                  id="partner-organization"
+                  name="organization"
+                  required
+                  placeholder="Organisation"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="partner-sector">Secteur d'activité</Label>
+                <Input
+                  id="partner-sector"
+                  name="sector"
+                  required
+                  placeholder="Banque, Télécom, Énergie..."
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Niveau de partenariat souhaité</Label>
+              <Select name="level" defaultValue={defaultLevel} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un niveau" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PARTNERSHIP_LEVELS.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="partner-message">Message</Label>
+              <Textarea
+                id="partner-message"
+                name="message"
+                className="min-h-28"
+                placeholder="Demandes spécifiques de branding, d'espace d'exposition ou d'atelier..."
+              />
+            </div>
+
+            {status === "error" ? (
+              <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {errorMessage}
+              </p>
+            ) : null}
+
+            <Button
+              type="submit"
+              size="lg"
+              className="bg-iris-violet hover:bg-iris-violet/90"
+              disabled={status === "submitting"}
+            >
+              {status === "submitting" ? "Envoi en cours..." : "Envoyer la demande"}
+            </Button>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function PartenairesPage() {
   return (
@@ -165,9 +323,9 @@ function PartenairesPage() {
                 Devenir partenaire du Sommet de la Cybersécurité Madagascar
               </h1>
               <p className="mt-4 max-w-2xl text-base text-nav-deep-foreground/80 md:text-lg">
-                Plateforme nationale de sensibilisation, d'innovation, de protection et de
-                confiance numérique. Associez votre marque à la 1ère édition d'un événement
-                stratégique pour Madagascar.
+                Plateforme nationale de sensibilisation, d'innovation, de protection et de confiance
+                numérique. Associez votre marque à la 1ère édition d'un événement stratégique pour
+                Madagascar.
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-4 text-xs text-nav-deep-foreground/75">
                 <span className="inline-flex items-center gap-1.5">
@@ -181,7 +339,11 @@ function PartenairesPage() {
                 </span>
               </div>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Button asChild size="lg" className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90"
+                >
                   <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
                     <Mail className="size-4" /> Contacter l'organisation
                   </a>
@@ -210,11 +372,11 @@ function PartenairesPage() {
                 Sensibiliser, connecter, innover
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-foreground/75 md:text-base">
-                À l'ère de la transformation numérique accélérée, Madagascar fait face à des
-                enjeux croissants en matière de cybersécurité. Protection des données,
-                résilience des infrastructures critiques, lutte contre la cybercriminalité :
-                ces défis sont devenus des priorités nationales. Ce Sommet est la première
-                plateforme stratégique dédiée à y répondre collectivement.
+                À l'ère de la transformation numérique accélérée, Madagascar fait face à des enjeux
+                croissants en matière de cybersécurité. Protection des données, résilience des
+                infrastructures critiques, lutte contre la cybercriminalité : ces défis sont devenus
+                des priorités nationales. Ce Sommet est la première plateforme stratégique dédiée à
+                y répondre collectivement.
               </p>
               <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
             </Reveal>
@@ -248,9 +410,8 @@ function PartenairesPage() {
                 Partenaires & sponsors recherchés
               </h2>
               <p className="mt-3 text-sm text-foreground/75 md:text-base">
-                Au-delà du public attendu, le Sommet cible des organisations dont le
-                positionnement, les enjeux et la stratégie de croissance s'alignent avec la
-                cybersécurité.
+                Au-delà du public attendu, le Sommet cible des organisations dont le positionnement,
+                les enjeux et la stratégie de croissance s'alignent avec la cybersécurité.
               </p>
               <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
             </Reveal>
@@ -294,56 +455,34 @@ function PartenairesPage() {
               <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
             </Reveal>
 
-            {/* Cards */}
-            <RevealGroup className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-5 flex justify-start">
+              <PackageRequestDialog />
+            </div>
+
+            <RevealGroup className="space-y-3">
               {PACKAGES.map((p) => (
                 <RevealItem key={p.name}>
-                  <Card
-                    className={
-                      "flex h-full flex-col border-border/60 p-6 " +
-                      (p.highlighted
-                        ? "border-iris-violet/60 bg-iris-violet/[0.04] shadow-[0_20px_60px_-20px_oklch(0.62_0.22_295_/_0.35)]"
-                        : "")
-                    }
-                  >
-                    {p.highlighted ? (
-                      <Badge className="mb-3 w-fit border-iris-lime/40 bg-iris-lime/15 text-iris-violet hover:bg-iris-lime/20">
-                        Recommandé
-                      </Badge>
-                    ) : null}
-                    <h3 className="font-display text-lg font-semibold text-primary-deep">
-                      {p.name}
-                    </h3>
-                    <p className="mt-2 font-display text-2xl font-bold text-iris-violet">
-                      {p.price}
-                    </p>
-                    <ul className="mt-5 flex-1 space-y-2 text-sm text-foreground/80">
-                      {p.inclusions.map((inc) => (
-                        <li key={inc} className="flex gap-2">
-                          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
-                          <span>{inc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button asChild className="mt-6" variant={p.highlighted ? "default" : "outline"}>
-                      <a
-                        href={`mailto:contact@cybersecurite-madagascar.mg?subject=Partenariat%20-%20${encodeURIComponent(p.name)}`}
-                      >
-                        <Mail className="size-4" /> Demander ce package
-                      </a>
-                    </Button>
-                  </Card>
+                  <div className="rounded-[8px] bg-[linear-gradient(110deg,oklch(0.67_0.28_300),oklch(0.72_0.18_205),oklch(0.88_0.23_125))] p-px">
+                    <div className="grid gap-4 rounded-[7px] bg-[#020839] px-5 py-5 text-white shadow-[0_22px_55px_-32px_rgba(23,81,255,0.8)] md:grid-cols-[1.05fr_2.2fr_auto] md:items-start md:px-8">
+                      <h3 className="bg-[linear-gradient(90deg,oklch(0.68_0.28_300)_0%,oklch(0.76_0.20_205)_48%,oklch(0.88_0.23_125)_100%)] bg-clip-text font-display text-lg font-semibold uppercase leading-none text-transparent md:text-xl">
+                        {p.name}
+                      </h3>
+                      <p className="text-sm font-bold leading-snug text-white md:text-base">
+                        {p.description}
+                      </p>
+                      <div className="md:min-w-40 md:text-right">
+                        <p className="whitespace-nowrap text-sm text-white/85">{p.price}</p>
+                      </div>
+                    </div>
+                  </div>
                 </RevealItem>
               ))}
             </RevealGroup>
-
-            {/* Recap table */}
-            
           </div>
         </section>
 
         {/* CTA */}
-        <section className="bg-nav-deep text-nav-deep-foreground">
+        {/* <section className="bg-nav-deep text-nav-deep-foreground">
           <div className="mx-auto max-w-4xl px-4 py-14 text-center md:px-8 md:py-20">
             <h2 className="font-display text-2xl font-bold md:text-4xl">
               Construisons ensemble la résilience numérique de Madagascar
@@ -367,7 +506,7 @@ function PartenairesPage() {
               </Button>
             </div>
           </div>
-        </section>
+        </section> */}
       </main>
       <SiteFooter />
     </div>

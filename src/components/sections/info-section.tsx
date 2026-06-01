@@ -29,7 +29,7 @@ export function InfoSection() {
             className="mb-3 text-xs uppercase tracking-[0.28em] text-iris-lime"
             style={{ fontFamily: "var(--font-barlow)" }}
           >
-            En un coup d'œil
+            Les temps forts
           </p>
           <h2
             className="max-w-full text-3xl uppercase leading-tight text-iris bg-iris animate-iris md:text-5xl"

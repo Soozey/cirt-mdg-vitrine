@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export function RocketLogo({ size = 96 }: { size?: number }) {
   return (
     <motion.div
-      initial={{ y: 0, scale: 0.96, opacity: 0 }}
+      initial={false}
       animate={{ y: [-3, 3, -3], scale: 1, opacity: 1 }}
       transition={{
         y: { duration: 4, repeat: Infinity, ease: "easeInOut" },

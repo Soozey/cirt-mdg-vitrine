@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
   Trophy,
-  Medal,
   Code2,
   Users,
   Calendar,
@@ -15,7 +14,6 @@ import {
   CheckCircle2,
   Flag,
   ExternalLink,
-  Clock,
   Mail,
   Laptop,
   Info,
@@ -246,98 +244,55 @@ function RichHero({
   );
 }
 
-/* ---------- HACKATHON ---------- */
+/* ---------- CTF & HACKATHON ---------- */
 
-function HackathonPage() {
-  const criteres = [
-    { label: "Innovation technique", desc: "Originalité et créativité de la solution." },
-    { label: "Niveau de sécurité", desc: "Robustesse face aux menaces cyber concrètes." },
-    { label: "Viabilité de la solution", desc: "Architecture solide, faisabilité réelle." },
-    { label: "Qualité de la présentation finale", desc: "Démo claire et pitch convaincant." },
+function CtfHackathonPage() {
+  const disciplines = [
+    { icon: Flag, title: "Pentest", desc: "Scénarios d'intrusion encadrés sur périmètre autorisé." },
+    { icon: Cpu, title: "Forensique", desc: "Analyse d'artefacts, traces, dumps mémoire et trafic réseau." },
+    { icon: Code2, title: "IA", desc: "Cas d'usage offensifs et défensifs autour de l'intelligence artificielle." },
+    { icon: Laptop, title: "Dev sécurité", desc: "Développement, correction et durcissement de solutions sécurisées." },
   ];
-  const prix = [
-    { icon: Trophy, label: "Trophées", desc: "Distinctions officielles remises aux meilleures équipes." },
-    { icon: Medal, label: "Matériel technologique", desc: "Équipements & licences pro pour continuer à coder." },
-    { icon: Trophy, label: "Programmes & formations", desc: "Accès à des cursus et programmes d'accompagnement cyber." },
-  ];
+
   return (
     <>
       <RichHero
-        badge="Challenge · 24 – 48h"
-        title="Hackathon Cybersécurité : Codez pour la Résilience"
-        tagline="24 à 48 heures de challenge non-stop pour concevoir les solutions de sécurité de demain."
-        ctaLabel="Voir le programme"
-        ctaHref="#programme"
+        badge="Challenge · 22 juin 2026"
+        title="CTF & HACKATHON"
+        tagline="CTF (Capture The Flag) et Hackathon Cyber organisés le 22 juin pour étudiants et jeunes professionnels."
+        ctaLabel="Voir les épreuves"
+        ctaHref="#epreuves"
         meta={[
-          { icon: <Calendar className="size-3.5" />, label: "22 – 23 Juin 2026" },
+          { icon: <Calendar className="size-3.5" />, label: "22 juin 2026" },
           { icon: <MapPin className="size-3.5" />, label: "Novotel, Alarobia" },
-          { icon: <Users className="size-3.5" />, label: "Équipes pluridisciplinaires" },
+          { icon: <Users className="size-3.5" />, label: "Étudiants & jeunes professionnels" },
         ]}
       />
 
-      <section id="programme" className="bg-background">
-        <ContentContainer>
-          <SectionHeader
-            eyebrow="Le concept"
-            title="Un marathon de code au service de la cybersécurité"
-            description="Innovation, cybersécurité et esprit d'équipe : les équipes prototypent des solutions concrètes de défense numérique aux côtés d'experts et de mentors."
-          />
-          <div className="grid gap-5 md:grid-cols-3 lg:grid-cols-5">
-            {[
-              { icon: Users, t: "Accueil & briefing", d: "Formation des équipes, présentation des défis et des règles." },
-              { icon: Flag, t: "Lancement du challenge", d: "Coup d'envoi officiel des sujets et accès aux ressources." },
-              { icon: Code2, t: "Sessions de développement", d: "Sprints encadrés par les mentors et points d'étape." },
-              { icon: Mic, t: "Soutenances", d: "Démo de quelques minutes devant le jury." },
-              { icon: Trophy, t: "Remise des prix", d: "Délibération et cérémonie de clôture." },
-            ].map(({ icon: Icon, t, d }) => (
-              <Card key={t} className="border-border/60 p-5">
-                <Icon className="size-5 text-iris-violet" />
-                <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{t}</h3>
-                <p className="mt-2 text-sm text-foreground/75">{d}</p>
-              </Card>
-            ))}
-          </div>
-        </ContentContainer>
-      </section>
-
-      <section className="bg-surface-muted/50">
-        <ContentContainer>
-          <SectionHeader eyebrow="Évaluation" title="Critères d'évaluation" />
-          <RevealGroup className="grid gap-5 md:grid-cols-2">
-            {criteres.map((c) => (
-              <RevealItem key={c.label}>
-                <Card className="border-border/60 p-6">
-                  <h3 className="font-display text-base font-semibold text-primary-deep">{c.label}</h3>
-                  <p className="mt-2 text-sm text-foreground/70">{c.desc}</p>
-                </Card>
-              </RevealItem>
-            ))}
-          </RevealGroup>
-        </ContentContainer>
-      </section>
-
       <section className="bg-background">
         <ContentContainer>
-          <SectionHeader eyebrow="Récompenses" title="Prix à gagner" />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {prix.map(({ icon: Icon, label, desc }) => (
-              <Card key={label} className="border-border/60 p-6 text-center">
-                <Icon className="mx-auto size-8 text-iris-violet" />
-                <h3 className="mt-3 font-display text-lg font-semibold text-primary-deep">{label}</h3>
-                <p className="mt-2 text-sm text-foreground/70">{desc}</p>
-              </Card>
-            ))}
-          </div>
-        </ContentContainer>
-      </section>
-      <section className="bg-surface-muted/50">
-        <ContentContainer>
-          <SectionHeader eyebrow="Pratique" title="Informations pratiques" />
+          <SectionHeader
+            eyebrow="Synthèse"
+            title="CTF (Capture The Flag) et Hackathon Cyber"
+            description="Organisés le 22 juin pour étudiants et jeunes professionnels. Épreuves techniques en conditions réelles : pentest, forensique, IA, dev sécurité. Plateforme de détection et de valorisation des talents cyber du territoire."
+          />
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { icon: Clock, t: "Durée totale", d: "24 à 48 heures non-stop selon le format final." },
-              { icon: Users, t: "Taille des équipes", d: "Équipes recommandées de 3 à 5 membres, profils variés (dev, ops, design, étudiants)." },
-              { icon: Laptop, t: "Matériel recommandé", d: "PC portable, chargeur, multiprise, casque, et votre stack préférée." },
+              {
+                icon: Flag,
+                t: "CTF",
+                d: "Résolution de challenges cyber pour tester les réflexes techniques et l'analyse en conditions réelles.",
+              },
+              {
+                icon: Code2,
+                t: "Hackathon Cyber",
+                d: "Conception de solutions concrètes autour de la défense, de la résilience et du développement sécurisé.",
+              },
+              {
+                icon: Trophy,
+                t: "Détection des talents",
+                d: "Mise en visibilité des profils cyber prometteurs auprès de l'écosystème et des partenaires.",
+              },
             ].map(({ icon: Icon, t, d }) => (
               <Card key={t} className="border-border/60 p-6">
                 <Icon className="size-5 text-iris-violet" />
@@ -349,110 +304,45 @@ function HackathonPage() {
         </ContentContainer>
       </section>
 
-      <section className="bg-background">
-        <ContentContainer className="max-w-3xl">
-          <SectionHeader eyebrow="FAQ" title="Mini FAQ" />
-          <Accordion type="single" collapsible className="w-full">
-            {[
-              { q: "Que dois-je amener ?", a: "Laptop, chargeur, multiprise, votre stack préférée. Restauration et connexion sur place." },
-              { q: "Quel niveau est requis ?", a: "Tous les niveaux sont les bienvenus, avec des équipes mixtes mêlant dev, design, ops et étudiants." },
-              { q: "Qu'attend le jury ?", a: "Une solution innovante, sécurisée, viable, et clairement présentée lors de la soutenance finale." },
-            ].map((f, i) => (
-              <AccordionItem value={`f${i}`} key={i}>
-                <AccordionTrigger>{f.q}</AccordionTrigger>
-                <AccordionContent className="text-foreground/75">{f.a}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </ContentContainer>
-      </section>
-    </>
-  );
-}
-
-/* ---------- CTF ---------- */
-
-function CtfPage() {
-  return (
-    <>
-      <RichHero
-        badge="Compétition · 22 juin 2026"
-        title="CTF Cybersécurité : l'arène des talents"
-        tagline="Capture The Flag organisé le 22 juin pour étudiants et jeunes professionnels, avec des épreuves techniques en conditions réelles : pentest, forensique, IA et développement sécurisé."
-        ctaLabel="Voir le règlement"
-        ctaHref="#reglement"
-        meta={[
-          { icon: <Flag className="size-3.5" />, label: "Format Jeopardy / Attack-Defense" },
-          { icon: <Users className="size-3.5" />, label: "Étudiants & jeunes professionnels" },
-        ]}
-      />
-
-      <section className="bg-background">
+      <section id="epreuves" className="bg-surface-muted/50">
         <ContentContainer>
           <SectionHeader
-            eyebrow="Format"
-            title="Plusieurs disciplines, une seule arène"
-            description="Plateforme de détection et de valorisation des talents cyber du territoire, dans une ambiance compétitive et fair-play."
+            eyebrow="Épreuves"
+            title="Techniques, réelles, encadrées"
+            description="Les participants manipulent des scénarios proches du terrain, dans un cadre éthique et maîtrisé."
           />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { t: "Cryptographie", d: "Cassez les algorithmes faibles." },
-              { t: "Exploitation web", d: "Exploitez les vulnérabilités OWASP." },
-              { t: "Forensics", d: "Analysez dumps mémoire et trafic." },
-              { t: "Reverse engineering", d: "Désassemblez et exploitez le binaire." },
-            ].map((c) => (
-              <Card key={c.t} className="border-border/60 p-5">
-                <Badge variant="secondary" className="bg-iris-violet/10 text-iris-violet">{c.t}</Badge>
-                <p className="mt-3 text-sm text-foreground/75">{c.d}</p>
-              </Card>
+          <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {disciplines.map(({ icon: Icon, title, desc }) => (
+              <RevealItem key={title}>
+                <Card className="h-full border-border/60 p-6">
+                  <Icon className="size-5 text-iris-violet" />
+                  <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{title}</h3>
+                  <p className="mt-2 text-sm text-foreground/70">{desc}</p>
+                </Card>
+              </RevealItem>
             ))}
-          </div>
+          </RevealGroup>
         </ContentContainer>
       </section>
 
-      <section id="reglement" className="bg-background">
-        <ContentContainer className="grid gap-10 md:grid-cols-2">
-          <div>
-            <SectionHeader eyebrow="Règlement" title="Cadre éthique & règles" />
-            <Accordion type="single" collapsible>
-              {[
-                { q: "Respect du cadre éthique", a: "Aucune attaque hors du périmètre du CTF, aucun partage de flag." },
-                { q: "Interdictions standard", a: "DoS, brute force massif, attaques sur l'infrastructure de l'événement." },
-                { q: "Matériel et outils autorisés", a: "Votre laptop, outils open-source, VM Kali ou Parrot." },
-              ].map((r, i) => (
-                <AccordionItem value={`r${i}`} key={i}>
-                  <AccordionTrigger>{r.q}</AccordionTrigger>
-                  <AccordionContent className="text-foreground/75">{r.a}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-          <div>
-            <SectionHeader eyebrow="Prérequis" title="Stack technique" />
-            <Card className="border-border/60 p-6">
-              <ul className="space-y-3 text-sm text-foreground/80">
-                {[
-                  ["PC personnel", "Avec accès admin/root local"],
-                  ["Systèmes recommandés", "Linux, Kali, Parrot"],
-                  ["Outils recommandés", "Wireshark, BurpSuite, Ghidra, etc."],
-                ].map(([t, d]) => (
-                  <li key={t} className="flex items-start gap-3">
-                    <Cpu className="mt-0.5 size-4 shrink-0 text-iris-violet" />
-                    <div>
-                      <p className="font-medium text-primary-deep">{t}</p>
-                      <p className="text-foreground/70">{d}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </div>
+      <section className="bg-background">
+        <ContentContainer className="max-w-3xl text-center">
+          <SectionHeader
+            align="center"
+            eyebrow="Objectif"
+            title="Valoriser les talents cyber du territoire"
+            description="Le CTF & Hackathon sert de plateforme de détection, de qualification et de mise en relation des étudiants et jeunes professionnels avec les acteurs cyber."
+          />
+          <Button asChild>
+            <Link to="/" hash="contact">
+              <Info className="size-4" /> Demander des informations
+            </Link>
+          </Button>
         </ContentContainer>
       </section>
     </>
   );
 }
-
 
 /* ---------- JOB DATING ---------- */
 
@@ -495,7 +385,9 @@ function JobDatingPage() {
           <SectionHeader
             eyebrow="Opportunité partenaires"
             title="Pour les recruteurs"
-            description="Un point de rencontre exclusif entre les jeunes talents et les entreprises en quête de profils spécialisés en cybersécurité."
+            description="L’évènement sera le point de
+rencontre entre les jeunes talents et les entreprises en quête de
+profils spécialisés."
           />
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -529,7 +421,7 @@ function JobDatingPage() {
                 </a>
               </Button>
               <Button asChild variant="outline">
-                <Link to="/" hash="contact">
+                <Link to="/" hash="informations">
                   <Info className="size-4" /> Plus d'informations
                 </Link>
               </Button>
@@ -551,17 +443,18 @@ function ConferencesPage() {
     { n: "04", t: "Formation & Sensibilisation", d: "Culture cyber et montée en compétences." },
     { n: "05", t: "Coopération Internationale", d: "Échanges, alliances et partage d'expérience." },
   ];
+
   return (
     <>
       <RichHero
-        badge="Programme · 2 jours"
-        title="Conférences & Panels : Décrypter les Enjeux du Cyber-Espace"
+        badge="Conférences · Panels"
+        title="Conférences & Tables Rondes"
         tagline="Experts nationaux & internationaux : cybermenaces, IA & cybersécurité, réglementation, protection des données."
-        ctaLabel="Voir le programme"
-        ctaHref="#programme"
+        ctaLabel="Voir les thématiques"
+        ctaHref="#themes"
       />
 
-      <section className="bg-background">
+      <section id="themes" className="bg-background">
         <ContentContainer>
           <SectionHeader
             eyebrow="Thèmes"
@@ -576,8 +469,14 @@ function ConferencesPage() {
               "Souveraineté numérique",
               "Gestion d'incidents",
               "Cadre réglementaire",
-            ].map((t) => (
-              <Badge key={t} variant="outline" className="border-iris-violet/40 text-iris-violet">{t}</Badge>
+            ].map((theme) => (
+              <Badge
+                key={theme}
+                variant="outline"
+                className="border-iris-violet/40 text-iris-violet"
+              >
+                {theme}
+              </Badge>
             ))}
           </div>
         </ContentContainer>
@@ -587,67 +486,18 @@ function ConferencesPage() {
         <ContentContainer>
           <SectionHeader eyebrow="Axes thématiques" title="Les 5 axes du Sommet" />
           <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {axes.map((a) => (
-              <RevealItem key={a.n}>
+            {axes.map((axis) => (
+              <RevealItem key={axis.n}>
                 <Card className="h-full border-border/60 p-6">
-                  <span className="font-display text-2xl font-bold text-iris-violet">{a.n}</span>
-                  <h3 className="mt-2 font-display text-base font-semibold text-primary-deep">{a.t}</h3>
-                  <p className="mt-2 text-sm text-foreground/75">{a.d}</p>
+                  <span className="font-display text-2xl font-bold text-iris-violet">{axis.n}</span>
+                  <h3 className="mt-2 font-display text-base font-semibold text-primary-deep">
+                    {axis.t}
+                  </h3>
+                  <p className="mt-2 text-sm text-foreground/75">{axis.d}</p>
                 </Card>
               </RevealItem>
             ))}
           </RevealGroup>
-        </ContentContainer>
-      </section>
-
-      <section id="programme" className="bg-background">
-        <ContentContainer>
-          <SectionHeader eyebrow="Programme" title="Les deux journées du Sommet" />
-          <div className="grid gap-6 md:grid-cols-2">
-            {[
-              {
-                day: "Jour 1",
-                date: "22 juin 2026",
-                items: [
-                  "Cérémonie d'ouverture officielle",
-                  "Conférences plénières & panels d'experts",
-                  "Ateliers techniques (systèmes & réseaux)",
-                  "Espace exposition & démos live partenaires",
-                  "Déjeuner networking partenaires & VIP",
-                  "CTF & Hackathon Cyber",
-                ],
-              },
-              {
-                day: "Jour 2",
-                date: "23 juin 2026",
-                items: [
-                  "Masterclass : gestion de cyber-crise",
-                  "Coopération internationale & panels",
-                  "Annonce des résultats & remise des prix CTF / Hackathon",
-                  "Job Dating Cyber : lauréats CTF, Hackathon & jeunes talents",
-                  "Table ronde : cybermenaces & IA",
-                  "Cocktail de clôture & networking",
-                ],
-              },
-            ].map((d) => (
-              <Card key={d.day} className="border-border/60 p-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-iris-violet">
-                  {d.day}
-                </p>
-                <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">
-                  {d.date}
-                </h3>
-                <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-                  {d.items.map((it) => (
-                    <li key={it} className="flex gap-2">
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
         </ContentContainer>
       </section>
 
@@ -656,14 +506,26 @@ function ConferencesPage() {
           <SectionHeader eyebrow="Panels" title="Thématiques des tables rondes" />
           <Accordion type="single" collapsible>
             {[
-              { q: "IA & cybersécurité", a: "Opportunités et risques de l'IA générative pour la défense et l'attaque." },
-              { q: "Protection des infrastructures critiques", a: "Bonnes pratiques pour les secteurs sensibles (énergie, télécoms, finance)." },
-              { q: "Souveraineté numérique", a: "Hébergement local, dépendances logicielles et autonomie stratégique." },
-              { q: "Gestion d'incidents", a: "Préparer, détecter, contenir, éradiquer et apprendre." },
-            ].map((p, i) => (
-              <AccordionItem value={`p${i}`} key={i}>
-                <AccordionTrigger>{p.q}</AccordionTrigger>
-                <AccordionContent className="text-foreground/75">{p.a}</AccordionContent>
+              {
+                q: "IA & cybersécurité",
+                a: "Opportunités et risques de l'IA générative pour la défense et l'attaque.",
+              },
+              {
+                q: "Protection des infrastructures critiques",
+                a: "Bonnes pratiques pour les secteurs sensibles comme l'énergie, les télécoms et la finance.",
+              },
+              {
+                q: "Souveraineté numérique",
+                a: "Hébergement local, dépendances logicielles et autonomie stratégique.",
+              },
+              {
+                q: "Gestion d'incidents",
+                a: "Préparer, détecter, contenir, éradiquer et apprendre.",
+              },
+            ].map((panel, index) => (
+              <AccordionItem value={`panel-${index}`} key={panel.q}>
+                <AccordionTrigger>{panel.q}</AccordionTrigger>
+                <AccordionContent className="text-foreground/75">{panel.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
@@ -775,9 +637,9 @@ function AteliersPage() {
   );
 }
 
-/* ---------- VILLAGE PARTENAIRES ---------- */
+/* ---------- EXPOSITION & NETWORKING ---------- */
 
-function VillagePage() {
+function ExpositionNetworkingPage() {
   const profils = [
     {
       icon: Building2,
@@ -795,12 +657,20 @@ function VillagePage() {
       desc: "Ministères, agences stratégiques, bailleurs, universités & centres de formation engagés dans la souveraineté numérique.",
     },
   ];
+  const slots = [
+    { h: "", t: "Pause café d'accueil", l: "Foyer principal" },
+    { h: "", t: "Déjeuner networking", l: "Restaurant Novotel" },
+    { h: "", t: "Pause café & démos", l: "Village partenaires" },
+    { h: "", t: "Afterwork avec cocktail de clôture J1", l: "Terrasse" },
+    { h: "", t: "Déjeuner J2 avec tables thématiques", l: "Restaurant Novotel" },
+  ];
+
   return (
     <>
       <RichHero
-        badge="Exposition · 2 jours"
-        title="Village Partenaires : l'innovation en action"
-        tagline="Espaces partenaires, démos live et plénière : un espace pour les échanges, la visibilité institutionnelle et les rencontres avec les acteurs de l'écosystème cyber."
+        badge="Exposition & Networking · 2 jours"
+        title="EXPOSITION & NETWORKING"
+        tagline="Espaces partenaires, plénière et démonstrations live : un espace commun pour rencontrer les acteurs de l'écosystème cyber et développer son réseau."
         ctaLabel="Devenir partenaire"
         ctaHref="/partenaires"
       />
@@ -809,8 +679,8 @@ function VillagePage() {
         <ContentContainer>
           <SectionHeader
             eyebrow="Objectifs"
-            title="Découvrir l'écosystème cyber malgache"
-            description="Stands des partenaires technologiques, démos live (EDR, SIEM, simulations d'attaques) et focus souveraineté numérique."
+            title="Découvrir, échanger, connecter"
+            description="Stands partenaires, zone plénière, démos live (EDR, SIEM, simulations d'attaques) et moments networking pour créer des opportunités concrètes."
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
@@ -849,6 +719,55 @@ function VillagePage() {
 
 
       <section className="bg-surface-muted/50">
+        <ContentContainer className="grid gap-8 md:grid-cols-2">
+          <Card className="border-border/60 p-6 md:p-8">
+            <h3 className="font-display text-xl font-semibold text-primary-deep">
+              Application de matchmaking
+            </h3>
+            <p className="mt-3 text-sm text-foreground/80">
+              Une application de matchmaking pourra être proposée pour faciliter la prise de rendez-vous
+              entre participants. Le lien sera communiqué prochainement par l'organisation.
+            </p>
+            <p className="mt-3 text-xs text-foreground/60">
+              <CheckCircle2 className="mr-1.5 inline size-3.5 text-iris-violet" />
+              Participation optionnelle, sans inscription requise pour les moments networking.
+            </p>
+            <Button asChild variant="outline" className="mt-6" disabled>
+              <span>
+                Lien à venir <ExternalLink className="size-4" />
+              </span>
+            </Button>
+          </Card>
+
+          <div id="horaires">
+            <h3 className="font-display text-xl font-semibold text-primary-deep">
+              Horaires des moments networking
+            </h3>
+            <ol className="mt-4 space-y-4">
+              {slots.map((s, i) => (
+                <li key={`${s.h}-${s.t}`} className="flex gap-4">
+                  <div className="flex flex-col items-center pt-1">
+                    <span className="size-3 shrink-0 rounded-full bg-iris-violet ring-4 ring-iris-violet/20" />
+                    {i < slots.length - 1 ? (
+                      <span className="mt-1 w-px flex-1 bg-iris-violet/30" aria-hidden />
+                    ) : null}
+                  </div>
+                  <Card className="flex-1 border-border/60 p-4">
+                    <div className="flex items-center gap-3">
+                      <Coffee className="size-4 text-iris-violet" />
+                      <span className="text-xs font-semibold text-iris-violet">{s.h}</span>
+                    </div>
+                    <p className="mt-1 font-display text-base font-semibold text-primary-deep">{s.t}</p>
+                    <p className="text-xs text-foreground/70">{s.l}</p>
+                  </Card>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </ContentContainer>
+      </section>
+
+      <section className="bg-surface-muted/50">
         <ContentContainer>
           <SectionHeader eyebrow="Profils ciblés" title="Qui sera présent" />
           <RevealGroup className="grid gap-5 md:grid-cols-3">
@@ -880,7 +799,7 @@ function VillagePage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Village%20Partenaires%20-%20CIRT%20MDG%202026">
+              <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Exposition%20%26%20Networking%20-%20CIRT%20MDG%202026">
                 <Mail className="size-4" /> Contacter l'organisation
               </a>
             </Button>
@@ -892,94 +811,66 @@ function VillagePage() {
 }
 
 
-/* ---------- NETWORKING ---------- */
-
-function NetworkingPage() {
-  const slots = [
-    { h: "09h30", t: "Pause café d'accueil", l: "Foyer principal" },
-    { h: "12h30", t: "Déjeuner networking", l: "Restaurant Novotel" },
-    { h: "15h30", t: "Pause café & démos", l: "Village partenaires" },
-    { h: "18h00", t: "Afterwork avec cocktail de clôture J1", l: "Terrasse" },
-    { h: "12h30", t: "Déjeuner J2 avec tables thématiques", l: "Restaurant Novotel" },
+function ProgrammePage() {
+  const days = [
+    {
+      day: "Jour 1",
+      date: "22 juin 2026",
+      items: [
+        "Cérémonie d'ouverture officielle",
+        "Conférences plénières & panels d'experts",
+        "Ateliers techniques (systèmes & réseaux)",
+        "Espace exposition & démos live partenaires",
+        "Déjeuner networking partenaires & VIP",
+        "CTF & Hackathon Cyber",
+      ],
+    },
+    {
+      day: "Jour 2",
+      date: "23 juin 2026",
+      items: [
+        "Masterclass : gestion de cyber-crise",
+        "Coopération internationale & panels",
+        "Annonce des résultats & remise des prix CTF / Hackathon",
+        "Job Dating Cyber : lauréats CTF, Hackathon & jeunes talents",
+        "Table ronde : cybermenaces & IA",
+        "Cocktail de clôture & networking",
+      ],
+    },
   ];
+
   return (
     <>
       <RichHero
-        badge="Rencontres · 2 jours"
-        title="Espace Networking : Développez votre Réseau Professionnel"
-        tagline="Connectez-vous avec vos pairs et créez des opportunités d'affaires."
-        ctaLabel="Voir les horaires"
-        ctaHref="#horaires"
+        badge="Programme · 2 jours"
+        title="Les deux journées du Sommet"
+        tagline="Cérémonies, conférences, ateliers techniques, CTF & Hackathon, networking et remise des prix : découvrez le programme complet."
+        ctaLabel="Voir le programme"
+        ctaHref="#programme"
       />
 
-      <section className="bg-background">
+      <section id="programme" className="bg-background">
         <ContentContainer>
-          <SectionHeader
-            eyebrow="Pour qui"
-            title="Étudiants, entreprises, institutions"
-            description="Espaces lounge, pauses café et déjeuners networking : des moments dédiés pour favoriser les rencontres informelles."
-          />
-          <div className="grid gap-5 md:grid-cols-3">
-            {[
-              { icon: Users, t: "Étudiants & jeunes diplômés", d: "Rencontrez vos futurs employeurs." },
-              { icon: Building2, t: "Entreprises", d: "Identifiez les talents et partenaires." },
-              { icon: Mic, t: "Institutions publiques", d: "Coopération et politiques cyber." },
-            ].map(({ icon: Icon, t, d }) => (
-              <Card key={t} className="border-border/60 p-6">
-                <Icon className="size-5 text-iris-violet" />
-                <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{t}</h3>
-                <p className="mt-2 text-sm text-foreground/70">{d}</p>
+          <SectionHeader eyebrow="Programme" title="Les deux journées du Sommet" />
+          <div className="grid gap-6 md:grid-cols-2">
+            {days.map((day) => (
+              <Card key={day.day} className="border-border/60 p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-iris-violet">
+                  {day.day}
+                </p>
+                <h3 className="mt-1 font-display text-xl font-semibold text-primary-deep">
+                  {day.date}
+                </h3>
+                <ul className="mt-4 space-y-2 text-sm text-foreground/80">
+                  {day.items.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </Card>
             ))}
-          </div>
-        </ContentContainer>
-      </section>
-
-      <section className="bg-surface-muted/50">
-        <ContentContainer className="grid gap-8 md:grid-cols-2">
-          <Card className="border-border/60 p-6 md:p-8">
-            <h3 className="font-display text-xl font-semibold text-primary-deep">
-              Application de matchmaking
-            </h3>
-            <p className="mt-3 text-sm text-foreground/80">
-              Une application de matchmaking pourra être proposée pour faciliter la prise de rendez-vous
-              entre participants. Le lien sera communiqué prochainement par l'organisation.
-            </p>
-            <p className="mt-3 text-xs text-foreground/60">
-              <CheckCircle2 className="mr-1.5 inline size-3.5 text-iris-violet" />
-              Participation optionnelle, sans inscription requise pour les moments networking.
-            </p>
-            <Button asChild variant="outline" className="mt-6" disabled>
-              <span>
-                Lien à venir <ExternalLink className="size-4" />
-              </span>
-            </Button>
-          </Card>
-
-          <div id="horaires">
-            <h3 className="font-display text-xl font-semibold text-primary-deep">
-              Horaires des moments networking
-            </h3>
-            <ol className="mt-4 space-y-4">
-              {slots.map((s, i) => (
-                <li key={i} className="flex gap-4">
-                  <div className="flex flex-col items-center pt-1">
-                    <span className="size-3 shrink-0 rounded-full bg-iris-violet ring-4 ring-iris-violet/20" />
-                    {i < slots.length - 1 ? (
-                      <span className="mt-1 w-px flex-1 bg-iris-violet/30" aria-hidden />
-                    ) : null}
-                  </div>
-                  <Card className="flex-1 border-border/60 p-4">
-                    <div className="flex items-center gap-3">
-                      <Coffee className="size-4 text-iris-violet" />
-                      <span className="text-xs font-semibold text-iris-violet">{s.h}</span>
-                    </div>
-                    <p className="mt-1 font-display text-base font-semibold text-primary-deep">{s.t}</p>
-                    <p className="text-xs text-foreground/70">{s.l}</p>
-                  </Card>
-                </li>
-              ))}
-            </ol>
           </div>
         </ContentContainer>
       </section>
@@ -990,11 +881,10 @@ function NetworkingPage() {
 /* ---------- Registry ---------- */
 
 export const RICH_PAGES: Record<string, () => React.JSX.Element> = {
-  hackathon: HackathonPage,
-  "ctf-etudiant": CtfPage,
+  "ctf-hackathon": CtfHackathonPage,
   "job-dating": JobDatingPage,
   conferences: ConferencesPage,
+  programme: ProgrammePage,
   ateliers: AteliersPage,
-  "village-partenaires": VillagePage,
-  networking: NetworkingPage,
+  "exposition-networking": ExpositionNetworkingPage,
 };
