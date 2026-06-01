@@ -167,9 +167,9 @@ function Card({ s, index }: { s: Submission; index: number }) {
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">IA</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Correct</p>
           <p className="font-mono font-semibold text-foreground">
-            {(s.aiAverage * 100).toFixed(0)}%
+            {s.answers.filter((answer) => answer.isCorrect).length}/{s.questions.length}
           </p>
         </div>
         <div>

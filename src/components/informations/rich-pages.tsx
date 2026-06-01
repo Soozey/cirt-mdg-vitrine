@@ -19,6 +19,7 @@ import {
   Mail,
   Laptop,
   Info,
+  ArrowLeft,
 } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/accordion";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
 import { cn } from "@/lib/utils";
+import detailHeroBg from "@/assets/info-section.webp";
 
 
 /* ---------- Shared layout primitives ---------- */
@@ -52,15 +54,21 @@ export function SectionHeader({
       className={cn("mb-10 max-w-3xl", align === "center" && "mx-auto text-center")}
     >
       {eyebrow ? (
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-iris-violet">
+        <p
+          className="mb-2 text-[11px] uppercase tracking-[0.24em] text-iris-lime"
+          style={{ fontFamily: "var(--font-barlow)" }}
+        >
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="font-display text-2xl font-bold text-primary-deep md:text-4xl">
+      <h2
+        className="text-2xl uppercase leading-tight text-iris bg-iris animate-iris md:text-4xl"
+        style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.02em" }}
+      >
         {title}
       </h2>
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-foreground/75 md:text-base">
+        <p className="mt-3 text-sm leading-relaxed text-white/82 md:text-base">
           {description}
         </p>
       ) : null}
@@ -104,45 +112,64 @@ function RichHero({
   meta?: { icon: React.ReactNode; label: string }[];
 }) {
   return (
-    <section className="relative isolate overflow-hidden bg-nav-deep text-nav-deep-foreground">
+    <section className="relative isolate overflow-hidden bg-[#03164a] text-white">
+      <img
+        src={detailHeroBg}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-35 mix-blend-screen"
+      />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-100"
         style={{
-          backgroundImage:
-            "radial-gradient(ellipse at top, oklch(0.55 0.22 295 / 0.45), transparent 60%)",
+          background:
+            "radial-gradient(circle at 88% 12%, rgba(214, 255, 87, 0.18), transparent 26%), radial-gradient(circle at 8% 82%, rgba(142, 60, 255, 0.22), transparent 30%), linear-gradient(180deg, rgba(3, 27, 89, 0.92) 0%, rgba(3, 20, 74, 0.94) 52%, rgba(2, 8, 45, 0.98) 100%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.07]"
         style={{
           backgroundImage:
-            "linear-gradient(oklch(1 0 0 / 0.6) 1px, transparent 1px), linear-gradient(90deg, oklch(1 0 0 / 0.6) 1px, transparent 1px)",
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
           backgroundSize: "44px 44px",
         }}
       />
       <ContentContainer className="relative">
         <Reveal>
-          <Badge className="border-iris-cyan/30 bg-iris-cyan/10 text-iris-cyan hover:bg-iris-cyan/15">
+          <Link
+            to="/"
+            hash="informations"
+            className="mb-6 inline-flex items-center gap-1 rounded-md border border-iris-cyan/25 bg-[#03164a]/85 px-3 py-2 text-sm font-semibold text-iris-lime shadow-[0_14px_35px_-28px_rgba(34,211,238,0.75)] transition-colors hover:bg-[#041a5d] hover:text-iris-cyan"
+          >
+            <ArrowLeft className="size-4" /> Retour aux informations
+          </Link>
+          <Badge
+            className="border-iris-cyan/35 bg-iris-cyan/10 text-iris-lime hover:bg-iris-cyan/15"
+            style={{ fontFamily: "var(--font-barlow)" }}
+          >
             {badge}
           </Badge>
-          <h1 className="mt-5 font-display text-3xl font-bold leading-tight md:text-5xl">
+          <h1
+            className="mt-5 text-3xl uppercase leading-tight text-iris bg-iris animate-iris md:text-5xl"
+            style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.02em" }}
+          >
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-nav-deep-foreground/75 md:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-white/82 md:text-lg">
             {tagline}
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90">
+            <Button asChild size="lg" className="bg-iris-lime text-primary-deep shadow-[0_14px_35px_-22px_rgba(214,255,87,0.85)] hover:bg-iris-lime/90">
               <a href={ctaHref}>{ctaLabel}</a>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-white/20 bg-white/5 text-nav-deep-foreground hover:bg-white/10">
+            <Button asChild size="lg" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
               <Link to="/" hash="contact">Nous contacter</Link>
             </Button>
           </div>
           {meta.length ? (
-            <div className="mt-8 flex flex-wrap gap-4 text-xs text-nav-deep-foreground/70">
+            <div className="mt-8 flex flex-wrap gap-4 text-xs text-white/78">
               {meta.map((m, i) => (
                 <span key={i} className="inline-flex items-center gap-1.5">
                   {m.icon}
@@ -241,7 +268,6 @@ function HackathonPage() {
           </div>
         </ContentContainer>
       </section>
-
       <section className="bg-surface-muted/50">
         <ContentContainer>
           <SectionHeader eyebrow="Pratique" title="Informations pratiques" />
@@ -436,7 +462,7 @@ function JobDatingPage() {
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild>
-                <a href="mailto:contact@cirt.gov.mg?subject=Candidature%20Job%20Dating%20-%20CIRT%20MDG%202026">
+                <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Candidature%20Job%20Dating%20-%20CIRT%20MDG%202026">
                   <Mail className="size-4" /> Envoyer mon CV par email
                 </a>
               </Button>
@@ -771,7 +797,7 @@ function VillagePage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <a href="mailto:contact@cirt.gov.mg?subject=Village%20Partenaires%20-%20CIRT%20MDG%202026">
+              <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Village%20Partenaires%20-%20CIRT%20MDG%202026">
                 <Mail className="size-4" /> Contacter l'organisation
               </a>
             </Button>

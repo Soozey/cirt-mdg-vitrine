@@ -1,43 +1,233 @@
-import type { Question, Domain } from "./types";
+import type { Answer, Domain, Question } from "./types";
 
 export const QUESTIONS: Question[] = [
-  // Réseaux
-  { id: "NET-BEG-001", domain: "Réseaux", level: "Débutant", text: "Expliquez la différence entre TCP et UDP et donnez un cas d'usage typique pour chacun.", keywords: ["tcp", "udp", "transport", "fiabilité", "connexion"] },
-  { id: "NET-BEG-002", domain: "Réseaux", level: "Débutant", text: "Décrivez le fonctionnement complet d'une résolution DNS, depuis la requête utilisateur jusqu'à la réponse.", keywords: ["dns", "résolution", "récursif", "autoritaire", "cache"] },
-  { id: "NET-INT-001", domain: "Réseaux", level: "Intermédiaire", text: "Qu'est-ce qu'une attaque ARP spoofing ? Comment la détecter et s'en protéger ?", keywords: ["arp", "spoofing", "mitm", "détection", "statique"] },
-  { id: "NET-INT-002", domain: "Réseaux", level: "Intermédiaire", text: "Comparez les rôles d'un IDS et d'un IPS dans une architecture défensive.", keywords: ["ids", "ips", "détection", "prévention", "inline"] },
-  { id: "NET-ADV-001", domain: "Réseaux", level: "Avancé", text: "Expliquez le concept de BGP Hijacking et les contre-mesures (RPKI, ROA).", keywords: ["bgp", "hijacking", "rpki", "roa", "routing"] },
-
-  // Web
-  { id: "WEB-BEG-001", domain: "Web", level: "Débutant", text: "Quelle est la différence entre une XSS reflected et une XSS stored ? Donnez un exemple.", keywords: ["xss", "reflected", "stored", "injection", "javascript"] },
-  { id: "WEB-BEG-002", domain: "Web", level: "Débutant", text: "Expliquez le principe d'une injection SQL et comment l'éviter en pratique.", keywords: ["sql", "injection", "prepared", "paramétré", "orm"] },
-  { id: "WEB-INT-001", domain: "Web", level: "Intermédiaire", text: "Qu'est-ce qu'une attaque SSRF ? Quels sont ses impacts dans un environnement cloud ?", keywords: ["ssrf", "metadata", "cloud", "imds", "interne"] },
-  { id: "WEB-INT-002", domain: "Web", level: "Intermédiaire", text: "Expliquez le fonctionnement d'une attaque CSRF et les défenses modernes.", keywords: ["csrf", "token", "samesite", "cookie", "synchronizer"] },
-  { id: "WEB-ADV-001", domain: "Web", level: "Avancé", text: "Présentez plusieurs techniques de contournement (bypass) d'une Content Security Policy.", keywords: ["csp", "bypass", "nonce", "jsonp", "dangling"] },
-
-  // Cryptographie
-  { id: "CRY-BEG-001", domain: "Cryptographie", level: "Débutant", text: "Expliquez le fonctionnement de RSA et le rôle des clés publique et privée.", keywords: ["rsa", "asymétrique", "clé", "publique", "modulo"] },
-  { id: "CRY-BEG-002", domain: "Cryptographie", level: "Débutant", text: "Décrivez l'échange de clés Diffie-Hellman et ce qu'il garantit.", keywords: ["diffie", "hellman", "échange", "secret", "discret"] },
-  { id: "CRY-INT-001", domain: "Cryptographie", level: "Intermédiaire", text: "Qu'est-ce qu'une attaque par Padding Oracle ? Donnez un cas concret (ex: CBC).", keywords: ["padding", "oracle", "cbc", "déchiffrement", "vaudenay"] },
-  { id: "CRY-INT-002", domain: "Cryptographie", level: "Intermédiaire", text: "Pourquoi le mode ECB d'AES est-il considéré comme dangereux par rapport au CBC ?", keywords: ["aes", "ecb", "cbc", "pattern", "iv"] },
-  { id: "CRY-ADV-001", domain: "Cryptographie", level: "Avancé", text: "Expliquez l'attaque de Bleichenbacher contre RSA PKCS#1 v1.5.", keywords: ["bleichenbacher", "rsa", "pkcs", "oracle", "padding"] },
-
-  // Forensics
-  { id: "FOR-BEG-001", domain: "Forensics", level: "Débutant", text: "Qu'est-ce que la chain of custody ? Pourquoi est-elle critique en investigation numérique ?", keywords: ["chain", "custody", "preuve", "intégrité", "traçabilité"] },
-  { id: "FOR-BEG-002", domain: "Forensics", level: "Débutant", text: "À quoi sert Volatility ? Donnez deux plugins utiles pour l'analyse mémoire.", keywords: ["volatility", "mémoire", "pslist", "netscan", "dump"] },
-  { id: "FOR-INT-001", domain: "Forensics", level: "Intermédiaire", text: "Que peut-on déduire des fichiers Prefetch de Windows lors d'une investigation ?", keywords: ["prefetch", "windows", "exécution", "timestamp", ".pf"] },
-  { id: "FOR-INT-002", domain: "Forensics", level: "Intermédiaire", text: "Qu'est-ce qu'un malware fileless ? Comment l'investiguer ?", keywords: ["fileless", "mémoire", "powershell", "wmi", "lolbins"] },
-  { id: "FOR-ADV-001", domain: "Forensics", level: "Avancé", text: "Quelles sont les particularités de la forensique sur un environnement Docker en production ?", keywords: ["docker", "container", "volume", "overlay", "runtime"] },
-
-  // Reverse
-  { id: "REV-BEG-001", domain: "Reverse", level: "Débutant", text: "Quelle est la différence entre un désassembleur et un décompilateur ?", keywords: ["désassembleur", "décompilateur", "ida", "ghidra", "assembly"] },
-  { id: "REV-BEG-002", domain: "Reverse", level: "Débutant", text: "Expliquez comment unpacker un binaire packé avec UPX.", keywords: ["upx", "unpack", "packer", "oep", "section"] },
-  { id: "REV-INT-001", domain: "Reverse", level: "Intermédiaire", text: "Qu'est-ce que la technique de process hollowing utilisée par certains malwares ?", keywords: ["process", "hollowing", "injection", "ntunmap", "suspended"] },
-  { id: "REV-INT-002", domain: "Reverse", level: "Intermédiaire", text: "Comment VMProtect rend-il l'analyse statique d'un binaire plus difficile ?", keywords: ["vmprotect", "virtualisation", "obfuscation", "handler", "bytecode"] },
-  { id: "REV-ADV-001", domain: "Reverse", level: "Avancé", text: "Expliquez le principe d'une attaque ROP (Return-Oriented Programming).", keywords: ["rop", "gadget", "stack", "ret", "dep"] },
+  {
+    id: "NET-BEG-001",
+    domain: "Réseaux",
+    level: "Débutant",
+    text: "Quel protocole garantit généralement la livraison ordonnée des paquets ?",
+    options: [
+      { id: "a", text: "UDP" },
+      { id: "b", text: "TCP" },
+      { id: "c", text: "ICMP" },
+      { id: "d", text: "ARP" },
+    ],
+    correctOptionId: "b",
+    explanation: "TCP établit une connexion et gère l'ordre, les accusés de réception et les retransmissions.",
+  },
+  {
+    id: "NET-BEG-002",
+    domain: "Réseaux",
+    level: "Débutant",
+    text: "Quel service traduit un nom de domaine comme cirt.gov.mg en adresse IP ?",
+    options: [
+      { id: "a", text: "DNS" },
+      { id: "b", text: "DHCP" },
+      { id: "c", text: "NTP" },
+      { id: "d", text: "SMTP" },
+    ],
+    correctOptionId: "a",
+    explanation: "Le DNS résout les noms de domaine vers des enregistrements réseau, dont les adresses IP.",
+  },
+  {
+    id: "NET-INT-001",
+    domain: "Réseaux",
+    level: "Intermédiaire",
+    text: "Une attaque ARP spoofing sert principalement à...",
+    options: [
+      { id: "a", text: "Chiffrer le trafic d'un réseau local" },
+      { id: "b", text: "Se placer en homme du milieu sur un LAN" },
+      { id: "c", text: "Empêcher la résolution DNS externe" },
+      { id: "d", text: "Créer un tunnel VPN site-à-site" },
+    ],
+    correctOptionId: "b",
+    explanation: "L'attaquant associe son adresse MAC à l'IP d'une autre machine, souvent la passerelle.",
+  },
+  {
+    id: "NET-INT-002",
+    domain: "Réseaux",
+    level: "Intermédiaire",
+    text: "Quelle différence décrit le mieux IDS et IPS ?",
+    options: [
+      { id: "a", text: "Un IDS détecte, un IPS peut bloquer en ligne" },
+      { id: "b", text: "Un IDS chiffre, un IPS déchiffre" },
+      { id: "c", text: "Un IDS remplace le pare-feu, un IPS remplace le DNS" },
+      { id: "d", text: "Aucune différence opérationnelle" },
+    ],
+    correctOptionId: "a",
+    explanation: "Un IDS alerte sur des activités suspectes, tandis qu'un IPS peut intervenir pour les bloquer.",
+  },
+  {
+    id: "WEB-BEG-001",
+    domain: "Web",
+    level: "Débutant",
+    text: "Quelle défense réduit fortement le risque d'injection SQL ?",
+    options: [
+      { id: "a", text: "Concaténer les chaînes côté serveur" },
+      { id: "b", text: "Utiliser des requêtes préparées paramétrées" },
+      { id: "c", text: "Désactiver HTTPS" },
+      { id: "d", text: "Masquer les erreurs CSS" },
+    ],
+    correctOptionId: "b",
+    explanation: "Les requêtes préparées séparent le code SQL des données utilisateur.",
+  },
+  {
+    id: "WEB-BEG-002",
+    domain: "Web",
+    level: "Débutant",
+    text: "Une XSS stockée est dangereuse car...",
+    options: [
+      { id: "a", text: "Elle ne touche que le navigateur de l'attaquant" },
+      { id: "b", text: "Elle est sauvegardée puis servie à plusieurs utilisateurs" },
+      { id: "c", text: "Elle bloque uniquement les images" },
+      { id: "d", text: "Elle nécessite toujours un accès root serveur" },
+    ],
+    correctOptionId: "b",
+    explanation: "Le payload est persistant dans l'application et peut atteindre les visiteurs légitimes.",
+  },
+  {
+    id: "WEB-INT-001",
+    domain: "Web",
+    level: "Intermédiaire",
+    text: "Quel en-tête aide à limiter l'impact des attaques XSS ?",
+    options: [
+      { id: "a", text: "Content-Security-Policy" },
+      { id: "b", text: "Accept-Language" },
+      { id: "c", text: "Server-Timing" },
+      { id: "d", text: "Cache-Control: public" },
+    ],
+    correctOptionId: "a",
+    explanation: "Une CSP bien configurée restreint les sources de scripts et réduit les injections exploitables.",
+  },
+  {
+    id: "WEB-INT-002",
+    domain: "Web",
+    level: "Intermédiaire",
+    text: "Une attaque SSRF vise souvent à...",
+    options: [
+      { id: "a", text: "Forcer le serveur à contacter une ressource interne" },
+      { id: "b", text: "Augmenter la taille des cookies" },
+      { id: "c", text: "Modifier la police du navigateur" },
+      { id: "d", text: "Transformer UDP en TCP" },
+    ],
+    correctOptionId: "a",
+    explanation: "La SSRF détourne le serveur pour atteindre des services internes ou des métadonnées cloud.",
+  },
+  {
+    id: "CRY-BEG-001",
+    domain: "Cryptographie",
+    level: "Débutant",
+    text: "Dans un chiffrement asymétrique, la clé publique sert typiquement à...",
+    options: [
+      { id: "a", text: "Être gardée secrète par une seule personne" },
+      { id: "b", text: "Chiffrer ou vérifier une signature selon l'usage" },
+      { id: "c", text: "Remplacer tous les mots de passe" },
+      { id: "d", text: "Désactiver l'authentification" },
+    ],
+    correctOptionId: "b",
+    explanation: "La clé publique peut être distribuée; elle sert par exemple au chiffrement ou à la vérification.",
+  },
+  {
+    id: "CRY-BEG-002",
+    domain: "Cryptographie",
+    level: "Débutant",
+    text: "Pourquoi le mode ECB est-il déconseillé avec AES ?",
+    options: [
+      { id: "a", text: "Il révèle des motifs quand des blocs identiques sont chiffrés" },
+      { id: "b", text: "Il est toujours plus lent que tous les autres modes" },
+      { id: "c", text: "Il supprime automatiquement l'intégrité" },
+      { id: "d", text: "Il ne fonctionne que sur Linux" },
+    ],
+    correctOptionId: "a",
+    explanation: "ECB chiffre chaque bloc indépendamment; deux blocs identiques donnent deux chiffrés identiques.",
+  },
+  {
+    id: "CRY-INT-001",
+    domain: "Cryptographie",
+    level: "Intermédiaire",
+    text: "Quelle propriété est fournie par une fonction de hachage cryptographique ?",
+    options: [
+      { id: "a", text: "Réversibilité facile du message" },
+      { id: "b", text: "Résistance aux collisions et préimages" },
+      { id: "c", text: "Compression ZIP sans perte" },
+      { id: "d", text: "Confidentialité automatique du canal réseau" },
+    ],
+    correctOptionId: "b",
+    explanation: "Un bon hash rend difficile de trouver une entrée équivalente ou de retrouver l'entrée originale.",
+  },
+  {
+    id: "FOR-BEG-001",
+    domain: "Forensics",
+    level: "Débutant",
+    text: "La chaîne de conservation des preuves sert à...",
+    options: [
+      { id: "a", text: "Prouver l'intégrité et la traçabilité d'une preuve" },
+      { id: "b", text: "Accélérer le Wi-Fi" },
+      { id: "c", text: "Compresser les journaux en JPEG" },
+      { id: "d", text: "Supprimer les horodatages" },
+    ],
+    correctOptionId: "a",
+    explanation: "Elle documente qui a manipulé la preuve, quand, comment, et dans quelles conditions.",
+  },
+  {
+    id: "FOR-BEG-002",
+    domain: "Forensics",
+    level: "Débutant",
+    text: "Volatility est principalement utilisé pour analyser...",
+    options: [
+      { id: "a", text: "Des captures mémoire" },
+      { id: "b", text: "Des chartes graphiques" },
+      { id: "c", text: "Des certificats papier" },
+      { id: "d", text: "Des antennes radio" },
+    ],
+    correctOptionId: "a",
+    explanation: "Volatility permet d'extraire processus, connexions et artefacts depuis un dump mémoire.",
+  },
+  {
+    id: "FOR-INT-001",
+    domain: "Forensics",
+    level: "Intermédiaire",
+    text: "Les fichiers Prefetch Windows peuvent aider à déterminer...",
+    options: [
+      { id: "a", text: "Qu'un programme a été exécuté et à quels moments approximatifs" },
+      { id: "b", text: "Le mot de passe exact de l'utilisateur" },
+      { id: "c", text: "La couleur de l'écran" },
+      { id: "d", text: "La clé privée TLS du serveur distant" },
+    ],
+    correctOptionId: "a",
+    explanation: "Les Prefetch contiennent des traces d'exécution utiles à la chronologie d'une investigation.",
+  },
+  {
+    id: "REV-BEG-001",
+    domain: "Reverse",
+    level: "Débutant",
+    text: "Un désassembleur transforme un binaire en...",
+    options: [
+      { id: "a", text: "Instructions assembleur lisibles" },
+      { id: "b", text: "Fichier audio" },
+      { id: "c", text: "Certificat TLS" },
+      { id: "d", text: "Adresse IP publique" },
+    ],
+    correctOptionId: "a",
+    explanation: "Le désassemblage reconstruit une représentation assembleur du code machine.",
+  },
+  {
+    id: "REV-INT-001",
+    domain: "Reverse",
+    level: "Intermédiaire",
+    text: "La technique de process hollowing consiste généralement à...",
+    options: [
+      { id: "a", text: "Lancer un processus légitime puis remplacer son contenu mémoire" },
+      { id: "b", text: "Défragmenter un disque dur" },
+      { id: "c", text: "Renommer un fichier texte" },
+      { id: "d", text: "Changer le fuseau horaire" },
+    ],
+    correctOptionId: "a",
+    explanation: "Des malwares l'utilisent pour exécuter du code sous l'apparence d'un processus légitime.",
+  },
 ];
 
-export function pickQuestions(nq = 5): Question[] {
+export function pickQuestions(nq = 10): Question[] {
   const domains: Domain[] = ["Réseaux", "Web", "Cryptographie", "Forensics", "Reverse"];
   const byDomain = new Map<Domain, Question[]>();
   for (const d of domains) {
@@ -55,4 +245,43 @@ export function pickQuestions(nq = 5): Question[] {
     if (q) picked.push(q);
   }
   return picked.sort(() => Math.random() - 0.5);
+}
+
+export function gradeAnswers(
+  questions: Question[],
+  selected: Record<string, string>,
+  startedAt: number,
+): { answers: Answer[]; finalScore: number; correctCount: number } {
+  const perQuestion = questions.length ? 100 / questions.length : 0;
+  const durationMs = questions.length
+    ? Math.round((Date.now() - startedAt) / questions.length)
+    : 0;
+
+  const answers = questions.map((question) => {
+    const selectedOptionId = selected[question.id] ?? "";
+    const option = question.options.find((item) => item.id === selectedOptionId);
+    const isCorrect = selectedOptionId === question.correctOptionId;
+
+    return {
+      questionId: question.id,
+      selectedOptionId,
+      selectedOptionText: option?.text ?? "",
+      correctOptionId: question.correctOptionId,
+      isCorrect,
+      points: isCorrect ? perQuestion : 0,
+      durationMs,
+    };
+  });
+
+  const correctCount = answers.filter((answer) => answer.isCorrect).length;
+  const finalScore = Math.round(answers.reduce((total, answer) => total + answer.points, 0));
+
+  return { answers, finalScore, correctCount };
+}
+
+export function sanitizeQuestion(question: Question): Question {
+  return {
+    ...question,
+    options: question.options.map((option) => ({ ...option })),
+  };
 }

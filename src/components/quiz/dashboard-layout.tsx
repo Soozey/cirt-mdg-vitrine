@@ -136,7 +136,7 @@ export function DashboardLayout({
             </div>
             <div className="relative px-6 py-7 md:px-8 md:py-9">
               <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/70">
-                CIRT · Quiz Cybersécurité
+                CIRT · Quizz Cybersécurité
               </p>
               <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-white md:text-3xl">
                 {title}

@@ -24,6 +24,13 @@ import {
 } from "@/components/ui/table";
 import { createRoleInvite, listRoleInvites, revokeRoleInvite } from "@/lib/firebase/server-api";
 import type { RoleInvite, RoleInviteRole } from "@/lib/access-control";
+import {
+  PHONE_PREFIXES,
+  composePhone,
+  formatNationalPhone,
+  formatPhone,
+  type PhonePrefix,
+} from "@/lib/quiz/format";
 import { getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/superadmin")({
@@ -38,6 +45,7 @@ export const Route = createFileRoute("/superadmin")({
 function SuperadminPage() {
   const [items, setItems] = useState<RoleInvite[]>([]);
   const [email, setEmail] = useState("");
+  const [phonePrefix, setPhonePrefix] = useState<PhonePrefix>("+261");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState<RoleInviteRole>("juror");
   const [loading, setLoading] = useState(true);
@@ -69,13 +77,14 @@ function SuperadminPage() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (!email.trim() && !phone.trim()) {
+    const formattedPhone = composePhone(phonePrefix, phone);
+    if (!email.trim() && !formattedPhone) {
       toast.error("Ajoutez au moins un email ou un téléphone");
       return;
     }
     setSubmitting(true);
     try {
-      await createRoleInvite({ email: email.trim(), phone: phone.trim(), role });
+      await createRoleInvite({ email: email.trim(), phone: formattedPhone, role });
       setEmail("");
       setPhone("");
       toast.success("Invitation créée");
@@ -129,7 +138,7 @@ function SuperadminPage() {
 
       <form
         onSubmit={submit}
-        className="mb-6 grid gap-3 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:grid-cols-[1fr_1fr_180px_auto]"
+        className="mb-6 grid gap-3 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:grid-cols-[1fr_8rem_1fr_180px_auto]"
       >
         <Input
           type="email"
@@ -138,10 +147,30 @@ function SuperadminPage() {
           placeholder="email@domaine.com"
           className="bg-background"
         />
+        <Select
+          value={phonePrefix}
+          onValueChange={(value) => {
+            const nextPrefix = value as PhonePrefix;
+            setPhonePrefix(nextPrefix);
+            setPhone((current) => formatNationalPhone(nextPrefix, current));
+          }}
+        >
+          <SelectTrigger className="bg-background">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PHONE_PREFIXES.map((prefix) => (
+              <SelectItem key={prefix.value} value={prefix.value}>
+                {prefix.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Input
+          type="tel"
           value={phone}
-          onChange={(event) => setPhone(event.target.value)}
-          placeholder="+261 34 12 345 67"
+          onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
+          placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
           className="bg-background"
         />
         <Select value={role} onValueChange={(value) => setRole(value as RoleInviteRole)}>
@@ -195,7 +224,9 @@ function SuperadminPage() {
                 <TableRow key={invite.id}>
                   <TableCell>
                     <p className="font-medium text-foreground">{invite.email || "Email non renseigné"}</p>
-                    <p className="text-xs text-muted-foreground">{invite.phone || "Téléphone non renseigné"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {invite.phone ? formatPhone(invite.phone) : "Téléphone non renseigné"}
+                    </p>
                   </TableCell>
                   <TableCell>{invite.role === "admin" ? "Administrateur" : "Juré"}</TableCell>
                   <TableCell>

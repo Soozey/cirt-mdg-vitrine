@@ -7,6 +7,7 @@ import { AuthShell } from "@/components/quiz/auth-shell";
 import { FloatingInput } from "@/components/quiz/floating-input";
 import { OAuthButtons } from "@/components/quiz/oauth-buttons";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -16,13 +17,19 @@ import {
 } from "@/components/ui/select";
 import { redirectForRole } from "@/lib/access-control";
 import { useAuth } from "@/lib/quiz/auth-context";
-import { formatPhone } from "@/lib/quiz/format";
+import {
+  PHONE_PREFIXES,
+  composePhone,
+  formatNationalPhone,
+  splitPhoneForInput,
+  type PhonePrefix,
+} from "@/lib/quiz/format";
 import { getErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Créer un compte · Quiz cybersécurité" },
+      { title: "Créer un compte · Quizz cybersécurité" },
       {
         name: "description",
         content: "Créez votre compte pour accéder au quiz cybersécurité du CIRT.",
@@ -44,6 +51,7 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
 
+  const [phonePrefix, setPhonePrefix] = useState<PhonePrefix>("+261");
   const [phone, setPhone] = useState("");
   const [profile, setProfile] = useState<
     "Étudiant" | "Professionnel" | "Chercheur" | "Indépendant"
@@ -58,7 +66,9 @@ function RegisterPage() {
       setFirstName(user.firstName ?? "");
       setLastName(user.lastName ?? "");
       setEmail(user.email ?? "");
-      setPhone(user.phone ?? "");
+      const splitPhone = splitPhoneForInput(user.phone);
+      setPhonePrefix(splitPhone.prefix);
+      setPhone(splitPhone.national);
       if (user.profile) setProfile(user.profile);
       setLinkedin(user.linkedin ?? "");
       if (!user.registered) setStep(2);
@@ -79,7 +89,9 @@ function RegisterPage() {
 
   function validateStep2() {
     const e: Record<string, string> = {};
-    if (!phone.trim() || phone.replace(/\D/g, "").length < 8) e.phone = "Téléphone invalide";
+    if (!composePhone(phonePrefix, phone) || phone.replace(/\D/g, "").length < 8) {
+      e.phone = "Téléphone invalide";
+    }
     setErr(e);
     return Object.keys(e).length === 0;
   }
@@ -108,7 +120,7 @@ function RegisterPage() {
         firstName,
         lastName,
         email,
-        phone,
+        phone: composePhone(phonePrefix, phone),
         profile,
         linkedin,
       });
@@ -226,13 +238,44 @@ function RegisterPage() {
         </div>
       ) : (
         <form onSubmit={onSubmit} className="grid gap-3">
-          <FloatingInput
-            label="Téléphone"
-            value={phone}
-            onChange={(e) => setPhone(formatPhone(e.target.value))}
-            error={err.phone}
-            placeholder="+261 34 12 345 67"
-          />
+          <div className="w-full">
+            <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
+              Téléphone
+            </label>
+            <div className="grid grid-cols-[7rem_1fr] gap-2">
+              <Select
+                value={phonePrefix}
+                onValueChange={(value) => {
+                  const nextPrefix = value as PhonePrefix;
+                  setPhonePrefix(nextPrefix);
+                  setPhone((current) => formatNationalPhone(nextPrefix, current));
+                }}
+              >
+                <SelectTrigger className="h-9 border-slate-200 bg-white text-xs text-slate-700">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PHONE_PREFIXES.map((prefix) => (
+                    <SelectItem key={prefix.value} value={prefix.value}>
+                      {prefix.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div>
+              <Input
+                type="tel"
+                value={phone}
+                onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
+                placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
+                className="h-9 border-slate-200 bg-white text-xs text-slate-700"
+              />
+              {err.phone ? (
+                <p className="mt-0.5 text-[11px] font-medium text-destructive">{err.phone}</p>
+              ) : null}
+              </div>
+            </div>
+          </div>
 
           <div className="w-full">
             <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">

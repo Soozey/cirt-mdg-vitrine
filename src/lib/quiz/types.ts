@@ -22,25 +22,35 @@ export type Question = {
   domain: Domain;
   level: Level;
   text: string;
-  keywords: string[];
+  options: QuizOption[];
+  correctOptionId: string;
+  explanation: string;
+};
+
+export type QuizOption = {
+  id: string;
+  text: string;
 };
 
 export type Answer = {
   questionId: string;
-  text: string;
-  aiScore: number;
-  contentScore: number;
+  selectedOptionId: string;
+  selectedOptionText: string;
+  correctOptionId: string;
+  isCorrect: boolean;
+  points: number;
   durationMs: number;
 };
 
 export type Submission = {
   id: string;
+  schemaVersion: 2;
+  quizMode: "qcm";
   userId: string;
   user: QuizUser;
   questions: Question[];
   answers: Answer[];
   finalScore: number;
-  aiAverage: number;
   juryNote?: string;
   juryScore?: number;
   reviewedBy?: string;

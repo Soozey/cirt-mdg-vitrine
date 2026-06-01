@@ -1,6 +1,5 @@
-export const QUIZ_LENGTH = 5;
-export const ANSWER_MAX = 1500;
-export const AUTOSAVE_KEY = "quiz_draft_v1";
+export const QUIZ_LENGTH = 10;
+export const AUTOSAVE_KEY = "quiz_qcm_draft_v2";
 
 export const DOMAIN_COLORS: Record<string, string> = {
   Réseaux: "bg-chart-1/15 text-chart-1 border-chart-1/30",

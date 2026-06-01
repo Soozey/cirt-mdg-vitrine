@@ -2,6 +2,30 @@
 @source "../src";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "Turret Road";
+  src: url("/fonts/TurretRoad-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Enfonix Pro";
+  src: url("/fonts/EnfonixPro.otf") format("opentype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow Semi Condensed";
+  src: url("/fonts/BarlowSemiCondensed-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -70,6 +94,9 @@
   --color-nav-deep-foreground: var(--nav-deep-foreground);
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Space Grotesk", "Sora", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-turret: "Turret Road", "Space Grotesk", sans-serif;
+  --font-enfonix: "Enfonix Pro", "Space Grotesk", sans-serif;
+  --font-barlow: "Barlow Semi Condensed", "Inter", sans-serif;
 }
 
 :root {
@@ -212,4 +239,93 @@
 @utility animate-iris {
   background-size: 200% 200%;
   animation: iris-shift 10s ease-in-out infinite;
+}
+
+.information-detail-theme {
+  background: #02082d;
+  color: white;
+}
+
+.information-detail-theme section {
+  background-color: #02082d;
+  color: white;
+}
+
+.information-detail-theme section.bg-background,
+.information-detail-theme section.bg-surface-muted\/50 {
+  background:
+    radial-gradient(circle at 88% 92%, rgba(214, 255, 87, 0.12), transparent 24%),
+    radial-gradient(circle at 10% 8%, rgba(142, 60, 255, 0.16), transparent 26%),
+    linear-gradient(180deg, #03144a 0%, #02082d 100%);
+}
+
+.information-detail-theme .bg-background,
+.information-detail-theme .bg-surface-muted\/50 {
+  background-color: transparent;
+}
+
+.information-detail-theme .border-border\/60,
+.information-detail-theme .border-border {
+  border-color: color-mix(in srgb, var(--iris-cyan) 35%, transparent);
+}
+
+.information-detail-theme [class*="bg-card"],
+.information-detail-theme [class*="bg-surface-muted"],
+.information-detail-theme [class*="border-border"] {
+  background-color: rgba(3, 18, 74, 0.74);
+  color: white;
+  box-shadow: 0 18px 55px -28px rgba(34, 211, 238, 0.62);
+  backdrop-filter: blur(12px);
+}
+
+.information-detail-theme h1,
+.information-detail-theme h2,
+.information-detail-theme h3 {
+  color: white;
+}
+
+.information-detail-theme h3.font-display,
+.information-detail-theme .font-display.text-base,
+.information-detail-theme .font-display.text-lg {
+  font-family: var(--font-enfonix);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.information-detail-theme p,
+.information-detail-theme li,
+.information-detail-theme [class*="text-foreground"],
+.information-detail-theme [class*="text-muted-foreground"] {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.information-detail-theme [class*="text-primary-deep"] {
+  color: white;
+}
+
+.information-detail-theme [class*="text-iris-violet"] {
+  color: var(--iris-lime);
+}
+
+.information-detail-theme [class*="bg-iris-violet"] {
+  background-color: color-mix(in srgb, var(--iris-cyan) 14%, transparent);
+}
+
+.information-detail-theme [class*="border-iris-violet"] {
+  border-color: color-mix(in srgb, var(--iris-cyan) 45%, transparent);
+}
+
+.information-detail-theme [data-slot="accordion-trigger"] {
+  color: white;
+  font-family: var(--font-enfonix);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.information-detail-theme [data-slot="accordion-content"] {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
 }

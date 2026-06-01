@@ -126,7 +126,7 @@ function PartenairesPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1 pt-16 md:pt-20">
         {/* Back bar */}
         <div className="bg-nav-deep">
           <div className="mx-auto max-w-7xl px-4 pt-6 pb-2 md:px-8">
@@ -182,7 +182,7 @@ function PartenairesPage() {
               </div>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button asChild size="lg" className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90">
-                  <a href="mailto:contact@cirt.gov.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
+                  <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
                     <Mail className="size-4" /> Contacter l'organisation
                   </a>
                 </Button>
@@ -327,7 +327,7 @@ function PartenairesPage() {
                     </ul>
                     <Button asChild className="mt-6" variant={p.highlighted ? "default" : "outline"}>
                       <a
-                        href={`mailto:contact@cirt.gov.mg?subject=Partenariat%20-%20${encodeURIComponent(p.name)}`}
+                        href={`mailto:contact@cybersecurite-madagascar.mg?subject=Partenariat%20-%20${encodeURIComponent(p.name)}`}
                       >
                         <Mail className="size-4" /> Demander ce package
                       </a>
@@ -338,30 +338,7 @@ function PartenairesPage() {
             </RevealGroup>
 
             {/* Recap table */}
-            <Card className="mt-10 overflow-hidden border-border/60">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Niveau</TableHead>
-                    <TableHead>Inclusions principales</TableHead>
-                    <TableHead className="text-right">Investissement</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {PACKAGES.map((p) => (
-                    <TableRow key={p.name}>
-                      <TableCell className="font-semibold text-primary-deep">{p.name}</TableCell>
-                      <TableCell className="text-foreground/75">
-                        {p.inclusions.join(" • ")}
-                      </TableCell>
-                      <TableCell className="text-right font-semibold text-iris-violet">
-                        {p.price}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
+            
           </div>
         </section>
 
@@ -376,8 +353,8 @@ function PartenairesPage() {
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90">
-                <a href="mailto:contact@cirt.gov.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
-                  <Mail className="size-4" /> contact@cirt.gov.mg
+                <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
+                  <Mail className="size-4" /> contact@cybersecurite-madagascar.mg
                 </a>
               </Button>
               <Button

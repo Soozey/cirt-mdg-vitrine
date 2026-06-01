@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle } from "lucide-react";
 
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
 import { ProtectedRoute } from "@/components/quiz/protected-route";
@@ -12,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { getSubmission, reviewSubmission } from "@/lib/firebase/server-api";
 import { useAuth } from "@/lib/quiz/auth-context";
 import { DOMAIN_COLORS, LEVEL_COLORS } from "@/lib/quiz/constants";
-import { initials } from "@/lib/quiz/format";
+import { formatPhone, initials } from "@/lib/quiz/format";
 import type { Submission } from "@/lib/quiz/types";
 import { cn, getErrorMessage } from "@/lib/utils";
 
@@ -32,6 +33,8 @@ function DetailPage() {
   const [sub, setSub] = useState<Submission | null>(null);
   const [note, setNote] = useState("");
   const [score, setScore] = useState<number>(0);
+  const [answerPage, setAnswerPage] = useState(0);
+  const [pageDirection, setPageDirection] = useState(1);
   const canEvaluate = user?.role === "juror";
 
   useEffect(() => {
@@ -48,6 +51,8 @@ function DetailPage() {
         setSub(s);
         setNote(s.juryNote ?? "");
         setScore(s.juryScore ?? s.finalScore);
+        setAnswerPage(0);
+        setPageDirection(1);
       })
       .catch((error: unknown) => {
         toast.error(getErrorMessage(error, "Chargement impossible"));
@@ -71,10 +76,24 @@ function DetailPage() {
 
   if (!sub) return null;
 
+  const answerTotal = sub.questions.length;
+  const currentQuestion = sub.questions[answerPage];
+  const currentAnswer = currentQuestion
+    ? sub.answers.find((answer) => answer.questionId === currentQuestion.id)
+    : undefined;
+
+  function goToAnswerPage(nextPage: number) {
+    if (!answerTotal) return;
+    const bounded = Math.max(0, Math.min(answerTotal - 1, nextPage));
+    if (bounded === answerPage) return;
+    setPageDirection(bounded > answerPage ? 1 : -1);
+    setAnswerPage(bounded);
+  }
+
   return (
     <DashboardLayout
       title="Évaluation candidat"
-      subtitle="Réponses détaillées, scores IA et avis du jury."
+      subtitle="Réponses QCM détaillées, score automatique et avis du jury."
     >
       <div className="mb-6">
         <Button asChild variant="ghost" size="sm">
@@ -104,7 +123,7 @@ function DetailPage() {
             <dl className="mt-5 grid gap-2 text-sm">
               {[
                 ["Profil", sub.user.profile ?? "Non renseigné"],
-                ["Téléphone", sub.user.phone ?? "Non renseigné"],
+                ["Téléphone", sub.user.phone ? formatPhone(sub.user.phone) : "Non renseigné"],
                 ["LinkedIn", sub.user.linkedin ?? "Non renseigné"],
                 ["Auth", sub.user.provider],
               ].map(([k, v]) => (
@@ -120,7 +139,7 @@ function DetailPage() {
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
-            <h3 className="text-sm font-semibold text-foreground">Scores automatiques</h3>
+            <h3 className="text-sm font-semibold text-foreground">Score automatique</h3>
             <div className="mt-4 space-y-3 text-sm">
               <div>
                 <div className="mb-1 flex justify-between text-xs text-muted-foreground">
@@ -133,12 +152,18 @@ function DetailPage() {
               </div>
               <div>
                 <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-                  <span>Probabilité IA</span>
+                  <span>Bonnes réponses</span>
                   <span className="font-mono font-semibold text-foreground">
-                    {(sub.aiAverage * 100).toFixed(0)}%
+                    {sub.answers.filter((answer) => answer.isCorrect).length}/{sub.questions.length}
                   </span>
                 </div>
-                <Progress value={sub.aiAverage * 100} />
+                <Progress
+                  value={
+                    sub.questions.length
+                      ? (sub.answers.filter((answer) => answer.isCorrect).length / sub.questions.length) * 100
+                      : 0
+                  }
+                />
               </div>
             </div>
           </div>
@@ -195,35 +220,115 @@ function DetailPage() {
             <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
               Aucune réponse détaillée disponible pour cette candidature de démonstration.
             </div>
-          ) : (
-            sub.questions.map((q, i) => {
-              const a = sub.answers.find((x) => x.questionId === q.id);
-              return (
-                <div
-                  key={q.id}
+          ) : currentQuestion ? (
+            <>
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Réponses du candidat
+                  </p>
+                  <p className="mt-1 text-sm text-foreground">
+                    Enregistrement {answerPage + 1} sur {answerTotal}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => goToAnswerPage(answerPage - 1)}
+                    disabled={answerPage === 0}
+                  >
+                    <ArrowLeft className="size-4" /> Précédent
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => goToAnswerPage(answerPage + 1)}
+                    disabled={answerPage >= answerTotal - 1}
+                  >
+                    Suivant <ArrowRight className="size-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <AnimatePresence mode="wait" custom={pageDirection}>
+                <motion.div
+                  key={currentQuestion.id}
+                  custom={pageDirection}
+                  initial={{ opacity: 0, x: pageDirection > 0 ? 36 : -36, scale: 0.985 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: pageDirection > 0 ? -36 : 36, scale: 0.985 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                   className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]"
                 >
+                  {(() => {
+              const q = currentQuestion;
+              const a = currentAnswer;
+              const options = q.options ?? [];
+              return (
+                <>
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-mono text-muted-foreground">Q{i + 1}</span>
+                    <span className="text-xs font-mono text-muted-foreground">Q{answerPage + 1}</span>
                     <Badge variant="outline" className={cn("border", DOMAIN_COLORS[q.domain])}>
                       {q.domain}
                     </Badge>
                     <Badge variant="outline" className={cn("border", LEVEL_COLORS[q.level])}>
                       {q.level}
                     </Badge>
-                    {a ? (
+                   {a ? (
                       <span className="ml-auto text-xs text-muted-foreground">
-                        Contenu {a.contentScore} · IA {(a.aiScore * 100).toFixed(0)}%
+                        {a.isCorrect ? "Correct" : "Incorrect"} · {Math.round(a.points)} pt
                       </span>
                     ) : null}
                   </div>
                   <h4 className="font-semibold text-foreground">{q.text}</h4>
-                  <p className="mt-3 whitespace-pre-wrap rounded-lg border border-border bg-surface-muted/40 px-3 py-2.5 text-sm leading-relaxed text-foreground">
-                    {a?.text ?? "Aucune réponse fournie."}
-                  </p>
-                </div>
+                  {options.length ? (
+                  <div className="mt-3 grid gap-2">
+                    {options.map((option) => {
+                      const isSelected = a?.selectedOptionId === option.id;
+                      const isCorrect = q.correctOptionId === option.id;
+                      return (
+                        <div
+                          key={option.id}
+                          className={cn(
+                            "flex items-start gap-2 rounded-lg border border-border bg-surface-muted/40 px-3 py-2.5 text-sm leading-relaxed text-foreground",
+                            isCorrect && "border-iris-lime/50 bg-iris-lime/10",
+                            isSelected && !isCorrect && "border-destructive/50 bg-destructive/10",
+                          )}
+                        >
+                          {isCorrect ? (
+                            <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
+                          ) : isSelected ? (
+                            <XCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                          ) : (
+                            <span className="mt-1 size-4 shrink-0 rounded-full border border-muted-foreground/30" />
+                          )}
+                          <span>{option.text}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  ) : (
+                    <p className="mt-3 whitespace-pre-wrap rounded-lg border border-border bg-surface-muted/40 px-3 py-2.5 text-sm leading-relaxed text-foreground">
+                      Ancienne réponse libre : {a?.text ?? "Aucune réponse fournie."}
+                    </p>
+                  )}
+                  {q.explanation ? (
+                    <p className="mt-3 rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-muted-foreground">
+                      {q.explanation}
+                    </p>
+                  ) : null}
+                </>
               );
-            })
+                  })()}
+                </motion.div>
+              </AnimatePresence>
+            </>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
+              Aucune question disponible pour cette candidature.
+            </div>
           )}
         </section>
       </div>

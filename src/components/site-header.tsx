@@ -17,7 +17,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-nav-deep/95 text-nav-deep-foreground backdrop-blur-xl">
+    <header className="fixed left-0 top-0 z-50 w-full border-b border-iris-cyan/25 bg-[#03124a]/95 text-white shadow-[0_18px_45px_-32px_rgba(34,211,238,0.75)] backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-6 px-4 md:h-20 md:px-8">
         <Link to="/" aria-label="Accueil CIRT MDG" className="flex items-center">
           <BrandMark variant="light" />
@@ -28,7 +28,8 @@ export function SiteHeader() {
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-nav-deep-foreground/75 transition-colors hover:text-nav-deep-foreground"
+              className="text-sm uppercase tracking-[0.14em] text-white transition-colors hover:text-iris-lime"
+              style={{ fontFamily: "var(--font-barlow)" }}
             >
               {item.label}
             </a>
@@ -37,12 +38,12 @@ export function SiteHeader() {
 
         <div className="hidden md:block">
           <div className="flex items-center gap-2">
-            <Button asChild size="sm" variant="outline" className="border-white/25 bg-transparent text-nav-deep-foreground hover:bg-white/10 hover:text-nav-deep-foreground">
+            <Button asChild size="sm" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
               <Link to="/login">Connexion</Link>
             </Button>
-            <Button asChild size="sm" className="bg-iris-lime text-primary-deep hover:bg-iris-lime/90">
+            <Button asChild size="sm" className="bg-iris-lime text-primary-deep shadow-[0_14px_35px_-22px_rgba(214,255,87,0.85)] hover:bg-iris-lime/90">
               <Link to="/quiz">
-                <ShieldCheck className="size-4" /> Quiz cybersécurité
+                <ShieldCheck className="size-4" /> Quizz cybersécurité
               </Link>
             </Button>
           </div>
@@ -53,7 +54,7 @@ export function SiteHeader() {
           aria-label="Ouvrir le menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/20 text-nav-deep-foreground md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-iris-cyan/35 text-iris-cyan md:hidden"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
@@ -61,7 +62,7 @@ export function SiteHeader() {
 
       <div
         className={cn(
-          "border-t border-white/10 bg-nav-deep text-nav-deep-foreground md:hidden",
+          "border-t border-iris-cyan/20 bg-[#03124a] text-white md:hidden",
           open ? "block" : "hidden",
         )}
       >
@@ -71,17 +72,18 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="rounded-md px-3 py-2 text-sm font-medium text-nav-deep-foreground/90 hover:bg-white/10"
+              className="rounded-md px-3 py-2 text-sm uppercase tracking-[0.14em] text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
+              style={{ fontFamily: "var(--font-barlow)" }}
             >
               {item.label}
             </a>
           ))}
-          <Button asChild size="sm" variant="outline" className="mt-2 border-white/25 bg-transparent text-nav-deep-foreground hover:bg-white/10">
+          <Button asChild size="sm" variant="outline" className="mt-2 border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10">
             <Link to="/login" onClick={() => setOpen(false)}>Connexion</Link>
           </Button>
           <Button asChild size="sm" className="mt-1 bg-iris-lime text-primary-deep hover:bg-iris-lime/90">
             <Link to="/quiz" onClick={() => setOpen(false)}>
-              <ShieldCheck className="size-4" /> Quiz cybersécurité
+              <ShieldCheck className="size-4" /> Quizz cybersécurité
             </Link>
           </Button>
         </nav>

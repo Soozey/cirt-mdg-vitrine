@@ -28,6 +28,8 @@ function fromFirestore(id: string, data: DocumentData): Submission {
     ...(data as Submission),
     id,
     submittedAt: timestampToIso(data.submittedAt),
+    schemaVersion: data.schemaVersion ?? 2,
+    quizMode: data.quizMode ?? "qcm",
     status: data.status === "reviewed" ? "reviewed" : "pending",
   };
 }

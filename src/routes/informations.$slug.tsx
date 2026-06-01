@@ -32,7 +32,7 @@ export const Route = createFileRoute("/informations/$slug")({
   errorComponent: ({ error, reset }) => (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
-      <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <div className="mx-auto max-w-2xl px-4 pb-24 pt-40 text-center">
         <h1 className="text-2xl font-bold text-primary-deep">Une erreur est survenue</h1>
         <p className="mt-2 text-muted-foreground">{error.message}</p>
         <Button className="mt-6" onClick={reset}>Réessayer</Button>
@@ -47,7 +47,7 @@ function NotFoundPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
-      <main className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+      <main className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-4 pb-24 pt-40 text-center">
         <h1 className="font-display text-3xl font-bold text-primary-deep">Information introuvable</h1>
         <p className="mt-3 text-muted-foreground">
           La page demandée n'existe pas ou a été déplacée.
@@ -70,20 +70,9 @@ function DetailPage() {
 
   if (RichPage) {
     return (
-      <div className="flex min-h-screen flex-col bg-background">
+      <div className="flex min-h-screen flex-col bg-[#02082d]">
         <SiteHeader />
-        <main className="flex-1">
-          <div className="bg-nav-deep">
-            <div className="mx-auto max-w-7xl px-4 pt-6 pb-2 md:px-8">
-              <Link
-                to="/"
-                hash="informations"
-                className="inline-flex items-center gap-1 text-sm font-semibold text-iris-lime transition-colors hover:text-iris-cyan"
-              >
-                <ArrowLeft className="size-4" /> Retour aux informations
-              </Link>
-            </div>
-          </div>
+        <main className="information-detail-theme flex-1 pt-16 md:pt-20">
           <RichPage />
         </main>
         <SiteFooter />
@@ -92,69 +81,82 @@ function DetailPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-[#02082d]">
       <SiteHeader />
 
-      <main className="flex-1">
+      <main className="information-detail-theme flex-1 pt-16 md:pt-20">
         <section
-          className="relative isolate overflow-hidden border-b border-white/10 bg-nav-deep text-nav-deep-foreground"
+          className="relative isolate overflow-hidden border-b border-iris-cyan/25 bg-[#03164a] text-white"
         >
           <img
             src={infoBg}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-20 hidden h-full w-full object-cover opacity-90 md:block"
+            className="pointer-events-none absolute inset-0 -z-20 hidden h-full w-full object-cover opacity-35 mix-blend-screen md:block"
           />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 -z-10"
             style={{
               background:
-                "linear-gradient(180deg, oklch(0.20 0.14 295 / 0.55) 0%, oklch(0.22 0.16 290 / 0.70) 100%)",
+                "radial-gradient(circle at 92% 16%, rgba(214, 255, 87, 0.18), transparent 26%), radial-gradient(circle at 10% 88%, rgba(142, 60, 255, 0.22), transparent 30%), linear-gradient(180deg, #031b59 0%, #03144a 52%, #02082d 100%)",
             }}
           />
           <div className="mx-auto max-w-5xl px-4 py-12 md:px-8 md:py-20">
             <Link
               to="/"
               hash="informations"
-              className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-iris-lime transition-colors hover:text-iris-cyan"
+              className="mb-6 inline-flex items-center gap-1 rounded-md border border-iris-cyan/25 bg-[#03164a]/85 px-3 py-2 text-sm font-semibold text-iris-lime shadow-[0_14px_35px_-28px_rgba(34,211,238,0.75)] transition-colors hover:bg-[#041a5d] hover:text-iris-cyan"
             >
               <ArrowLeft className="size-4" /> Retour aux informations
             </Link>
-            <h1 className="mt-4 font-display text-4xl font-bold leading-tight text-nav-deep-foreground md:text-5xl">
+            <h1
+              className="mt-4 text-4xl uppercase leading-tight text-iris bg-iris animate-iris md:text-5xl"
+              style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.02em" }}
+            >
               {page.title}
             </h1>
-            <p className="mt-4 max-w-2xl text-lg text-nav-deep-foreground/75">{page.summary}</p>
+            <p className="mt-4 max-w-2xl text-lg text-white/82">{page.summary}</p>
           </div>
         </section>
 
-        <section className="relative isolate overflow-hidden">
+        <section className="relative isolate overflow-hidden bg-[#02082d]">
           <img
             src={contentBg}
             alt=""
             aria-hidden
-            className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-20"
+            className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover opacity-25 mix-blend-screen"
           />
-          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-white/80" />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10"
+            style={{
+              background:
+                "radial-gradient(circle at 88% 92%, rgba(214, 255, 87, 0.16), transparent 24%), linear-gradient(180deg, rgba(3, 20, 74, 0.94), rgba(2, 8, 45, 0.98))",
+            }}
+          />
           <div className="mx-auto max-w-5xl px-4 py-16 md:grid md:grid-cols-[2fr_1fr] md:gap-12 md:px-8">
           <article className="space-y-6">
-            <p className="text-lg leading-relaxed text-foreground/80">{page.description}</p>
+            <p className="text-lg leading-relaxed text-white/82">{page.description}</p>
 
-            <Card className="border-border/60 bg-surface-muted p-6">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-iris-violet">
+            <Card className="border-iris-cyan/25 bg-[#03124a]/75 p-6 text-white shadow-[0_18px_55px_-26px_rgba(34,211,238,0.65)] backdrop-blur-md">
+              <h2
+                className="mb-4 text-sm uppercase tracking-[0.2em] text-iris-lime"
+                style={{ fontFamily: "var(--font-barlow)" }}
+              >
                 Ce qu'il faut retenir
               </h2>
-              <ul className="space-y-3 text-sm text-foreground/80">
+              <ul className="space-y-3 text-sm text-white/82">
                 <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
                   Événement organisé par le CIRT MDG.
                 </li>
                 <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
                   Les 22 et 23 juin 2026 au Novotel Convention, Alarobia (Antananarivo).
                 </li>
                 <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-violet" />
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
                   Détails complémentaires publiés dès validation officielle.
                 </li>
               </ul>
@@ -179,7 +181,10 @@ function DetailPage() {
           </article>
 
           <aside className="mt-12 md:mt-0">
-            <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <h2
+              className="mb-4 text-xs uppercase tracking-[0.22em] text-iris-lime"
+              style={{ fontFamily: "var(--font-barlow)" }}
+            >
               Voir aussi
             </h2>
             <ul className="space-y-3">
@@ -188,15 +193,18 @@ function DetailPage() {
                   <Link
                     to="/informations/$slug"
                     params={{ slug: o.slug }}
-                    className="group flex items-start justify-between gap-3 rounded-lg border border-border/60 bg-card p-4 transition-colors hover:border-primary/30"
+                    className="group flex items-start justify-between gap-3 rounded-lg border border-iris-cyan/25 bg-[#03124a]/75 p-4 text-white shadow-[0_18px_55px_-30px_rgba(34,211,238,0.55)] transition-colors hover:border-iris-lime/60"
                   >
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      <p
+                        className="text-[11px] uppercase tracking-[0.22em] text-iris-lime/80"
+                        style={{ fontFamily: "var(--font-barlow)" }}
+                      >
                         {o.kicker}
                       </p>
-                      <p className="mt-1 text-sm font-semibold text-primary-deep">{o.title}</p>
+                      <p className="mt-1 text-sm font-semibold text-white">{o.title}</p>
                     </div>
-                    <ArrowUpRight className="size-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    <ArrowUpRight className="size-4 shrink-0 text-iris-lime transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </Link>
                 </li>
               ))}

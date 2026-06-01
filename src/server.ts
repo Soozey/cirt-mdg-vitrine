@@ -10,6 +10,7 @@ import {
   type RoleInviteRole,
   type UserRole,
 } from "./lib/access-control";
+import { QUESTIONS, gradeAnswers, sanitizeQuestion } from "./lib/quiz/questions";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -202,6 +203,8 @@ function submissionFromDoc(id: string, data: admin.firestore.DocumentData) {
     ...data,
     id,
     submittedAt: timestampToIso(data.submittedAt),
+    schemaVersion: data.schemaVersion ?? 2,
+    quizMode: data.quizMode ?? "qcm",
     status: data.status === "reviewed" ? "reviewed" : "pending",
   };
 }
@@ -470,15 +473,49 @@ async function handleSubmissions(request: Request) {
         typeof submission.submittedAt === "string"
           ? admin.firestore.Timestamp.fromDate(new Date(submission.submittedAt))
           : admin.firestore.FieldValue.serverTimestamp();
+      const submittedQuestions = Array.isArray(submission.questions) ? submission.questions : [];
+      const canonicalQuestions = submittedQuestions
+        .map((question: admin.firestore.DocumentData) =>
+          QUESTIONS.find((item) => item.id === question?.id),
+        )
+        .filter(Boolean);
+
+      if (!canonicalQuestions.length) {
+        return json({ message: "questions are required" }, { status: 400 });
+      }
+
+      const selected = Array.isArray(submission.answers)
+        ? Object.fromEntries(
+            submission.answers
+              .filter((answer: admin.firestore.DocumentData) => typeof answer?.questionId === "string")
+              .map((answer: admin.firestore.DocumentData) => [
+                answer.questionId,
+                typeof answer.selectedOptionId === "string" ? answer.selectedOptionId : "",
+              ]),
+          )
+        : {};
+      const startedAt =
+        typeof submission.startedAt === "number"
+          ? submission.startedAt
+          : Date.now() - canonicalQuestions.length * 30_000;
+      const graded = gradeAnswers(canonicalQuestions, selected, startedAt);
+      const sanitizedQuestions = canonicalQuestions.map((question) => sanitizeQuestion(question));
 
       await firestoreAdmin()
         .collection(QUIZ_COLLECTION)
         .doc(id)
         .set(
           {
-            ...submission,
             id,
+            schemaVersion: 2,
+            quizMode: "qcm",
             userId: decoded.uid,
+            user: submission.user,
+            questions: sanitizedQuestions,
+            answers: graded.answers,
+            finalScore: graded.finalScore,
+            correctCount: graded.correctCount,
+            totalQuestions: sanitizedQuestions.length,
             submittedAt,
             status: "pending",
             updatedAt: admin.firestore.FieldValue.serverTimestamp(),

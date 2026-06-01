@@ -98,19 +98,19 @@ function AdminPage() {
     const total = items.length;
     const pending = items.filter((s) => s.status === "pending").length;
     const avg = total ? Math.round(items.reduce((a, s) => a + s.finalScore, 0) / total) : 0;
-    const aiRisk = items.filter((s) => s.aiAverage > 0.5).length;
-    return { total, pending, avg, aiRisk };
+    const perfect = items.filter((s) => s.finalScore === 100).length;
+    return { total, pending, avg, perfect };
   }, [items]);
 
   function exportCsv() {
     const rows = [
-      ["id", "candidat", "email", "score", "ai", "statut", "evalué par", "date"],
+      ["id", "candidat", "email", "score", "bonnes réponses", "statut", "évalué par", "date"],
       ...filtered.map((s) => [
         s.id,
         `${s.user.firstName} ${s.user.lastName}`,
         s.user.email,
         String(s.finalScore),
-        (s.aiAverage * 100).toFixed(0) + "%",
+        `${s.answers.filter((answer) => answer.isCorrect).length}/${s.questions.length}`,
         s.status,
         s.reviewedByEmail ?? "",
         s.submittedAt,
@@ -151,8 +151,8 @@ function AdminPage() {
             accent: "from-iris-violet to-iris-magenta",
           },
           {
-            label: "Risque IA élevé",
-            value: stats.aiRisk,
+            label: "Scores parfaits",
+            value: stats.perfect,
             accent: "from-iris-magenta to-destructive",
           },
         ].map((s, i) => (
@@ -203,7 +203,7 @@ function AdminPage() {
                 <TableHead>Candidat</TableHead>
                 <TableHead>Profil</TableHead>
                 <TableHead>Score</TableHead>
-                <TableHead>IA</TableHead>
+                <TableHead>Bonnes réponses</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Évalué par</TableHead>
                 <TableHead>Soumis</TableHead>
@@ -257,17 +257,8 @@ function AdminPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={
-                          s.aiAverage > 0.5
-                            ? "border-destructive/40 bg-destructive/10 text-destructive"
-                            : s.aiAverage > 0.3
-                              ? "border-chart-4/40 bg-chart-4/10 text-chart-4"
-                              : "border-accent/40 bg-accent-soft text-primary-deep"
-                        }
-                      >
-                        {(s.aiAverage * 100).toFixed(0)}%
+                      <Badge variant="outline" className="border-iris-lime/40 bg-iris-lime/10 text-primary-deep">
+                        {s.answers.filter((answer) => answer.isCorrect).length}/{s.questions.length}
                       </Badge>
                     </TableCell>
                     <TableCell>
