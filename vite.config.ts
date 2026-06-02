@@ -42,6 +42,7 @@ export default defineConfig({
   ],
     server: {
     host: "0.0.0.0", // écoute sur toutes les interfaces réseau
-    port: 2220       // ou le port que tu utilises
+    port: 2220,
+    allowedHosts: true
   }
 });

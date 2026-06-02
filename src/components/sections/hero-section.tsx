@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/project-section2.webp";
-import ministere from "@/assets/partners/1-ministere.webp";
+import ministere from "@/assets/MINISTERE.png";
 import mndpt from "@/assets/partners/2-mndpt.webp";
 import cirtShield from "@/assets/partners/3-cirt-shield.png";
 import prodigy from "@/assets/partners/4-prodigy.webp";
@@ -20,9 +20,10 @@ import udg from "@/assets/partners/5-udg.webp";
 // ];
 
 const PARTNERS = [
-  { src: cirtShield, alt: "CIRT MDG", className: "h-10 sm:h-10 md:h-14" },
-  { src: prodigy, alt: "Prodigy", className: "h-7 sm:h-8 md:h-10" },
   { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-18 sm:h-16 md:h-25" },
+  { src: prodigy, alt: "Prodigy", className: "h-7 sm:h-8 md:h-10" },
+  { src: cirtShield, alt: "CIRT MDG", className: "h-10 sm:h-10 md:h-14" },
+
 ];
 
 
@@ -118,7 +119,7 @@ export function HeroSection() {
           className="flex justify-center"
         >
           <img src={ministere} alt="République de Madagascar"
-            className="h-16 sm:h-20 md:h-22 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+            className="h-22 sm:h-20 md:h-32 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
         </motion.div>
         {/* Ligne 2 : MNDPT seul */}
         <motion.div
