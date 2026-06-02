@@ -38,9 +38,9 @@ export function SiteHeader() {
 
         <div className="hidden md:block">
           <div className="flex items-center gap-2">
-            <Button asChild size="sm" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
-              <Link to="/login">Connexion</Link>
-            </Button>
+            {/* <Button asChild size="sm" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
+              <Link to="/login">Quizz cybersécurité</Link>
+            </Button> */}
             <Button asChild size="sm" className="bg-iris-lime text-primary-deep shadow-[0_14px_35px_-22px_rgba(214,255,87,0.85)] hover:bg-iris-lime/90">
               <Link to="/quiz">
                 <ShieldCheck className="size-4" /> Quizz cybersécurité
