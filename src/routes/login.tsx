@@ -13,8 +13,8 @@ import { getErrorMessage } from "@/lib/utils";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Connexion · Quizz Cybersécurité" },
-      { name: "description", content: "Accédez au Quizz Cybersécurité du CIRT Madagascar." },
+      { title: "Connexion · Quiz Cybersécurité" },
+      { name: "description", content: "Accédez au Quiz Cybersécurité du CIRT Madagascar." },
     ],
   }),
   component: LoginPage,

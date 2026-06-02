@@ -14,7 +14,7 @@ const search = z.object({ id: z.string().optional() });
 export const Route = createFileRoute("/done")({
   validateSearch: (s) => search.parse(s),
   head: () => ({
-    meta: [{ title: "Quizz terminé · CIRT" }],
+    meta: [{ title: "Quiz terminé · CIRT" }],
   }),
   component: DonePage,
 });
@@ -36,7 +36,7 @@ function DonePage() {
 
   return (
     <AuthShell
-      title="Quizz envoyé !"
+      title="Quiz envoyé !"
       subtitle="Merci pour votre participation. Le jury va évaluer vos réponses."
     >
       <div className="grid gap-5 text-center">

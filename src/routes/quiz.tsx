@@ -27,7 +27,7 @@ import { cn, getErrorMessage } from "@/lib/utils";
 export const Route = createFileRoute("/quiz")({
   head: () => ({
     meta: [
-      { title: "Quizz Cybersécurité · Jobdating CIRT" },
+      { title: "Quiz Cybersécurité · Jobdating CIRT" },
       {
         name: "description",
         content: "Passez le quiz cybersécurité pour participer au jobdating.",

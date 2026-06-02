@@ -29,7 +29,7 @@ import { getErrorMessage } from "@/lib/utils";
 export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
-      { title: "Créer un compte · Quizz cybersécurité" },
+      { title: "Créer un compte · Quiz cybersécurité" },
       {
         name: "description",
         content: "Créez votre compte pour accéder au quiz cybersécurité du CIRT.",
