@@ -129,7 +129,7 @@ export function HeroSection() {
           className="md:hidden flex justify-center"
         >
           <img src={mndpt} alt="MNDPT"
-            className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+            className="h-16 sm:h-16 md:h-23 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
         </motion.div>
 
         <motion.div
