@@ -25,6 +25,7 @@ const USERS_COLLECTION = "users";
 const ROLE_INVITES_COLLECTION = "roleInvites";
 const QUIZ_COLLECTION = "quiz";
 const PARTNERSHIP_LEADS_COLLECTION = "partnershipLeads";
+const EVENT_REGISTRATIONS_COLLECTION = "eventRegistrations";
 
 function json(data: unknown, init?: ResponseInit) {
   return new Response(JSON.stringify(data), {
@@ -54,6 +55,15 @@ function getProjectId() {
     import.meta.env.VITE_FIREBASE_PROJECT_ID ??
     process.env.GCLOUD_PROJECT ??
     "jobdating-cybersec"
+  );
+}
+
+function getStorageBucketName() {
+  return (
+    process.env.FIREBASE_STORAGE_BUCKET ??
+    process.env.VITE_FIREBASE_STORAGE_BUCKET ??
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ??
+    ""
   );
 }
 
@@ -96,15 +106,20 @@ function getAdminApp() {
   }
 
   const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  const storageBucket = getStorageBucketName();
   if (rawServiceAccount) {
     adminApp = admin.initializeApp({
       credential: admin.credential.cert(JSON.parse(rawServiceAccount)),
       projectId: getProjectId(),
+      ...(storageBucket ? { storageBucket } : {}),
     });
     return adminApp;
   }
 
-  adminApp = admin.initializeApp({ projectId: getProjectId() });
+  adminApp = admin.initializeApp({
+    projectId: getProjectId(),
+    ...(storageBucket ? { storageBucket } : {}),
+  });
   return adminApp;
 }
 
@@ -210,6 +225,28 @@ function submissionFromDoc(id: string, data: admin.firestore.DocumentData) {
   };
 }
 
+function registrationFromDoc(id: string, data: admin.firestore.DocumentData) {
+  return {
+    ...data,
+    id,
+    createdAt: timestampToIso(data.createdAt),
+  };
+}
+
+function partnershipLeadFromDoc(id: string, data: admin.firestore.DocumentData) {
+  return {
+    ...data,
+    id,
+    createdAt: timestampToIso(data.createdAt),
+  };
+}
+
+function stripUndefined<T extends Record<string, unknown>>(data: T) {
+  return Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined),
+  ) as Partial<T>;
+}
+
 function isStaffRole(role: unknown) {
   return role === "superadmin" || role === "admin" || role === "juror";
 }
@@ -246,21 +283,24 @@ async function handleBootstrap(request: Request) {
     const { firstName, lastName } = splitDisplayName(String(decoded.name ?? ""), email);
     const db = firestoreAdmin();
     await authAdmin().setCustomUserClaims(decoded.uid, { role: "superadmin" });
-    await db.collection(USERS_COLLECTION).doc(decoded.uid).set(
-      {
-        uid: decoded.uid,
-        email,
-        firstName,
-        lastName,
-        photoURL: decoded.picture ?? null,
-        provider: "google",
-        role: "superadmin",
-        registered: true,
-        quizDone: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      },
-      { merge: true },
-    );
+    await db
+      .collection(USERS_COLLECTION)
+      .doc(decoded.uid)
+      .set(
+        {
+          uid: decoded.uid,
+          email,
+          firstName,
+          lastName,
+          photoURL: decoded.picture ?? null,
+          provider: "google",
+          role: "superadmin",
+          registered: true,
+          quizDone: false,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
     await db.collection(APP_CONFIG_COLLECTION).doc(CONFIG_DOC).set({
       is_configured: true,
       superadminUid: decoded.uid,
@@ -488,7 +528,9 @@ async function handleSubmissions(request: Request) {
       const selected = Array.isArray(submission.answers)
         ? Object.fromEntries(
             submission.answers
-              .filter((answer: admin.firestore.DocumentData) => typeof answer?.questionId === "string")
+              .filter(
+                (answer: admin.firestore.DocumentData) => typeof answer?.questionId === "string",
+              )
               .map((answer: admin.firestore.DocumentData) => [
                 answer.questionId,
                 typeof answer.selectedOptionId === "string" ? answer.selectedOptionId : "",
@@ -502,27 +544,24 @@ async function handleSubmissions(request: Request) {
       const graded = gradeAnswers(canonicalQuestions, selected, startedAt);
       const sanitizedQuestions = canonicalQuestions.map((question) => sanitizeQuestion(question));
 
-      await firestoreAdmin()
-        .collection(QUIZ_COLLECTION)
-        .doc(id)
-        .set(
-          {
-            id,
-            schemaVersion: 2,
-            quizMode: "qcm",
-            userId: decoded.uid,
-            user: submission.user,
-            questions: sanitizedQuestions,
-            answers: graded.answers,
-            finalScore: graded.finalScore,
-            correctCount: graded.correctCount,
-            totalQuestions: sanitizedQuestions.length,
-            submittedAt,
-            status: "pending",
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        );
+      await firestoreAdmin().collection(QUIZ_COLLECTION).doc(id).set(
+        {
+          id,
+          schemaVersion: 2,
+          quizMode: "qcm",
+          userId: decoded.uid,
+          user: submission.user,
+          questions: sanitizedQuestions,
+          answers: graded.answers,
+          finalScore: graded.finalScore,
+          correctCount: graded.correctCount,
+          totalQuestions: sanitizedQuestions.length,
+          submittedAt,
+          status: "pending",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       await firestoreAdmin().collection(USERS_COLLECTION).doc(decoded.uid).set(
         {
@@ -563,22 +602,19 @@ async function handleSubmissions(request: Request) {
         return json({ message: "juryScore must be between 0 and 100" }, { status: 400 });
       }
 
-      await firestoreAdmin()
-        .collection(QUIZ_COLLECTION)
-        .doc(detailMatch[1])
-        .set(
-          {
-            juryNote,
-            juryScore,
-            status: "reviewed",
-            reviewedBy: decoded.uid,
-            reviewedByEmail,
-            reviewedByName,
-            reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          },
-          { merge: true },
-        );
+      await firestoreAdmin().collection(QUIZ_COLLECTION).doc(detailMatch[1]).set(
+        {
+          juryNote,
+          juryScore,
+          status: "reviewed",
+          reviewedBy: decoded.uid,
+          reviewedByEmail,
+          reviewedByName,
+          reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
 
       const snap = await firestoreAdmin().collection(QUIZ_COLLECTION).doc(detailMatch[1]).get();
       return json({ submission: submissionFromDoc(snap.id, snap.data() ?? {}) });
@@ -613,19 +649,107 @@ async function handleSubmissions(request: Request) {
 
 async function handlePartnershipLeads(request: Request) {
   const url = new URL(request.url);
-  if (url.pathname !== "/api/partnership-leads" || request.method !== "POST") return undefined;
+  if (!url.pathname.startsWith("/api/partnership-leads")) return undefined;
 
   try {
+    const db = firestoreAdmin();
+
+    if (url.pathname === "/api/partnership-leads" && request.method === "GET") {
+      const decoded = await requireAuth(request);
+      if (!isStaffRole(decoded.role)) return json({ message: "Forbidden" }, { status: 403 });
+
+      const snap = await db
+        .collection(PARTNERSHIP_LEADS_COLLECTION)
+        .orderBy("createdAt", "desc")
+        .limit(1000)
+        .get();
+
+      return json({ leads: snap.docs.map((doc) => partnershipLeadFromDoc(doc.id, doc.data())) });
+    }
+
+    if (url.pathname !== "/api/partnership-leads" || request.method !== "POST") {
+      const detailMatch = url.pathname.match(/^\/api\/partnership-leads\/([^/]+)$/);
+
+      if (detailMatch && request.method === "PATCH") {
+        const decoded = await requireAuth(request);
+        if (!isStaffRole(decoded.role)) return json({ message: "Forbidden" }, { status: 403 });
+
+        const body = await readJson(request);
+        const status = typeof body.status === "string" ? body.status : "";
+        const allowedStatuses = ["new", "contacted", "qualified", "archived"];
+        if (!allowedStatuses.includes(status)) {
+          return json({ message: "Statut partenaire invalide." }, { status: 400 });
+        }
+
+        const ref = db.collection(PARTNERSHIP_LEADS_COLLECTION).doc(detailMatch[1]);
+        await ref.set(
+          {
+            status,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedBy: decoded.uid,
+          },
+          { merge: true },
+        );
+        const snap = await ref.get();
+        if (!snap.exists) return notFoundJson();
+        return json({ lead: partnershipLeadFromDoc(snap.id, snap.data() ?? {}) });
+      }
+
+      if (detailMatch && request.method === "DELETE") {
+        const decoded = await requireAuth(request);
+        if (decoded.role !== "superadmin" && decoded.role !== "admin") {
+          return json({ message: "Forbidden" }, { status: 403 });
+        }
+
+        if (url.searchParams.get("mode") === "hard") {
+          await db.collection(PARTNERSHIP_LEADS_COLLECTION).doc(detailMatch[1]).delete();
+        } else {
+          await db.collection(PARTNERSHIP_LEADS_COLLECTION).doc(detailMatch[1]).set(
+            {
+              deleted: true,
+              status: "archived",
+              deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+              deletedBy: decoded.uid,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+          );
+        }
+        return json({ ok: true });
+      }
+
+      return notFoundJson();
+    }
+
     const body = await readJson(request);
-    const phone = assertString(body.phone, "phone");
-    const email = normalizeEmail(assertString(body.email, "email"));
-    const organization = assertString(body.organization, "organization");
-    const sector = assertString(body.sector, "sector");
-    const level = assertString(body.level, "level");
+    const labels: Record<string, string> = {
+      phone: "Numéro",
+      email: "Email",
+      organization: "Nom de la société",
+      sector: "Secteur d'activité",
+      level: "Niveau de partenariat",
+    };
+    const requiredLeadString = (field: string) => {
+      const value = typeof body[field] === "string" ? body[field].trim() : "";
+      if (!value) {
+        throw Object.assign(new Error(`${labels[field] ?? field} est requis.`), { status: 400 });
+      }
+      return value;
+    };
+    const phone = requiredLeadString("phone");
+    const email = normalizeEmail(requiredLeadString("email"));
+    const organization = requiredLeadString("organization");
+    const sector = requiredLeadString("sector");
+    const level = requiredLeadString("level");
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const sourcePackage = typeof body.sourcePackage === "string" ? body.sourcePackage.trim() : "";
 
-    const ref = await firestoreAdmin().collection(PARTNERSHIP_LEADS_COLLECTION).add({
+    if (!email) return json({ message: "Email invalide." }, { status: 400 });
+
+    const ref = db.collection(PARTNERSHIP_LEADS_COLLECTION).doc();
+    const qrCode = `SCM2026-PARTNER-${ref.id}`;
+    await ref.set({
+      id: ref.id,
       phone,
       email,
       organization,
@@ -634,11 +758,290 @@ async function handlePartnershipLeads(request: Request) {
       message,
       sourcePackage,
       status: "new",
+      qrCode,
+      qrPayload: JSON.stringify({ event: "SCM2026", id: ref.id, type: "partnership" }),
+      deleted: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    return json({ id: ref.id }, { status: 201 });
+    return json({ id: ref.id, qrCode }, { status: 201 });
+  } catch (error) {
+    const status = (error as { status?: number }).status ?? 500;
+    return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
+  }
+}
+
+function optionalFormString(form: FormData, field: string) {
+  const value = form.get(field);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function requiredFormString(form: FormData, field: string) {
+  const value = optionalFormString(form, field);
+  if (!value) {
+    const labels: Record<string, string> = {
+      type: "Type de formulaire",
+      nom: "Nom",
+      prenom: "Prénom",
+      email: "Email",
+      telephone: "Téléphone",
+      privacyConsent: "Politique de confidentialité",
+      profil: "Entreprise / Institution",
+      fonction: "Fonction",
+      typeBillet: "Type de billet",
+      invitationCode: "Code VIP / Sponsor",
+      statut: "Statut",
+      university: "Université",
+      participationMode: "Mode de participation",
+      teamName: "Nom de l'équipe",
+      teamCount: "Nombre de membres",
+      technicalProfile: "Profil technique",
+      portfolioUrl: "Lien vers le portfolio",
+      session: "Session",
+      expertiseLevel: "Niveau d'expertise",
+    };
+    throw Object.assign(new Error(`${labels[field] ?? field} est requis.`), { status: 400 });
+  }
+  return value;
+}
+
+function formBoolean(form: FormData, field: string) {
+  return optionalFormString(form, field) === "true";
+}
+
+function formNumber(form: FormData, field: string) {
+  const raw = optionalFormString(form, field);
+  if (!raw) return undefined;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : undefined;
+}
+
+function parseSkills(form: FormData) {
+  const raw = optionalFormString(form, "technicalSkills");
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === "string")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+async function uploadRegistrationFile(id: string, field: string, file: FormDataEntryValue | null) {
+  if (!file || typeof file === "string" || !("arrayBuffer" in file)) return null;
+
+  const fileName = "name" in file && typeof file.name === "string" ? file.name : `${field}.bin`;
+  const safeName = fileName.replace(/[^\w.-]+/g, "_");
+  const storagePath = `event-registrations/${id}/${field}-${Date.now()}-${safeName}`;
+  const bucketName = getStorageBucketName();
+
+  if (!bucketName) {
+    return { fileName, storagePath: "", uploadStatus: "bucket-not-configured" };
+  }
+
+  const contentType = "type" in file && typeof file.type === "string" ? file.type : undefined;
+  try {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await admin
+      .storage()
+      .bucket(bucketName)
+      .file(storagePath)
+      .save(buffer, {
+        metadata: contentType ? { contentType } : undefined,
+      });
+
+    return { fileName, storagePath, uploadStatus: "stored" };
+  } catch (error) {
+    console.error("Registration file upload failed", error);
+    return { fileName, storagePath: "", uploadStatus: "failed" };
+  }
+}
+
+async function handleEventRegistrations(request: Request) {
+  const url = new URL(request.url);
+  if (!url.pathname.startsWith("/api/event-registrations")) return undefined;
+
+  try {
+    const db = firestoreAdmin();
+
+    if (url.pathname === "/api/event-registrations" && request.method === "POST") {
+      const form = await request.formData();
+      const type = requiredFormString(form, "type");
+      const allowedTypes = ["visitor", "ctf-hackathon", "job-dating", "workshop", "newsletter"];
+      if (!allowedTypes.includes(type)) {
+        return json({ message: "type is invalid" }, { status: 400 });
+      }
+
+      const nom = requiredFormString(form, "nom");
+      const email = normalizeEmail(requiredFormString(form, "email"));
+      const telephone = requiredFormString(form, "telephone");
+      if (type !== "newsletter" && !formBoolean(form, "privacyConsent")) {
+        return json({ message: "privacyConsent is required" }, { status: 400 });
+      }
+
+      if (type !== "newsletter") requiredFormString(form, "prenom");
+      if (type === "visitor") {
+        requiredFormString(form, "profil");
+        requiredFormString(form, "fonction");
+        const ticket = requiredFormString(form, "typeBillet");
+        if (ticket === "Sur invitation") requiredFormString(form, "invitationCode");
+      }
+      if (type === "ctf-hackathon") {
+        const statut = requiredFormString(form, "statut");
+        if (statut === "Étudiant") requiredFormString(form, "university");
+        const participationMode = requiredFormString(form, "participationMode");
+        if (participationMode === "Équipe") {
+          requiredFormString(form, "teamName");
+          const teamCount = Number(requiredFormString(form, "teamCount"));
+          if (!Number.isFinite(teamCount) || teamCount < 3 || teamCount > 5) {
+            return json(
+              { message: "Le nombre de membres par équipe doit être compris entre 3 et 5." },
+              { status: 400 },
+            );
+          }
+        }
+      }
+      if (type === "job-dating") {
+        requiredFormString(form, "technicalProfile");
+        requiredFormString(form, "portfolioUrl");
+        if (!form.get("cv") || typeof form.get("cv") === "string") {
+          return json({ message: "Le CV est requis." }, { status: 400 });
+        }
+        try {
+          new URL(requiredFormString(form, "portfolioUrl"));
+        } catch {
+          return json(
+            { message: "Le lien vers le portfolio doit être une URL valide." },
+            { status: 400 },
+          );
+        }
+      }
+      if (type === "workshop") {
+        requiredFormString(form, "session");
+        requiredFormString(form, "expertiseLevel");
+      }
+
+      const ref = db.collection(EVENT_REGISTRATIONS_COLLECTION).doc();
+      const qrCode = `SCM2026-${type.toUpperCase()}-${ref.id}`;
+      const cv = await uploadRegistrationFile(ref.id, "cv", form.get("cv"));
+      const typeBillet = optionalFormString(form, "typeBillet");
+      const invitationCode = optionalFormString(form, "invitationCode");
+      const isInvitation = typeBillet === "Sur invitation";
+
+      const record = {
+        id: ref.id,
+        type,
+        nom,
+        prenom: optionalFormString(form, "prenom"),
+        email,
+        telephone,
+        profil: optionalFormString(form, "profil"),
+        fonction: optionalFormString(form, "fonction"),
+        typeBillet,
+        invitationCode,
+        paiementStatus: type === "visitor" ? isInvitation : undefined,
+        privacyConsent: formBoolean(form, "privacyConsent"),
+        newsletterConsent: formBoolean(form, "newsletterConsent"),
+        statut: optionalFormString(form, "statut"),
+        university: optionalFormString(form, "university"),
+        technicalSkills: parseSkills(form),
+        participationMode: optionalFormString(form, "participationMode"),
+        teamName: optionalFormString(form, "teamName"),
+        teamCount: formNumber(form, "teamCount"),
+        technicalProfile: optionalFormString(form, "technicalProfile"),
+        cvFileName: cv?.fileName ?? "",
+        cvStoragePath: cv?.storagePath ?? "",
+        cvUploadStatus: cv?.uploadStatus ?? "",
+        portfolioUrl: optionalFormString(form, "portfolioUrl"),
+        session: optionalFormString(form, "session"),
+        expertiseLevel: optionalFormString(form, "expertiseLevel"),
+        qrCode,
+        qrPayload: JSON.stringify({ event: "SCM2026", id: ref.id, type }),
+        badgeStatus: "pending",
+        deleted: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      await ref.set(stripUndefined(record));
+      const snap = await ref.get();
+      return json(
+        { registration: registrationFromDoc(snap.id, snap.data() ?? {}) },
+        { status: 201 },
+      );
+    }
+
+    if (url.pathname === "/api/event-registrations" && request.method === "GET") {
+      const decoded = await requireAuth(request);
+      if (!isStaffRole(decoded.role)) return json({ message: "Forbidden" }, { status: 403 });
+
+      const snap = await db
+        .collection(EVENT_REGISTRATIONS_COLLECTION)
+        .orderBy("createdAt", "desc")
+        .limit(1000)
+        .get();
+      return json({
+        registrations: snap.docs.map((doc) => registrationFromDoc(doc.id, doc.data())),
+      });
+    }
+
+    const detailMatch = url.pathname.match(/^\/api\/event-registrations\/([^/]+)$/);
+    const fileMatch = url.pathname.match(/^\/api\/event-registrations\/([^/]+)\/files\/cv$/);
+    if (fileMatch && request.method === "GET") {
+      const decoded = await requireAuth(request);
+      if (!isStaffRole(decoded.role)) return json({ message: "Forbidden" }, { status: 403 });
+
+      const snap = await db.collection(EVENT_REGISTRATIONS_COLLECTION).doc(fileMatch[1]).get();
+      if (!snap.exists) return notFoundJson();
+      const data = snap.data() ?? {};
+      const storagePath = typeof data.cvStoragePath === "string" ? data.cvStoragePath : "";
+      const fileName =
+        typeof data.cvFileName === "string" && data.cvFileName ? data.cvFileName : "cv";
+      if (!storagePath) {
+        return json(
+          { message: "Le CV n'est pas disponible au téléchargement. Vérifiez Firebase Storage." },
+          { status: 404 },
+        );
+      }
+
+      const bucketName = getStorageBucketName();
+      if (!bucketName)
+        return json({ message: "Firebase Storage n'est pas configuré." }, { status: 500 });
+      const [buffer] = await admin.storage().bucket(bucketName).file(storagePath).download();
+      return new Response(buffer, {
+        headers: {
+          "content-type": "application/octet-stream",
+          "content-disposition": `attachment; filename="${fileName.replace(/"/g, "")}"`,
+        },
+      });
+    }
+
+    if (detailMatch && request.method === "DELETE") {
+      const decoded = await requireAuth(request);
+      if (decoded.role !== "superadmin" && decoded.role !== "admin") {
+        return json({ message: "Forbidden" }, { status: 403 });
+      }
+
+      if (url.searchParams.get("mode") === "hard") {
+        await db.collection(EVENT_REGISTRATIONS_COLLECTION).doc(detailMatch[1]).delete();
+      } else {
+        await db.collection(EVENT_REGISTRATIONS_COLLECTION).doc(detailMatch[1]).set(
+          {
+            deleted: true,
+            deletedAt: admin.firestore.FieldValue.serverTimestamp(),
+            deletedBy: decoded.uid,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+      return json({ ok: true });
+    }
+
+    return notFoundJson();
   } catch (error) {
     const status = (error as { status?: number }).status ?? 500;
     return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
@@ -828,6 +1231,9 @@ export default {
 
       const partnershipLeadsResponse = await handlePartnershipLeads(request);
       if (partnershipLeadsResponse) return partnershipLeadsResponse;
+
+      const eventRegistrationsResponse = await handleEventRegistrations(request);
+      if (eventRegistrationsResponse) return eventRegistrationsResponse;
 
       const finalizeProfileResponse = await handleFinalizeProfile(request);
       if (finalizeProfileResponse) return finalizeProfileResponse;

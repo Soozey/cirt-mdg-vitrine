@@ -12,6 +12,7 @@ import {
   Calendar,
   MapPin,
   Sparkles,
+  QrCode,
 } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
@@ -39,6 +40,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { downloadQrCodePng } from "@/lib/qr-code";
+import { getErrorMessage } from "@/lib/utils";
 import infoBg from "@/assets/info-section.webp";
 
 export const Route = createFileRoute("/partenaires")({
@@ -112,11 +115,11 @@ const PACKAGES = [
     description:
       "Animation d'un atelier ou masterclass • Visibilité programme • Accès réseau spécialisé • 25 invitations",
   },
-  {
-    name: "Billet Visiteur",
-    price: "1 000 000 Ar",
-    description: "Sur invitation uniquement",
-  },
+  // {
+  //   name: "Billet Visiteur",
+  //   price: "1 000 000 Ar",
+  //   description: "Sur invitation uniquement",
+  // },
 ];
 
 const PARTNERSHIP_LEVELS = [
@@ -128,6 +131,7 @@ const PARTNERSHIP_LEVELS = [
 function PackageRequestDialog({ packageName }: { packageName?: string }) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [createdLead, setCreatedLead] = useState<{ id: string; qrCode: string } | null>(null);
   const defaultLevel =
     packageName === "Conférence / Masterclass"
       ? "Partenaire Technique (Atelier/Masterclass)"
@@ -141,6 +145,7 @@ function PackageRequestDialog({ packageName }: { packageName?: string }) {
         if (open) {
           setStatus("idle");
           setErrorMessage("");
+          setCreatedLead(null);
         }
       }}
     >
@@ -162,8 +167,42 @@ function PackageRequestDialog({ packageName }: { packageName?: string }) {
 
         {status === "success" ? (
           <div className="rounded-md border border-iris-lime/40 bg-iris-lime/10 p-4 text-sm text-primary-deep">
-            Merci, votre demande a bien été enregistrée. L'équipe du Sommet vous recontactera pour
-            finaliser le package.
+            <p>
+              Merci, votre demande a bien été enregistrée. L'équipe du Sommet vous recontactera pour
+              finaliser le package.
+            </p>
+            {createdLead ? (
+              <div className="mt-4">
+                <p className="font-mono text-xs">{createdLead.qrCode}</p>
+                <Button
+                  type="button"
+                  className="mt-3 bg-iris-violet hover:bg-iris-violet/90"
+                  onClick={() =>
+                    downloadQrCodePng({
+                      payload: JSON.stringify({
+                        event: "SCM2026",
+                        id: createdLead.id,
+                        type: "partnership",
+                        qrCode: createdLead.qrCode,
+                      }),
+                      fileName: `${createdLead.qrCode}.png`,
+                    }).catch((error) =>
+                      setErrorMessage(
+                        getErrorMessage(error, "Téléchargement du QR Code impossible"),
+                      ),
+                    )
+                  }
+                >
+                  <QrCode className="size-4" />
+                  Télécharger mon QR Code
+                </Button>
+              </div>
+            ) : null}
+            {errorMessage ? (
+              <p className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {errorMessage}
+              </p>
+            ) : null}
           </div>
         ) : (
           <form
@@ -175,7 +214,7 @@ function PackageRequestDialog({ packageName }: { packageName?: string }) {
 
               const formData = new FormData(event.currentTarget);
               try {
-                await submitPartnershipLead({
+                const response = await submitPartnershipLead({
                   phone: String(formData.get("phone") ?? ""),
                   email: String(formData.get("email") ?? ""),
                   organization: String(formData.get("organization") ?? ""),
@@ -184,6 +223,7 @@ function PackageRequestDialog({ packageName }: { packageName?: string }) {
                   message: String(formData.get("message") ?? ""),
                   sourcePackage: packageName ?? "",
                 });
+                setCreatedLead(response);
                 setStatus("success");
               } catch (error) {
                 setStatus("error");
@@ -449,9 +489,16 @@ function PartenairesPage() {
               <h2 className="font-display text-2xl font-bold text-primary-deep md:text-4xl">
                 Choisissez votre niveau d'engagement
               </h2>
-              <p className="mt-3 text-xs text-foreground/60">
+              {/* <p className="mt-3 text-xs text-foreground/60">
                 * Tarifs pouvant être adaptés sous forme d'échange de service ou en nature.
+              </p> */}
+              <p
+                style={{ opacity: 0.8 }}
+                className="inline-block rounded-md bg-iris-violet px-4 py-2 my-2 text-sm font-semibold uppercase tracking-wide text-white shadow-md"
+              >
+                Visiteurs sur invitation uniquement
               </p>
+
               <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
             </Reveal>
 

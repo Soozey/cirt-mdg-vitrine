@@ -18,6 +18,7 @@ import {
   Laptop,
   Info,
   ArrowLeft,
+  Gift,
 } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
@@ -30,6 +31,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/reveal";
+import { RegistrationDialog } from "@/components/registration/registration-dialog";
 import { cn } from "@/lib/utils";
 import detailHeroBg from "@/assets/info-section.webp";
 
@@ -37,14 +39,21 @@ import detailHeroBg from "@/assets/info-section.webp";
 
 function StandPlan() {
   const stands = [
-    { n: 1, x: 60, y: 120 }, { n: 2, x: 60, y: 240 }, { n: 3, x: 60, y: 360 },
-    { n: 6, x: 540, y: 120 }, { n: 7, x: 540, y: 240 }, { n: 8, x: 540, y: 360 },
-    { n: 4, x: 235, y: 310 }, { n: 5, x: 365, y: 310 },
+    { n: 1, x: 60, y: 120 },
+    { n: 2, x: 60, y: 240 },
+    { n: 3, x: 60, y: 360 },
+    { n: 6, x: 540, y: 120 },
+    { n: 7, x: 540, y: 240 },
+    { n: 8, x: 540, y: 360 },
+    { n: 4, x: 235, y: 310 },
+    { n: 5, x: 365, y: 310 },
   ];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/15 bg-[oklch(0.14_0.10_265)] 
-                    p-4 md:p-6 max-w-full md:max-w-3xl lg:max-w-2xl mx-auto">
+    <div
+      className="overflow-hidden rounded-2xl border border-white/15 bg-[oklch(0.14_0.10_265)] 
+                    p-4 md:p-6 max-w-full md:max-w-3xl lg:max-w-2xl mx-auto"
+    >
       <svg
         viewBox="0 0 720 560"
         className="h-auto w-full md:w-[90%] lg:w-[95%]"
@@ -52,40 +61,85 @@ function StandPlan() {
         aria-label="Plan des stands"
       >
         {/* room outline */}
-        <rect x="30" y="30" width="660" height="430" rx="14"
-          fill="oklch(0.18 0.12 265)" stroke="var(--iris-cyan)" strokeWidth="2" />
+        <rect
+          x="30"
+          y="30"
+          width="660"
+          height="430"
+          rx="14"
+          fill="oklch(0.18 0.12 265)"
+          stroke="var(--iris-cyan)"
+          strokeWidth="2"
+        />
 
         {/* stage arc */}
-        <path d="M 200 70 Q 360 30 520 70" fill="none" stroke="var(--iris-lime)" strokeWidth="4" strokeLinecap="round" />
+        <path
+          d="M 200 70 Q 360 30 520 70"
+          fill="none"
+          stroke="var(--iris-lime)"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
 
         {/* seats in arc */}
         {Array.from({ length: 5 }).map((_, r) =>
           Array.from({ length: 12 }).map((_, c) => {
             const angle = (c - 6) * 8; // angle de placement
             const radius = 120 + r * 22;
-            const x = 360 + radius * Math.sin(angle * Math.PI / 180);
-            const y = 60 + radius * Math.cos(angle * Math.PI / 180);
+            const x = 360 + radius * Math.sin((angle * Math.PI) / 180);
+            const y = 60 + radius * Math.cos((angle * Math.PI) / 180);
             return (
-              <rect key={`s-${r}-${c}`} x={x} y={y} width="8" height="6" rx="2"
-                fill="oklch(0.92 0.02 265)" opacity="0.85" />
+              <rect
+                key={`s-${r}-${c}`}
+                x={x}
+                y={y}
+                width="8"
+                height="6"
+                rx="2"
+                fill="oklch(0.92 0.02 265)"
+                opacity="0.85"
+              />
             );
-          })
+          }),
         )}
 
         {/* stands */}
         {stands.map((s) => (
           <g key={s.n}>
-            <rect x={s.x} y={s.y} width="120" height="100" rx="8"
-              fill="oklch(0.10 0.08 265)" stroke="var(--iris-cyan)" strokeWidth="1.5" />
-            <text x={s.x + 60} y={s.y + 62} textAnchor="middle"
-              fill="white" fontSize="36" fontWeight="700" fontFamily="var(--font-display)">
+            <rect
+              x={s.x}
+              y={s.y}
+              width="120"
+              height="100"
+              rx="8"
+              fill="oklch(0.10 0.08 265)"
+              stroke="var(--iris-cyan)"
+              strokeWidth="1.5"
+            />
+            <text
+              x={s.x + 60}
+              y={s.y + 62}
+              textAnchor="middle"
+              fill="white"
+              fontSize="36"
+              fontWeight="700"
+              fontFamily="var(--font-display)"
+            >
               {s.n}
             </text>
           </g>
         ))}
 
         {/* entrance */}
-        <rect x="320" y="470" width="80" height="50" rx="6" fill="var(--iris-magenta)" opacity="0.85" />
+        <rect
+          x="320"
+          y="470"
+          width="80"
+          height="50"
+          rx="6"
+          fill="var(--iris-magenta)"
+          opacity="0.85"
+        />
         <text x="360" y="545" textAnchor="middle" fill="white" fontSize="14" fontWeight="600">
           ↑ ENTRÉE
         </text>
@@ -93,8 +147,6 @@ function StandPlan() {
     </div>
   );
 }
-
-
 
 /* ---------- Shared layout primitives ---------- */
 
@@ -110,9 +162,7 @@ export function SectionHeader({
   align?: "left" | "center";
 }) {
   return (
-    <Reveal
-      className={cn("mb-10 max-w-3xl", align === "center" && "mx-auto text-center")}
-    >
+    <Reveal className={cn("mb-10 max-w-3xl", align === "center" && "mx-auto text-center")}>
       {eyebrow ? (
         <p
           className="mb-2 text-[11px] uppercase tracking-[0.24em] text-iris-lime"
@@ -128,16 +178,9 @@ export function SectionHeader({
         {title}
       </h2>
       {description ? (
-        <p className="mt-3 text-sm leading-relaxed text-white/82 md:text-base">
-          {description}
-        </p>
+        <p className="mt-3 text-sm leading-relaxed text-white/82 md:text-base">{description}</p>
       ) : null}
-      <div
-        className={cn(
-          "mt-4 h-1 w-12 rounded-full bg-iris",
-          align === "center" && "mx-auto",
-        )}
-      />
+      <div className={cn("mt-4 h-1 w-12 rounded-full bg-iris", align === "center" && "mx-auto")} />
     </Reveal>
   );
 }
@@ -217,15 +260,24 @@ function RichHero({
           >
             {title}
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-white/82 md:text-lg">
-            {tagline}
-          </p>
+          <p className="mt-4 max-w-2xl text-base text-white/82 md:text-lg">{tagline}</p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="bg-iris-lime text-primary-deep shadow-[0_14px_35px_-22px_rgba(214,255,87,0.85)] hover:bg-iris-lime/90">
+            <Button
+              asChild
+              size="lg"
+              className="bg-iris-lime text-primary-deep shadow-[0_14px_35px_-22px_rgba(214,255,87,0.85)] hover:bg-iris-lime/90"
+            >
               <a href={ctaHref}>{ctaLabel}</a>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
-              <Link to="/" hash="contact">Nous contacter</Link>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
+            >
+              <Link to="/" hash="contact">
+                Nous contacter
+              </Link>
             </Button>
           </div>
           {meta.length ? (
@@ -248,10 +300,26 @@ function RichHero({
 
 function CtfHackathonPage() {
   const disciplines = [
-    { icon: Flag, title: "Pentest", desc: "Scénarios d'intrusion encadrés sur périmètre autorisé." },
-    { icon: Cpu, title: "Forensique", desc: "Analyse d'artefacts, traces, dumps mémoire et trafic réseau." },
-    { icon: Code2, title: "IA", desc: "Cas d'usage offensifs et défensifs autour de l'intelligence artificielle." },
-    { icon: Laptop, title: "Dev sécurité", desc: "Développement, correction et durcissement de solutions sécurisées." },
+    {
+      icon: Flag,
+      title: "Pentest",
+      desc: "Scénarios d'intrusion encadrés sur périmètre autorisé.",
+    },
+    {
+      icon: Cpu,
+      title: "Forensique",
+      desc: "Analyse d'artefacts, traces, dumps mémoire et trafic réseau.",
+    },
+    {
+      icon: Code2,
+      title: "IA",
+      desc: "Cas d'usage offensifs et défensifs autour de l'intelligence artificielle.",
+    },
+    {
+      icon: Laptop,
+      title: "Dev sécurité",
+      desc: "Développement, correction et durcissement de solutions sécurisées.",
+    },
   ];
 
   return (
@@ -259,7 +327,7 @@ function CtfHackathonPage() {
       <RichHero
         badge="Challenge · 22 juin 2026"
         title="CTF & HACKATHON"
-        tagline="CTF (Capture The Flag) et Hackathon Cyber organisés le 22 juin pour étudiants et jeunes professionnels."
+        tagline="CTF (Capture The Flag) et Hackathon organisés le 22 juin pour étudiants et jeunes professionnels."
         ctaLabel="Voir les épreuves"
         ctaHref="#epreuves"
         meta={[
@@ -273,7 +341,7 @@ function CtfHackathonPage() {
         <ContentContainer>
           <SectionHeader
             eyebrow="Synthèse"
-            title="CTF (Capture The Flag) et Hackathon Cyber"
+            title="CTF (Capture The Flag) et Hackathon"
             description="Organisés le 22 juin pour étudiants et jeunes professionnels. Épreuves techniques en conditions réelles : pentest, forensique, IA, dev sécurité. Plateforme de détection et de valorisation des talents cyber du territoire."
           />
           <div className="grid gap-5 md:grid-cols-3">
@@ -285,13 +353,13 @@ function CtfHackathonPage() {
               },
               {
                 icon: Code2,
-                t: "Hackathon Cyber",
+                t: "Hackathon",
                 d: "Conception de solutions concrètes autour de la défense, de la résilience et du développement sécurisé.",
               },
               {
-                icon: Trophy,
-                t: "Détection des talents",
-                d: "Mise en visibilité des profils cyber prometteurs auprès de l'écosystème et des partenaires.",
+                icon: Gift, // tu peux utiliser l’icône "Gift" de lucide-react
+                t: "Goodies pour participants",
+                d: "Distribution de cadeaux et goodies offerts aux participants par les deux partenaires sollicités.",
               },
             ].map(({ icon: Icon, t, d }) => (
               <Card key={t} className="border-border/60 p-6">
@@ -316,7 +384,9 @@ function CtfHackathonPage() {
               <RevealItem key={title}>
                 <Card className="h-full border-border/60 p-6">
                   <Icon className="size-5 text-iris-violet" />
-                  <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{title}</h3>
+                  <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">
+                    {title}
+                  </h3>
                   <p className="mt-2 text-sm text-foreground/70">{desc}</p>
                 </Card>
               </RevealItem>
@@ -338,6 +408,11 @@ function CtfHackathonPage() {
               <Info className="size-4" /> Demander des informations
             </Link>
           </Button>
+          <RegistrationDialog
+            type="ctf-hackathon"
+            label="S'inscrire au CTF & Hackathon"
+            className="ml-0 mt-3 sm:ml-3 sm:mt-0"
+          />
         </ContentContainer>
       </section>
     </>
@@ -366,13 +441,24 @@ function JobDatingPage() {
           />
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { t: "Préparez un pitch de 60s", d: "Présentez clairement votre parcours et vos motivations." },
-              { t: "Imprimez 5 CV à jour", d: "Apportez aussi votre version numérique sur clé USB." },
-              { t: "Ciblez les bons profils", d: "Concentrez-vous sur les entreprises alignées avec votre projet." },
+              {
+                t: "Préparez un pitch de 60s",
+                d: "Présentez clairement votre parcours et vos motivations.",
+              },
+              {
+                t: "Imprimez 5 CV à jour",
+                d: "Apportez aussi votre version numérique sur clé USB.",
+              },
+              {
+                t: "Ciblez les bons profils",
+                d: "Concentrez-vous sur les entreprises alignées avec votre projet.",
+              },
             ].map((c) => (
               <Card key={c.t} className="border-border/60 p-6">
                 <Briefcase className="size-5 text-iris-violet" />
-                <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{c.t}</h3>
+                <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">
+                  {c.t}
+                </h3>
                 <p className="mt-2 text-sm text-foreground/70">{c.d}</p>
               </Card>
             ))}
@@ -391,13 +477,21 @@ profils spécialisés."
           />
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { t: "Sourcing direct", d: "Rencontres en face-à-face avec les lauréats CTF & Hackathon." },
-              { t: "Candidats pré-filtrés", d: "Profils évalués sur compétences réelles, pas seulement sur CV." },
+              {
+                t: "Sourcing direct",
+                d: "Rencontres en face-à-face avec les lauréats CTF & Hackathon.",
+              },
+              {
+                t: "Candidats pré-filtrés",
+                d: "Profils évalués sur compétences réelles, pas seulement sur CV.",
+              },
               { t: "Profils spécialisés", d: "Pentest, forensique, IA, dev sécurité." },
             ].map((c) => (
               <Card key={c.t} className="border-border/60 p-6">
                 <Building2 className="size-5 text-iris-violet" />
-                <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{c.t}</h3>
+                <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">
+                  {c.t}
+                </h3>
                 <p className="mt-2 text-sm text-foreground/70">{c.d}</p>
               </Card>
             ))}
@@ -406,20 +500,15 @@ profils spécialisés."
       </section>
 
       <section id="cv" className="bg-surface-muted/50">
-
         <ContentContainer className="max-w-3xl">
           <SectionHeader eyebrow="Candidature" title="Déposer mon CV" />
           <Card className="border-border/60 p-6 md:p-8">
             <p className="text-sm text-foreground/80">
-              Envoyez votre CV à l'organisation par email afin que votre candidature soit transmise aux recruteurs partenaires
-              avant l'événement.
+              Envoyez votre CV à l'organisation par email afin que votre candidature soit transmise
+              aux recruteurs partenaires avant l'événement.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild>
-                <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Candidature%20Job%20Dating%20-%20CIRT%20MDG%202026">
-                  <Mail className="size-4" /> Envoyer mon CV par email
-                </a>
-              </Button>
+              <RegistrationDialog type="job-dating" label="Déposer mon CV" />
               <Button asChild variant="outline">
                 <Link to="/" hash="informations">
                   <Info className="size-4" /> Plus d'informations
@@ -535,7 +624,6 @@ function ConferencesPage() {
   );
 }
 
-
 /* ---------- ATELIERS ---------- */
 
 function AteliersPage() {
@@ -573,7 +661,8 @@ function AteliersPage() {
           <Card className="mb-8 flex items-start gap-3 border-iris-lime/40 bg-iris-lime/10 p-5">
             <Info className="mt-0.5 size-5 shrink-0 text-iris-violet" />
             <p className="text-sm text-primary-deep">
-              <strong>Places limitées.</strong> L'inscription se fait obligatoirement auprès de l'organisation.
+              <strong>Places limitées.</strong> L'inscription se fait obligatoirement auprès de
+              l'organisation.
             </p>
           </Card>
           <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -581,17 +670,24 @@ function AteliersPage() {
               <RevealItem key={a.t}>
                 <Card className="flex h-full flex-col border-border/60 p-6">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-display text-base font-semibold text-primary-deep">{a.t}</h3>
+                    <h3 className="font-display text-base font-semibold text-primary-deep">
+                      {a.t}
+                    </h3>
                     <Badge variant="outline" className={cn("shrink-0", levelColor[a.level])}>
                       {a.level}
                     </Badge>
                   </div>
-                  <p className="mt-3 text-sm text-foreground/75">Atelier scénarisé encadré par un expert SOC/CSIRT.</p>
+                  <p className="mt-3 text-sm text-foreground/75">
+                    Atelier scénarisé encadré par un expert SOC/CSIRT.
+                  </p>
                   <p className="mt-2 text-xs text-foreground/60">Matériel : {a.mat}</p>
                 </Card>
               </RevealItem>
             ))}
           </RevealGroup>
+          <div className="mt-8">
+            <RegistrationDialog type="workshop" label="S'inscrire à un atelier" />
+          </div>
         </ContentContainer>
       </section>
 
@@ -601,8 +697,16 @@ function AteliersPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {[
               { icon: Laptop, t: "PC portable", d: "Avec accès admin local." },
-              { icon: Cpu, t: "Environnement virtualisé", d: "VM pré-installée (VirtualBox / VMware, 8 Go RAM min)." },
-              { icon: Wrench, t: "Outils techniques", d: "Selon chaque atelier : Wireshark, Ghidra, Volatility, etc." },
+              {
+                icon: Cpu,
+                t: "Environnement virtualisé",
+                d: "VM pré-installée (VirtualBox / VMware, 8 Go RAM min).",
+              },
+              {
+                icon: Wrench,
+                t: "Outils techniques",
+                d: "Selon chaque atelier : Wireshark, Ghidra, Volatility, etc.",
+              },
             ].map(({ icon: Icon, t, d }) => (
               <Card key={t} className="border-border/60 p-6">
                 <Icon className="size-6 text-iris-violet" />
@@ -684,9 +788,18 @@ function ExpositionNetworkingPage() {
           />
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { t: "Démonstrations live", d: "EDR, SIEM, SOC managé et simulations d'attaques en conditions réelles." },
-              { t: "Génération de leads B2B", d: "Rencontres ciblées avec décideurs et grands comptes." },
-              { t: "Positionnement d'expert", d: "Visibilité programme et prise de parole auprès d'un public qualifié." },
+              {
+                t: "Démonstrations live",
+                d: "EDR, SIEM, SOC managé et simulations d'attaques en conditions réelles.",
+              },
+              {
+                t: "Génération de leads B2B",
+                d: "Rencontres ciblées avec décideurs et grands comptes.",
+              },
+              {
+                t: "Positionnement d'expert",
+                d: "Visibilité programme et prise de parole auprès d'un public qualifié.",
+              },
             ].map((c) => (
               <Card key={c.t} className="border-border/60 p-6">
                 <h3 className="font-display text-base font-semibold text-primary-deep">{c.t}</h3>
@@ -705,7 +818,8 @@ function ExpositionNetworkingPage() {
             </p>
             <h2 className="font-display text-2xl font-bold md:text-4xl">Plan des stands</h2>
             <p className="mt-3 text-sm text-nav-deep-foreground/75 md:text-base">
-              Disposition des 8 espaces partenaires autour de la zone plénière (scène + sièges), avec entrée centrale.
+              Disposition des 8 espaces partenaires autour de la zone plénière (scène + sièges),
+              avec entrée centrale.
             </p>
             <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
           </Reveal>
@@ -716,8 +830,6 @@ function ExpositionNetworkingPage() {
         </ContentContainer>
       </section>
 
-
-
       <section className="bg-surface-muted/50">
         <ContentContainer className="grid gap-8 md:grid-cols-2">
           <Card className="border-border/60 p-6 md:p-8">
@@ -725,8 +837,9 @@ function ExpositionNetworkingPage() {
               Application de matchmaking
             </h3>
             <p className="mt-3 text-sm text-foreground/80">
-              Une application de matchmaking pourra être proposée pour faciliter la prise de rendez-vous
-              entre participants. Le lien sera communiqué prochainement par l'organisation.
+              Une application de matchmaking pourra être proposée pour faciliter la prise de
+              rendez-vous entre participants. Le lien sera communiqué prochainement par
+              l'organisation.
             </p>
             <p className="mt-3 text-xs text-foreground/60">
               <CheckCircle2 className="mr-1.5 inline size-3.5 text-iris-violet" />
@@ -757,7 +870,9 @@ function ExpositionNetworkingPage() {
                       <Coffee className="size-4 text-iris-violet" />
                       <span className="text-xs font-semibold text-iris-violet">{s.h}</span>
                     </div>
-                    <p className="mt-1 font-display text-base font-semibold text-primary-deep">{s.t}</p>
+                    <p className="mt-1 font-display text-base font-semibold text-primary-deep">
+                      {s.t}
+                    </p>
                     <p className="text-xs text-foreground/70">{s.l}</p>
                   </Card>
                 </li>
@@ -775,7 +890,9 @@ function ExpositionNetworkingPage() {
               <RevealItem key={title}>
                 <Card className="h-full border-border/60 p-6">
                   <Icon className="size-6 text-iris-violet" />
-                  <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">{title}</h3>
+                  <h3 className="mt-3 font-display text-base font-semibold text-primary-deep">
+                    {title}
+                  </h3>
                   <p className="mt-2 text-sm text-foreground/75">{desc}</p>
                 </Card>
               </RevealItem>
@@ -793,6 +910,7 @@ function ExpositionNetworkingPage() {
             description="Visibilité maximale, prise de parole, espace dédié, invitations VIP : découvrez les packages de partenariat de la 1ère édition."
           />
           <div className="flex flex-wrap justify-center gap-3">
+            <RegistrationDialog type="visitor" label="Acheter un billet visiteur" />
             <Button asChild>
               <Link to="/partenaires">
                 <Building2 className="size-4" /> Voir les packages
@@ -810,7 +928,6 @@ function ExpositionNetworkingPage() {
   );
 }
 
-
 function ProgrammePage() {
   const days = [
     {
@@ -822,7 +939,7 @@ function ProgrammePage() {
         "Ateliers techniques (systèmes & réseaux)",
         "Espace exposition & démos live partenaires",
         "Déjeuner networking partenaires & VIP",
-        "CTF & Hackathon Cyber",
+        "CTF & Hackathon",
       ],
     },
     {
@@ -832,7 +949,7 @@ function ProgrammePage() {
         "Masterclass : gestion de cyber-crise",
         "Coopération internationale & panels",
         "Annonce des résultats & remise des prix CTF / Hackathon",
-        "Job Dating Cyber : lauréats CTF, Hackathon & jeunes talents",
+        "Job Dating : lauréats CTF, Hackathon & jeunes talents",
         "Table ronde : cybermenaces & IA",
         "Cocktail de clôture & networking",
       ],
@@ -871,6 +988,13 @@ function ProgrammePage() {
                 </ul>
               </Card>
             ))}
+          </div>
+          <div className="mt-8">
+            <RegistrationDialog
+              type="newsletter"
+              label="Recevoir les informations du Sommet"
+              variant="outline"
+            />
           </div>
         </ContentContainer>
       </section>
