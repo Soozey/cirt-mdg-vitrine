@@ -11,13 +11,20 @@ import cirtShield from "@/assets/partners/3-cirt-shield.png";
 import prodigy from "@/assets/partners/4-prodigy.webp";
 import udg from "@/assets/partners/5-udg.webp";
 
+// const PARTNERS = [
+//   // { src: ministere, alt: "République de Madagascar", className: "h-16 sm:h-20 md:h-24" },
+//   // { src: mndpt, alt: "Ministère du Développement Numérique, des Postes et des Télécommunications", className: "h-14 sm:h-16 md:h-20" },
+//   { src: cirtShield, alt: "CIRT MDG", className: "h-12 sm:h-14 md:h-16" },
+//   { src: prodigy, alt: "Prodigy", className: "h-8 sm:h-10 md:h-12" },
+//   { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-20 sm:h-24 md:h-32" },
+// ];
+
 const PARTNERS = [
-  { src: ministere, alt: "République de Madagascar", className: "h-16 sm:h-20 md:h-24" },
-  { src: mndpt, alt: "Ministère du Développement Numérique, des Postes et des Télécommunications", className: "h-14 sm:h-16 md:h-20" },
-  { src: cirtShield, alt: "CIRT MDG", className: "h-12 sm:h-14 md:h-16" },
-  { src: prodigy, alt: "Prodigy", className: "h-8 sm:h-10 md:h-12" },
-  { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-20 sm:h-24 md:h-32" },
+  { src: cirtShield, alt: "CIRT MDG", className: "h-10 sm:h-10 md:h-14" },
+  { src: prodigy, alt: "Prodigy", className: "h-7 sm:h-8 md:h-10" },
+  { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-18 sm:h-16 md:h-25" },
 ];
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -102,6 +109,29 @@ export function HeroSection() {
       />
 
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-[1400px] flex-col px-4 pb-16 pt-6 sm:px-6 md:min-h-[calc(100svh-5rem)] md:px-10 md:pb-24 md:pt-1">
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={heroViewport}
+          variants={fadeUp}
+          className="flex justify-center"
+        >
+          <img src={ministere} alt="République de Madagascar"
+            className="h-16 sm:h-20 md:h-22 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+        </motion.div>
+        {/* Ligne 2 : MNDPT seul */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={heroViewport}
+          variants={fadeUp}
+          className="md:hidden flex justify-center"
+        >
+          <img src={mndpt} alt="MNDPT"
+            className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+        </motion.div>
+
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -109,6 +139,11 @@ export function HeroSection() {
           variants={fadeUp}
           className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-3 sm:gap-x-6"
         >
+          {/* Ligne 2 : MNDPT seul */}
+          <div className="hidden md:flex justify-center">
+            <img src={mndpt} alt="MNDPT"
+              className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+          </div>
           {PARTNERS.map((p) => (
             <img
               key={p.alt}
@@ -131,7 +166,7 @@ export function HeroSection() {
             >
               <div className="flex flex-col">
                 {/* Ligne du haut : édition et Sommet/de la */}
-                <motion.div variants={titleFromTop} className="block md:flex md:w-full md:justify-between md:items-baseline mb-3">
+                <motion.div variants={titleFromTop} className="flex w-full justify-between items-baseline mb-3">
                   <motion.span
                     className="text-[0.7rem] tracking-wide text-white sm:text-xs md:text-sm"
                     style={{ fontFamily: "var(--font-barlow)" }}
@@ -141,8 +176,8 @@ export function HeroSection() {
 
                   <motion.span
                     className="flex flex-col items-start 
-                   text-xs sm:text-sm md:text-[clamp(0.95rem,1.35vw,1.25rem)] 
-                   uppercase leading-[1.0] text-white/95 mt-2 md:mt-0"
+                    text-xs sm:text-sm md:text-[clamp(0.95rem,1.35vw,1.25rem)] 
+                    uppercase leading-[1.0] text-white/95 mt-2 md:mt-0"
                     style={{ fontFamily: "var(--font-enfonix)", letterSpacing: "0.06em" }}
                   >
                     <span>Sommet</span>
@@ -153,7 +188,7 @@ export function HeroSection() {
                 {/* Ligne du bas : Cyber */}
                 <motion.span
                   variants={titleFromTop}
-                  className="block text-[clamp(2.75rem,9.4vw,8rem)] uppercase leading-[0.88] text-white"
+                  className="block text-[clamp(5rem,9vw,7rem)] uppercase leading-[0.88] text-white"
                   style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.01em" }}
                 >
                   Cyber
@@ -164,14 +199,14 @@ export function HeroSection() {
               <div className="inline-flex max-w-full flex-col items-end">
                 <motion.span
                   variants={titleFromTop}
-                  className="block max-w-full text-[clamp(2.75rem,9.4vw,8rem)] uppercase leading-[0.88] text-white"
+                  className="block max-w-full text-[clamp(5rem,9vw,6rem)] uppercase leading-[0.88] text-white"
                   style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.01em" }}
                 >
                   Sécurité
                 </motion.span>
                 <motion.span
                   variants={titleFromTop}
-                  className="-mt-1 max-w-full text-right text-[clamp(0.78rem,1.65vw,1.45rem)] uppercase text-white"
+                  className="-mt-1 max-w-full text-right text-[clamp(1rem,1.8vw,1.6rem)] uppercase text-white"
                   style={{ fontFamily: "var(--font-enfonix)", letterSpacing: "0.14em" }}
                 >
                   Madagascar
