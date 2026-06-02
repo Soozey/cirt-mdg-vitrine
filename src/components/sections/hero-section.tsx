@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/project-section2.webp";
-import ministere from "@/assets/MINISTERE.png";
+import ministere from "@/assets/partners/1-ministere.webp";
 import mndpt from "@/assets/partners/2-mndpt.webp";
 import cirtShield from "@/assets/partners/3-cirt-shield.png";
 import prodigy from "@/assets/partners/4-prodigy.webp";
