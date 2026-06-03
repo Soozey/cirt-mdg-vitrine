@@ -78,9 +78,9 @@ export function SiteHeader() {
               {item.label}
             </a>
           ))}
-          <Button asChild size="sm" variant="outline" className="mt-2 border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10">
+          {/* <Button asChild size="sm" variant="outline" className="mt-2 border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10">
             <Link to="/login" onClick={() => setOpen(false)}>Connexion</Link>
-          </Button>
+          </Button> */}
           <Button asChild size="sm" className="mt-1 bg-iris-lime text-primary-deep hover:bg-iris-lime/90">
             <Link to="/quiz" onClick={() => setOpen(false)}>
               <ShieldCheck className="size-4" /> Quiz cybersécurité

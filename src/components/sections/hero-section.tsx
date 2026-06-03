@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/project-section2.webp";
+import heroBgMobile from "@/assets/hero-version-mobile.webp";
 import ministere from "@/assets/partners/1-ministere.webp";
 import mndpt from "@/assets/partners/2-mndpt.webp";
 import cirtShield from "@/assets/partners/3-cirt-shield.png";
@@ -19,11 +20,9 @@ import udg from "@/assets/partners/5-udg.webp";
 //   { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-20 sm:h-24 md:h-32" },
 // ];
 
-const PARTNERS = [
+const BOTTOM_PARTNERS = [
   { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-18 sm:h-16 md:h-25" },
   { src: prodigy, alt: "Prodigy", className: "h-7 sm:h-8 md:h-10" },
-  { src: cirtShield, alt: "CIRT MDG", className: "h-10 sm:h-10 md:h-14" },
-
 ];
 
 
@@ -86,13 +85,18 @@ export function HeroSection() {
       id="accueil"
       className="relative isolate overflow-hidden bg-[#02060f] text-white"
     >
-      <img
-        src={heroBg}
-        alt=""
+      <picture
         aria-hidden
-        fetchPriority="high"
-        className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover"
-      />
+        className="pointer-events-none absolute inset-0 -z-20 h-full w-full"
+      >
+        <source media="(max-width: 767px)" srcSet={heroBgMobile} />
+        <img
+          src={heroBg}
+          alt=""
+          fetchPriority="high"
+          className="h-full w-full object-cover"
+        />
+      </picture>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10"
@@ -119,41 +123,27 @@ export function HeroSection() {
           className="flex justify-center"
         >
           <img src={ministere} alt="République de Madagascar"
-            className="h-22 sm:h-20 md:h-32 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+            className="h-20 sm:h-20 md:h-32 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
         </motion.div>
-        {/* Ligne 2 : MNDPT seul */}
+        
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={heroViewport}
           variants={fadeUp}
-          className="md:hidden flex justify-center"
-        >
-          <img src={mndpt} alt="MNDPT"
-            className="h-16 sm:h-16 md:h-23 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
-        </motion.div>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={heroViewport}
-          variants={fadeUp}
-          className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-3 sm:gap-x-6"
+          className="-mt-2 flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-3 sm:-mt-3 sm:gap-x-6 md:-mt-5"
         >
           {/* Ligne 2 : MNDPT seul */}
-          <div className="hidden md:flex justify-center">
+          <div className="flex justify-center">
             <img src={mndpt} alt="MNDPT"
               className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
           </div>
-          {PARTNERS.map((p) => (
-            <img
-              key={p.alt}
-              src={p.src}
-              alt={p.alt}
-              className={`${p.className} w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]`}
-              loading="eager"
-            />
-          ))}
+          <img
+            src={cirtShield}
+            alt="CIRT MDG"
+            className="h-10 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] sm:h-10 md:h-14"
+            loading="eager"
+          />
         </motion.div>
 
         <div className="mt-8 flex flex-1 flex-col justify-center md:mt-10">
@@ -189,7 +179,7 @@ export function HeroSection() {
                 {/* Ligne du bas : Cyber */}
                 <motion.span
                   variants={titleFromTop}
-                  className="block text-[clamp(5rem,9vw,7rem)] uppercase leading-[0.88] text-white"
+                  className="block text-[clamp(4rem,9vw,7rem)] uppercase leading-[0.88] text-white"
                   style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.01em" }}
                 >
                   Cyber
@@ -200,7 +190,7 @@ export function HeroSection() {
               <div className="inline-flex max-w-full flex-col items-end">
                 <motion.span
                   variants={titleFromTop}
-                  className="block max-w-full text-[clamp(5rem,9vw,6rem)] uppercase leading-[0.88] text-white"
+                  className="block max-w-full text-[clamp(3.6rem,7vw,6rem)] uppercase leading-[0.88] text-white"
                   style={{ fontFamily: "var(--font-turret)", letterSpacing: "0.01em" }}
                 >
                   Sécurité
@@ -277,6 +267,24 @@ export function HeroSection() {
               </div>
             </motion.div>
           </div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={heroViewport}
+            variants={fadeUp}
+            className="mt-5 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 sm:mt-6 md:mt-7 md:gap-x-8"
+          >
+            {BOTTOM_PARTNERS.map((p) => (
+              <img
+                key={p.alt}
+                src={p.src}
+                alt={p.alt}
+                className={`${p.className} w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]`}
+                loading="eager"
+              />
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>

@@ -23,7 +23,7 @@ export function SiteFooter() {
 
           <div className="grid min-w-0 gap-5 text-sm leading-relaxed text-white sm:max-w-xl lg:max-w-none lg:pt-1">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-              <div className="flex w-20 shrink-0 justify-start sm:w-28">
+              <div className="flex w-28 shrink-0 justify-start sm:w-36 lg:w-44">
                 <img
                   src="/cirt-shield.png"
                   alt="CIRT MDG"
@@ -36,11 +36,11 @@ export function SiteFooter() {
             </div>
 
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-              <div className="flex w-20 shrink-0 justify-start sm:w-28">
+              <div className="flex w-28 shrink-0 justify-start sm:w-36 lg:w-44">
                 <img
                   src={udgLogo}
                   alt="Unité de Gouvernance Digitale"
-                  className="h-20 w-auto object-contain sm:h-24 lg:h-32"
+                  className="h-28 w-auto object-contain sm:h-32 lg:h-40"
                 />
               </div>
               <p className="min-w-0 [overflow-wrap:anywhere]">
