@@ -74,7 +74,7 @@ import {
 import { formatPhone } from "@/lib/quiz/format";
 import { getErrorMessage } from "@/lib/utils";
 
-const PER_PAGE = 8;
+const PER_PAGE = 5;
 const ROLE_INVITES_PER_PAGE = 5;
 const ROLE_USERS_PER_PAGE = 5;
 

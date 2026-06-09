@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type React from "react";
+import { Link } from "@tanstack/react-router";
 import { CheckCircle2, Loader2, QrCode, Ticket } from "lucide-react";
 import { toast } from "sonner";
 
@@ -125,7 +126,7 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (requiresPrivacy && !privacyConsent) {
-      toast.error("Veuillez accepter la politique de confidentialité.");
+      toast.error("Veuillez accepter les conditions générales d'utilisation.");
       return;
     }
     if (type === "job-dating" && (!cvFile || cvFile.size >= MAX_CV_BYTES)) {
@@ -394,7 +395,17 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
 
             {type !== "newsletter" ? (
               <CheckboxLine
-                label="J'accepte la politique de confidentialité."
+                label={
+                  <>
+                    J'accepte les{" "}
+                    <Link
+                      to="/conditions-generales-utilisation"
+                      className="font-semibold text-primary hover:underline"
+                    >
+                      conditions générales d'utilisation
+                    </Link>
+                  </>
+                }
                 checked={privacyConsent}
                 onCheckedChange={setPrivacyConsent}
               />
@@ -481,7 +492,7 @@ function CheckboxLine({
   checked,
   onCheckedChange,
 }: {
-  label: string;
+  label: React.ReactNode;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
 }) {

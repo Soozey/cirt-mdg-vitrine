@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ArrowLeft, Mail } from "lucide-react";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -21,6 +21,8 @@ export const Route = createFileRoute("/conditions-generales-utilisation")({
 });
 
 function TermsPage() {
+  const { history } = useRouter();
+
   const sections = [
     {
       title: "Objet",
@@ -68,10 +70,12 @@ function TermsPage() {
             }}
           />
           <div className="mx-auto w-full max-w-4xl px-4 py-12 md:px-8 md:py-16">
-            <Button asChild variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
-              <Link to="/register">
-                <ArrowLeft className="size-4" /> Retour à l'inscription
-              </Link>
+            <Button
+              variant="outline"
+              onClick={() => history.go(-1)}
+              className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
+            >
+              <ArrowLeft className="size-4" /> Retour
             </Button>
 
             <h1
