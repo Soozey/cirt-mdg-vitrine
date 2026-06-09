@@ -444,11 +444,15 @@ async function handleRoleInvites(request: Request) {
     if (url.pathname === "/api/role-invites" && request.method === "POST") {
       const body = await readJson(request);
       const role =
-        body.role === "admin" || body.role === "juror" ? (body.role as RoleInviteRole) : null;
+        body.role === "admin" || body.role === "juror" || body.role === "superadmin"
+          ? (body.role as RoleInviteRole)
+          : null;
       const email = typeof body.email === "string" ? body.email.trim() : "";
       const phone = typeof body.phone === "string" ? body.phone.trim() : "";
 
-      if (!role) return json({ message: "role must be admin or juror" }, { status: 400 });
+      if (!role) {
+        return json({ message: "role must be superadmin, admin or juror" }, { status: 400 });
+      }
       if (!email && !phone) return json({ message: "email or phone is required" }, { status: 400 });
 
       const ref = await db.collection(ROLE_INVITES_COLLECTION).add({
@@ -481,6 +485,75 @@ async function handleRoleInvites(request: Request) {
     }
 
     return notFoundJson();
+  } catch (error) {
+    const status = (error as { status?: number }).status ?? 500;
+    return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
+  }
+}
+
+async function handleUserRoles(request: Request) {
+  const url = new URL(request.url);
+  if (url.pathname !== "/api/users/roles" && !/^\/api\/users\/[^/]+\/roles$/.test(url.pathname)) {
+    return undefined;
+  }
+
+  try {
+    const actor = await requireSuperadmin(request);
+    const db = firestoreAdmin();
+
+    if (url.pathname === "/api/users/roles" && request.method === "GET") {
+      const snap = await db.collection(USERS_COLLECTION).get();
+      const users = snap.docs
+        .map((doc) => ({ uid: doc.id, ...doc.data() }))
+        .filter((user) => isStaffRole(user.role))
+        .sort((a, b) => {
+          const roleOrder: Record<string, number> = { superadmin: 0, admin: 1, juror: 2 };
+          return (roleOrder[String(a.role)] ?? 99) - (roleOrder[String(b.role)] ?? 99);
+        });
+      return json({ users });
+    }
+
+    const removeRolesMatch = url.pathname.match(/^\/api\/users\/([^/]+)\/roles$/);
+    if (removeRolesMatch && request.method === "DELETE") {
+      const uid = removeRolesMatch[1];
+      if (uid === actor.uid) {
+        return json({ message: "Vous ne pouvez pas retirer vos propres rôles." }, { status: 400 });
+      }
+
+      const ref = db.collection(USERS_COLLECTION).doc(uid);
+      const snap = await ref.get();
+      if (!snap.exists) return notFoundJson();
+
+      const data = snap.data() ?? {};
+      if (data.role === "superadmin") {
+        const superadmins = await db
+          .collection(USERS_COLLECTION)
+          .where("role", "==", "superadmin")
+          .limit(2)
+          .get();
+        if (superadmins.size <= 1) {
+          return json(
+            { message: "Impossible de retirer le dernier superadministrateur." },
+            { status: 400 },
+          );
+        }
+      }
+
+      await authAdmin().setCustomUserClaims(uid, { role: "candidate" });
+      await ref.set(
+        {
+          role: "candidate",
+          rolesRemovedAt: admin.firestore.FieldValue.serverTimestamp(),
+          rolesRemovedBy: actor.uid,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      return json({ ok: true });
+    }
+
+    return undefined;
   } catch (error) {
     const status = (error as { status?: number }).status ?? 500;
     return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
@@ -1089,7 +1162,7 @@ async function handleFinalizeProfile(request: Request) {
     const invitedRole = invite?.data().role as UserRole | undefined;
     const existingRole = decoded.role as UserRole | undefined;
     const role: UserRole =
-      invitedRole === "admin" || invitedRole === "juror"
+      invitedRole === "superadmin" || invitedRole === "admin" || invitedRole === "juror"
         ? invitedRole
         : existingRole === "superadmin" || existingRole === "admin" || existingRole === "juror"
           ? existingRole
@@ -1217,6 +1290,9 @@ export default {
 
       const authSessionResponse = await handleAuthSession(request);
       if (authSessionResponse) return authSessionResponse;
+
+      const userRolesResponse = await handleUserRoles(request);
+      if (userRolesResponse) return userRolesResponse;
 
       const roleInviteResponse = await handleRoleInvites(request);
       if (roleInviteResponse) return roleInviteResponse;

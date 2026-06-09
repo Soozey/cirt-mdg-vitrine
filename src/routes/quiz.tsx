@@ -2,15 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Circle,
-  Clock3,
-  Dot,
-  Loader2,
-  Send,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Circle, Clock3, Dot, Loader2, Play, Send } from "lucide-react";
 
 import quizPattern from "@/assets/hero-section.webp";
 import { DashboardLayout } from "@/components/quiz/dashboard-layout";
@@ -54,17 +46,6 @@ type Draft = {
   startedAt: number;
 };
 
-function loadDraft(): Draft | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(AUTOSAVE_KEY);
-    const parsed = raw ? (JSON.parse(raw) as Draft) : null;
-    return parsed?.schemaVersion === 2 && parsed.quizMode === "qcm" ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
 function createDraft(): Draft {
   return {
     schemaVersion: 2,
@@ -97,11 +78,7 @@ function QuizPage() {
   const autoSubmittedRef = useRef(false);
 
   useEffect(() => {
-    const existing = loadDraft();
-    const next = existing ?? createDraft();
-    setDraft(next);
-    setRemainingSeconds(getRemainingSeconds(next));
-    localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(next));
+    localStorage.removeItem(AUTOSAVE_KEY);
   }, []);
 
   const current = draft?.questions[draft.index];
@@ -131,46 +108,48 @@ function QuizPage() {
     persist({ ...draft, index: next });
   }
 
-  function restart() {
+  function startQuiz() {
     const next = createDraft();
     autoSubmittedRef.current = false;
     persist(next);
-    toast.success("Nouveau QCM généré");
   }
 
-  const submitAll = useCallback(async (force = false) => {
-    if (!draft || !user) return;
-    const empty = draft.questions.filter((question) => !draft.answers[question.id]);
-    if (!force && empty.length) {
-      toast.error(`Il reste ${empty.length} question(s) sans réponse`);
-      return;
-    }
+  const submitAll = useCallback(
+    async (force = false) => {
+      if (!draft || !user) return;
+      const empty = draft.questions.filter((question) => !draft.answers[question.id]);
+      if (!force && empty.length) {
+        toast.error(`Il reste ${empty.length} question(s) sans réponse`);
+        return;
+      }
 
-    const { answers, finalScore } = gradeAnswers(draft.questions, draft.answers, draft.startedAt);
-    const sub: Submission = {
-      id: `sub-${Date.now()}`,
-      schemaVersion: 2,
-      quizMode: "qcm",
-      userId: user.id,
-      user,
-      questions: draft.questions,
-      answers,
-      finalScore,
-      submittedAt: new Date().toISOString(),
-      status: "pending",
-    };
+      const { answers, finalScore } = gradeAnswers(draft.questions, draft.answers, draft.startedAt);
+      const sub: Submission = {
+        id: `sub-${Date.now()}`,
+        schemaVersion: 2,
+        quizMode: "qcm",
+        userId: user.id,
+        user,
+        questions: draft.questions,
+        answers,
+        finalScore,
+        submittedAt: new Date().toISOString(),
+        status: "pending",
+      };
 
-    try {
-      setSubmitting(true);
-      await submitQuizSubmission(sub);
-      localStorage.removeItem(AUTOSAVE_KEY);
-      navigate({ to: "/done", search: { id: sub.id } });
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Envoi impossible"));
-    } finally {
-      setSubmitting(false);
-    }
-  }, [draft, navigate, user]);
+      try {
+        setSubmitting(true);
+        await submitQuizSubmission(sub);
+        localStorage.removeItem(AUTOSAVE_KEY);
+        navigate({ to: "/done", search: { id: sub.id } });
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Envoi impossible"));
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [draft, navigate, user],
+  );
 
   useEffect(() => {
     if (!draft) return;
@@ -190,12 +169,38 @@ function QuizPage() {
     return () => window.clearInterval(interval);
   }, [draft, submitAll]);
 
-  if (!draft || !current) return null;
+  if (!draft || !current) {
+    return (
+      <DashboardLayout
+        title="QCM cybersécurité"
+        subtitle="Le quiz commencera uniquement après votre confirmation. La première question s'affichera ensuite et la minuterie s'arrêtera à la fin du temps imparti."
+      >
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)] md:p-8">
+          <div className="max-w-2xl">
+            <Badge variant="outline" className="mb-4 border-primary/30 text-primary">
+              Prêt à commencer
+            </Badge>
+            <h2 className="font-display text-2xl font-semibold text-foreground">
+              Lancez le quiz quand vous êtes disponible.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Après le clic sur le bouton, le minuteur démarre et la première question apparaît. Le
+              quiz sera soumis automatiquement lorsque le temps imparti sera écoulé.
+            </p>
+          </div>
+          <Button onClick={startQuiz} className="mt-6">
+            <Play className="size-4" />
+            Commencer le quiz
+          </Button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout
       title="QCM cybersécurité"
-      subtitle={`Vous disposez d'une minute par question, soit ${draft.questions.length} minutes au total.`}
+      subtitle="La minuterie s'arrêtera automatiquement à la fin du temps imparti."
     >
       <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_auto]">
         <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
@@ -273,20 +278,19 @@ function QuizPage() {
                 onClick={() => choose(option.id)}
                 className={cn(
                   "group flex w-full items-start gap-3 rounded-xl border bg-background p-4 text-left transition-all hover:-translate-y-0.5 hover:border-sky-400/50 hover:shadow-[0_16px_36px_-24px_rgba(56,189,248,0.75)]",
-                  isSelected && "border-sky-400 bg-sky-500/15 shadow-[0_18px_42px_-24px_rgba(56,189,248,0.95)]",
+                  isSelected &&
+                    "border-sky-400 bg-sky-500/15 shadow-[0_18px_42px_-24px_rgba(56,189,248,0.95)]",
                 )}
               >
                 <span
                   className={cn(
                     "mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full border text-xs font-semibold",
-                    isSelected ? "border-sky-300 text-sky-300" : "border-border text-muted-foreground",
+                    isSelected
+                      ? "border-sky-300 text-sky-300"
+                      : "border-border text-muted-foreground",
                   )}
                 >
-                  {isSelected ? (
-                    <Dot className="size-5" />
-                  ) : (
-                    <Circle className="size-3" />
-                  )}
+                  {isSelected ? <Dot className="size-5" /> : <Circle className="size-3" />}
                 </span>
                 <span className="min-w-0 flex-1 text-sm leading-relaxed text-foreground md:text-base">
                   {option.text}
@@ -315,7 +319,11 @@ function QuizPage() {
               onClick={() => submitAll()}
               disabled={submitting || answeredCount < draft.questions.length}
             >
-              {submitting ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+              {submitting ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Send className="size-4" />
+              )}
               Soumettre le QCM
             </Button>
           )}

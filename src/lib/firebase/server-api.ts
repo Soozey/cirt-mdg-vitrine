@@ -76,7 +76,7 @@ export async function listRoleInvites() {
 export async function createRoleInvite(data: {
   email?: string;
   phone?: string;
-  role: "admin" | "juror";
+  role: "admin" | "juror" | "superadmin";
 }) {
   const response = await fetch("/api/role-invites", {
     method: "POST",
@@ -92,6 +92,21 @@ export async function createRoleInvite(data: {
 export async function revokeRoleInvite(id: string) {
   const response = await fetch(`/api/role-invites/${id}/revoke`, {
     method: "POST",
+    headers: await authHeaders(),
+  });
+  return readResponse<{ ok: true }>(response);
+}
+
+export async function listRoleUsers() {
+  const response = await fetch("/api/users/roles", {
+    headers: await authHeaders(),
+  });
+  return readResponse<{ users: import("@/lib/firebase/firestore").UserDoc[] }>(response);
+}
+
+export async function removeUserRoles(uid: string) {
+  const response = await fetch(`/api/users/${uid}/roles`, {
+    method: "DELETE",
     headers: await authHeaders(),
   });
   return readResponse<{ ok: true }>(response);

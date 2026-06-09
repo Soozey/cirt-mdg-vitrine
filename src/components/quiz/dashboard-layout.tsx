@@ -5,6 +5,17 @@ import { Crown, LayoutDashboard, LogOut, ScrollText, ShieldCheck } from "lucide-
 import heroBanner from "@/assets/above-countdown.webp";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/quiz/auth-context";
 import { initials } from "@/lib/quiz/format";
 import { cn } from "@/lib/utils";
@@ -100,18 +111,37 @@ export function DashboardLayout({
             </nav>
 
             <div className="mx-4 mt-5 border-t border-border pb-4 pt-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-muted-foreground"
-                onClick={async () => {
-                  await logout();
-                  navigate({ to: "/login" });
-                }}
-              >
-                <LogOut className="size-4" />
-                Se déconnecter
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-muted-foreground"
+                  >
+                    <LogOut className="size-4" />
+                    Se déconnecter
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmer la déconnexion ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Si un quiz est en cours, il sera annulé et le minuteur s'arrêtera.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={async () => {
+                        await logout();
+                        navigate({ to: "/login" });
+                      }}
+                    >
+                      Se déconnecter
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
         </aside>

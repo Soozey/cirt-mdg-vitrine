@@ -16,6 +16,7 @@ import {
   finalizeUserProfile,
 } from "@/lib/firebase/server-api";
 import type { QuizUser, UserRole } from "./types";
+import { AUTOSAVE_KEY } from "./constants";
 
 type Ctx = {
   user: QuizUser | null;
@@ -99,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!active) return;
 
       if (!authUser) {
+        localStorage.removeItem(AUTOSAVE_KEY);
         setUser(null);
         setReady(true);
         return;
@@ -157,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
+    localStorage.removeItem(AUTOSAVE_KEY);
     await logoutUser();
     setUser(null);
   }, []);
@@ -170,14 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       completeProfile,
       logout,
     }),
-    [
-      user,
-      ready,
-      loginWithProvider,
-      bootstrapWithGoogle,
-      completeProfile,
-      logout,
-    ],
+    [user, ready, loginWithProvider, bootstrapWithGoogle, completeProfile, logout],
   );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;

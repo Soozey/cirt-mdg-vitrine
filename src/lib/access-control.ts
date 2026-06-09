@@ -1,6 +1,6 @@
 export type UserRole = "candidate" | "juror" | "admin" | "superadmin";
 
-export type RoleInviteRole = "juror" | "admin";
+export type RoleInviteRole = "juror" | "admin" | "superadmin";
 
 export type RoleInviteStatus = "pending" | "used" | "revoked";
 

@@ -6,6 +6,7 @@ import {
   Plus,
   RotateCw,
   Search,
+  ShieldCheck,
   ShieldPlus,
   Trash2,
   UserCog,
@@ -53,9 +54,12 @@ import {
   listEventRegistrations,
   listPartnershipLeads,
   listRoleInvites,
+  listRoleUsers,
+  removeUserRoles,
   revokeRoleInvite,
   updatePartnershipLeadStatus,
 } from "@/lib/firebase/server-api";
+import type { UserDoc } from "@/lib/firebase/firestore";
 import type { RoleInvite, RoleInviteRole } from "@/lib/access-control";
 import {
   PARTNERSHIP_STATUS_LABELS,
@@ -80,6 +84,7 @@ const PER_PAGE = 8;
 
 type SuperadminView =
   | "role-invites"
+  | "role-users"
   | "partnerships"
   | "registrations"
   | "registrations-visitor"
@@ -100,7 +105,12 @@ const SUPERADMIN_VIEWS: Array<{ value: SuperadminView; label: string; hint: stri
   {
     value: "role-invites",
     label: "Invitations de rôle",
-    hint: "Gestion des accès admin et juré",
+    hint: "Gestion des accès superadmin, admin et juré",
+  },
+  {
+    value: "role-users",
+    label: "Utilisateurs à rôle",
+    hint: "Retirer un utilisateur de tous les rôles staff",
   },
   {
     value: "partnerships",
@@ -119,6 +129,13 @@ const SUPERADMIN_VIEWS: Array<{ value: SuperadminView; label: string; hint: stri
   { value: "registrations-newsletter", label: "Newsletter", hint: "Leads mailing list" },
 ];
 
+const ROLE_LABELS: Record<RoleInviteRole | "candidate", string> = {
+  superadmin: "Superadministrateur",
+  admin: "Administrateur",
+  juror: "Juré",
+  candidate: "Candidat",
+};
+
 export const Route = createFileRoute("/superadmin")({
   head: () => ({ meta: [{ title: "Superadministration · CIRT" }] }),
   component: () => (
@@ -134,6 +151,7 @@ function SuperadminPage() {
   const [phonePrefix, setPhonePrefix] = useState<PhonePrefix>("+261");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState<RoleInviteRole>("juror");
+  const [roleUsers, setRoleUsers] = useState<UserDoc[]>([]);
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
   const [registrationQuery, setRegistrationQuery] = useState("");
   const [registrationType, setRegistrationType] = useState<RegistrationType | "all">("all");
@@ -148,6 +166,7 @@ function SuperadminPage() {
   const [partnershipPage, setPartnershipPage] = useState(1);
   const [registrationPage, setRegistrationPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [roleUsersLoading, setRoleUsersLoading] = useState(true);
   const [registrationsLoading, setRegistrationsLoading] = useState(true);
   const [partnershipsLoading, setPartnershipsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -155,10 +174,19 @@ function SuperadminPage() {
   const stats = useMemo(() => {
     const pending = items.filter((item) => item.status === "pending").length;
     const used = items.filter((item) => item.status === "used").length;
+    const superadmin = items.filter((item) => item.role === "superadmin").length;
     const admin = items.filter((item) => item.role === "admin").length;
     const juror = items.filter((item) => item.role === "juror").length;
-    return { pending, used, admin, juror };
+    return { pending, used, superadmin, admin, juror };
   }, [items]);
+
+  const roleUserStats = useMemo(() => {
+    return {
+      superadmin: roleUsers.filter((item) => item.role === "superadmin").length,
+      admin: roleUsers.filter((item) => item.role === "admin").length,
+      juror: roleUsers.filter((item) => item.role === "juror").length,
+    };
+  }, [roleUsers]);
 
   const registrationStats = useMemo(() => {
     const active = registrations.filter((item) => !item.deleted);
@@ -268,6 +296,18 @@ function SuperadminPage() {
     }
   }
 
+  async function refreshRoleUsers() {
+    setRoleUsersLoading(true);
+    try {
+      const data = await listRoleUsers();
+      setRoleUsers(data.users);
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Chargement des utilisateurs impossible"));
+    } finally {
+      setRoleUsersLoading(false);
+    }
+  }
+
   async function refreshPartnershipLeads() {
     setPartnershipsLoading(true);
     try {
@@ -282,6 +322,7 @@ function SuperadminPage() {
 
   useEffect(() => {
     refresh();
+    refreshRoleUsers();
     refreshRegistrations();
     refreshPartnershipLeads();
   }, []);
@@ -314,6 +355,17 @@ function SuperadminPage() {
       await refresh();
     } catch (error) {
       toast.error(getErrorMessage(error, "Révocation impossible"));
+    }
+  }
+
+  async function removeRoles(uid: string) {
+    try {
+      await removeUserRoles(uid);
+      setRoleUsers((current) => current.filter((item) => item.uid !== uid));
+      toast.success("Rôles retirés");
+      await refreshRoleUsers();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Retrait des rôles impossible"));
     }
   }
 
@@ -454,7 +506,7 @@ function SuperadminPage() {
   return (
     <DashboardLayout
       title="Superadministration"
-      subtitle="Autorisez les emails ou numéros qui pourront devenir administrateur ou juré."
+      subtitle="Autorisez les emails ou numéros qui pourront devenir superadministrateur, administrateur ou juré."
     >
       <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -491,8 +543,8 @@ function SuperadminPage() {
             {[
               { label: "En attente", value: stats.pending, icon: ShieldPlus },
               { label: "Utilisées", value: stats.used, icon: UserCog },
-              { label: "Administrateurs", value: stats.admin, icon: UserCog },
-              { label: "Jurés", value: stats.juror, icon: ShieldPlus },
+              { label: "Superadmins", value: stats.superadmin, icon: ShieldCheck },
+              { label: "Admins / jurés", value: stats.admin + stats.juror, icon: UserCog },
             ].map((stat) => {
               const Icon = stat.icon;
               return (
@@ -558,6 +610,7 @@ function SuperadminPage() {
               <SelectContent>
                 <SelectItem value="juror">Juré</SelectItem>
                 <SelectItem value="admin">Administrateur</SelectItem>
+                <SelectItem value="superadmin">Superadministrateur</SelectItem>
               </SelectContent>
             </Select>
             <Button type="submit" disabled={submitting}>
@@ -614,7 +667,7 @@ function SuperadminPage() {
                           {invite.phone ? formatPhone(invite.phone) : "Téléphone non renseigné"}
                         </p>
                       </TableCell>
-                      <TableCell>{invite.role === "admin" ? "Administrateur" : "Juré"}</TableCell>
+                      <TableCell>{ROLE_LABELS[invite.role]}</TableCell>
                       <TableCell>
                         <span className="rounded-full border border-border px-2 py-0.5 text-xs">
                           {invite.status}
@@ -645,6 +698,120 @@ function SuperadminPage() {
             pageCount={roleInvitePageCount}
             onChange={setRoleInvitePage}
           />
+        </>
+      ) : null}
+
+      {activeView === "role-users" ? (
+        <>
+          <div className="mb-6 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: "Superadmins", value: roleUserStats.superadmin },
+              { label: "Administrateurs", value: roleUserStats.admin },
+              { label: "Jurés", value: roleUserStats.juror },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]"
+              >
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                  {stat.label}
+                </p>
+                <p className="mt-2 font-display text-2xl font-bold text-foreground">{stat.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-soft)]">
+            <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <h2 className="text-sm font-semibold text-foreground">Utilisateurs à rôle</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshRoleUsers}
+                disabled={roleUsersLoading}
+              >
+                <RotateCw className="size-4" />
+                Actualiser
+              </Button>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-primary/[0.04]">
+                  <TableHead>Utilisateur</TableHead>
+                  <TableHead>Rôle actuel</TableHead>
+                  <TableHead>Profil</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {roleUsersLoading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="py-10 text-center text-sm text-muted-foreground"
+                    >
+                      Chargement des utilisateurs...
+                    </TableCell>
+                  </TableRow>
+                ) : roleUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="py-10 text-center text-sm text-muted-foreground"
+                    >
+                      Aucun utilisateur à rôle.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  roleUsers.map((roleUser) => (
+                    <TableRow key={roleUser.uid}>
+                      <TableCell>
+                        <p className="font-medium text-foreground">
+                          {roleUser.firstName} {roleUser.lastName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{roleUser.email}</p>
+                        <p className="text-xs text-muted-foreground">{roleUser.uid}</p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{ROLE_LABELS[roleUser.role]}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {roleUser.profile ?? "Non renseigné"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="size-4" />
+                              Retirer les rôles
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Retirer tous les rôles staff ?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                L'utilisateur redeviendra candidat et ne pourra plus accéder aux
+                                interfaces superadmin, admin ou jury.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuler</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => removeRoles(roleUser.uid)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Retirer les rôles
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </>
       ) : null}
 
