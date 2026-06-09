@@ -275,9 +275,11 @@ function RichHero({
               variant="outline"
               className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
             >
-              <Link to="/" hash="contact">
-                Nous contacter
-              </Link>
+          <RegistrationDialog
+            type="ctf-hackathon"
+            label="S'inscrire"
+            className="ml-0 mt-3 sm:ml-3 sm:mt-0"
+          />
             </Button>
           </div>
           {meta.length ? (
@@ -395,7 +397,7 @@ function CtfHackathonPage() {
         </ContentContainer>
       </section>
 
-      <section className="bg-background">
+      {/* <section className="bg-background">
         <ContentContainer className="max-w-3xl text-center">
           <SectionHeader
             align="center"
@@ -414,7 +416,7 @@ function CtfHackathonPage() {
             className="ml-0 mt-3 sm:ml-3 sm:mt-0"
           />
         </ContentContainer>
-      </section>
+      </section> */}
     </>
   );
 }

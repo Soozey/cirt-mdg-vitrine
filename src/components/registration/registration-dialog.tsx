@@ -46,6 +46,9 @@ const initialCommon = {
   telephone: "",
 };
 
+const MAX_CV_BYTES = 1_000_000;
+const CV_SIZE_ERROR = "Le CV doit peser strictement moins de 1 Mo.";
+
 export function RegistrationDialog({ type, label, variant, className }: Props) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -70,6 +73,7 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [newsletterConsent, setNewsletterConsent] = useState(type === "newsletter");
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvError, setCvError] = useState("");
 
   const title = REGISTRATION_LABELS[type];
   const triggerLabel = label ?? `S'inscrire - ${title}`;
@@ -104,10 +108,29 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
     );
   }
 
+  function handleCvChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+    if (file && file.size >= MAX_CV_BYTES) {
+      setCvFile(null);
+      setCvError(CV_SIZE_ERROR);
+      event.target.value = "";
+      toast.error(CV_SIZE_ERROR);
+      return;
+    }
+
+    setCvFile(file);
+    setCvError("");
+  }
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (requiresPrivacy && !privacyConsent) {
       toast.error("Veuillez accepter la politique de confidentialité.");
+      return;
+    }
+    if (type === "job-dating" && (!cvFile || cvFile.size >= MAX_CV_BYTES)) {
+      setCvError(CV_SIZE_ERROR);
+      toast.error(CV_SIZE_ERROR);
       return;
     }
 
@@ -331,9 +354,13 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={(event) => setCvFile(event.target.files?.[0] ?? null)}
+                      onChange={handleCvChange}
                       required
                     />
+                    <p className="text-xs text-muted-foreground">
+                      Taille maximale acceptée : strictement moins de 1 Mo.
+                    </p>
+                    {cvError ? <p className="text-xs text-destructive">{cvError}</p> : null}
                   </Field>
                   <Field label="Lien vers le portfolio" required>
                     <Input

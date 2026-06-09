@@ -4,6 +4,8 @@ import { Link } from "@tanstack/react-router";
 
 import { Countdown } from "@/components/countdown";
 import { Button } from "@/components/ui/button";
+import { redirectForRole } from "@/lib/access-control";
+import { useAuth } from "@/lib/quiz/auth-context";
 import heroBg from "@/assets/project-section2.webp";
 import heroBgMobile from "@/assets/hero-version-mobile.webp";
 import ministere from "@/assets/partners/1-ministere.webp";
@@ -12,26 +14,22 @@ import cirtShield from "@/assets/partners/3-cirt-shield.png";
 import prodigy from "@/assets/partners/4-prodigy.webp";
 import udg from "@/assets/partners/5-udg.webp";
 
-// const PARTNERS = [
-//   // { src: ministere, alt: "République de Madagascar", className: "h-16 sm:h-20 md:h-24" },
-//   // { src: mndpt, alt: "Ministère du Développement Numérique, des Postes et des Télécommunications", className: "h-14 sm:h-16 md:h-20" },
-//   { src: cirtShield, alt: "CIRT MDG", className: "h-12 sm:h-14 md:h-16" },
-//   { src: prodigy, alt: "Prodigy", className: "h-8 sm:h-10 md:h-12" },
-//   { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-20 sm:h-24 md:h-32" },
-// ];
 
 const BOTTOM_PARTNERS = [
   { src: udg, alt: "Unité de Gouvernance Digitale", className: "h-18 sm:h-16 md:h-25" },
   { src: prodigy, alt: "Prodigy", className: "h-7 sm:h-8 md:h-10" },
 ];
 
-
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+    transition: {
+      duration: 0.7,
+      delay: i * 0.12,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
   }),
 };
 
@@ -80,22 +78,14 @@ const countdownFromRight = {
 const heroViewport = { once: false, amount: 0.35 };
 
 export function HeroSection() {
+  const { user } = useAuth();
+  const quizEntryPath = user ? redirectForRole(user.role, user.registered) : "/login";
+
   return (
-    <section
-      id="accueil"
-      className="relative isolate overflow-hidden bg-[#02060f] text-white"
-    >
-      <picture
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-20 h-full w-full"
-      >
+    <section id="accueil" className="relative isolate overflow-hidden bg-[#02060f] text-white">
+      <picture aria-hidden className="pointer-events-none absolute inset-0 -z-20 h-full w-full">
         <source media="(max-width: 767px)" srcSet={heroBgMobile} />
-        <img
-          src={heroBg}
-          alt=""
-          fetchPriority="high"
-          className="h-full w-full object-cover"
-        />
+        <img src={heroBg} alt="" fetchPriority="high" className="h-full w-full object-cover" />
       </picture>
       <div
         aria-hidden
@@ -114,7 +104,6 @@ export function HeroSection() {
       />
 
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-[1400px] flex-col px-4 pb-16 pt-6 sm:px-6 md:min-h-[calc(100svh-5rem)] md:px-10 md:pb-24 md:pt-1">
-
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -122,10 +111,13 @@ export function HeroSection() {
           variants={fadeUp}
           className="flex justify-center"
         >
-          <img src={ministere} alt="République de Madagascar"
-            className="h-20 sm:h-20 md:h-32 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+          <img
+            src={ministere}
+            alt="République de Madagascar"
+            className="h-20 sm:h-20 md:h-32 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+          />
         </motion.div>
-        
+
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -135,8 +127,11 @@ export function HeroSection() {
         >
           {/* Ligne 2 : MNDPT seul */}
           <div className="flex justify-center">
-            <img src={mndpt} alt="MNDPT"
-              className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+            <img
+              src={mndpt}
+              alt="MNDPT"
+              className="h-14 sm:h-16 md:h-20 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+            />
           </div>
           <img
             src={cirtShield}
@@ -157,7 +152,10 @@ export function HeroSection() {
             >
               <div className="flex flex-col">
                 {/* Ligne du haut : édition et Sommet/de la */}
-                <motion.div variants={titleFromTop} className="flex w-full justify-between items-baseline mb-3">
+                <motion.div
+                  variants={titleFromTop}
+                  className="flex w-full justify-between items-baseline mb-3"
+                >
                   <motion.span
                     className="text-[0.7rem] tracking-wide text-white sm:text-xs md:text-sm"
                     style={{ fontFamily: "var(--font-barlow)" }}
@@ -227,7 +225,8 @@ export function HeroSection() {
               className="space-y-5"
             >
               <p className="max-w-xl text-sm text-white/85 sm:text-base">
-                <span className="font-semibold text-iris-lime">Confiance numérique</span>, votre gage de pérennité
+                <span className="font-semibold text-iris-lime">Confiance numérique</span>, votre
+                gage de pérennité
               </p>
 
               <dl className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-white/85 sm:text-sm">
@@ -252,8 +251,9 @@ export function HeroSection() {
                   size="lg"
                   className="h-10 bg-iris-lime px-4 text-sm text-primary-deep hover:bg-iris-lime/90 shadow-[var(--shadow-iris)]"
                 >
-                  <Link to="/register">
-                    S'inscrire <ArrowRight className="ml-1" />
+                  <Link to="/informations/$slug" params={{ slug: "ctf-hackathon" }}>
+                    Hackathon & CTF
+                    <ArrowRight className="ml-1" />
                   </Link>
                 </Button>
                 <Button

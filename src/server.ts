@@ -26,6 +26,7 @@ const ROLE_INVITES_COLLECTION = "roleInvites";
 const QUIZ_COLLECTION = "quiz";
 const PARTNERSHIP_LEADS_COLLECTION = "partnershipLeads";
 const EVENT_REGISTRATIONS_COLLECTION = "eventRegistrations";
+const MAX_CV_BYTES = 1_000_000;
 
 function json(data: unknown, init?: ResponseInit) {
   return new Response(JSON.stringify(data), {
@@ -375,13 +376,39 @@ async function handleAuthSession(request: Request) {
     const db = firestoreAdmin();
     const ref = db.collection(USERS_COLLECTION).doc(decoded.uid);
     const existing = await ref.get();
+    const email = normalizeEmail(decoded.email ?? "");
 
     if (existing.exists) {
-      return json({ user: quizUserFromDoc(existing.id, existing.data() ?? {}) });
+      const data = existing.data() ?? {};
+      const invite = await findPendingInvite(email || data.email);
+      if (invite) {
+        const invitedRole = invite.data().role as UserRole | undefined;
+        if (invitedRole === "superadmin" || invitedRole === "admin" || invitedRole === "juror") {
+          await authAdmin().setCustomUserClaims(decoded.uid, { role: invitedRole });
+          await ref.set(
+            {
+              role: invitedRole,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+          );
+          await invite.ref.set(
+            {
+              status: "used",
+              usedBy: decoded.uid,
+              usedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true },
+          );
+          const updated = await ref.get();
+          return json({ user: quizUserFromDoc(updated.id, updated.data() ?? {}) });
+        }
+      }
+
+      return json({ user: quizUserFromDoc(existing.id, data) });
     }
 
     const provider = providerFromDecodedToken(decoded);
-    const email = normalizeEmail(decoded.email ?? "");
     if (!email) {
       return json(
         {
@@ -392,6 +419,12 @@ async function handleAuthSession(request: Request) {
     }
 
     const { firstName, lastName } = splitDisplayName(String(decoded.name ?? ""), email);
+    const invite = await findPendingInvite(email);
+    const invitedRole = invite?.data().role as UserRole | undefined;
+    const role: UserRole =
+      invitedRole === "superadmin" || invitedRole === "admin" || invitedRole === "juror"
+        ? invitedRole
+        : "candidate";
     const userDoc = {
       uid: decoded.uid,
       email,
@@ -399,13 +432,25 @@ async function handleAuthSession(request: Request) {
       lastName,
       photoURL: decoded.picture ?? null,
       provider,
-      role: "candidate",
+      role,
       registered: false,
       quizDone: false,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
+    await authAdmin().setCustomUserClaims(decoded.uid, { role });
     await ref.set(userDoc, { merge: true });
+
+    if (invite) {
+      await invite.ref.set(
+        {
+          status: "used",
+          usedBy: decoded.uid,
+          usedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
 
     return json({
       user: {
@@ -413,7 +458,7 @@ async function handleAuthSession(request: Request) {
         email,
         firstName,
         lastName,
-        role: "candidate",
+        role,
         provider,
         registered: false,
       },
@@ -448,18 +493,17 @@ async function handleRoleInvites(request: Request) {
           ? (body.role as RoleInviteRole)
           : null;
       const email = typeof body.email === "string" ? body.email.trim() : "";
-      const phone = typeof body.phone === "string" ? body.phone.trim() : "";
 
       if (!role) {
         return json({ message: "role must be superadmin, admin or juror" }, { status: 400 });
       }
-      if (!email && !phone) return json({ message: "email or phone is required" }, { status: 400 });
+      if (!email) return json({ message: "email is required" }, { status: 400 });
 
       const ref = await db.collection(ROLE_INVITES_COLLECTION).add({
         email,
-        emailKey: email ? normalizeEmail(email) : "",
-        phone,
-        phoneKey: phone ? normalizePhone(phone) : "",
+        emailKey: normalizeEmail(email),
+        phone: "",
+        phoneKey: "",
         role,
         status: "pending",
         createdBy: actor.uid,
@@ -505,9 +549,13 @@ async function handleUserRoles(request: Request) {
       const snap = await db.collection(USERS_COLLECTION).get();
       const users = snap.docs
         .map((doc) => ({ uid: doc.id, ...doc.data() }))
-        .filter((user) => isStaffRole(user.role))
         .sort((a, b) => {
-          const roleOrder: Record<string, number> = { superadmin: 0, admin: 1, juror: 2 };
+          const roleOrder: Record<string, number> = {
+            superadmin: 0,
+            admin: 1,
+            juror: 2,
+            candidate: 3,
+          };
           return (roleOrder[String(a.role)] ?? 99) - (roleOrder[String(b.role)] ?? 99);
         });
       return json({ users });
@@ -554,6 +602,37 @@ async function handleUserRoles(request: Request) {
     }
 
     return undefined;
+  } catch (error) {
+    const status = (error as { status?: number }).status ?? 500;
+    return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
+  }
+}
+
+async function handleCurrentUserDeletion(request: Request) {
+  const url = new URL(request.url);
+  if (url.pathname !== "/api/users/me" || request.method !== "DELETE") return undefined;
+
+  try {
+    const decoded = await requireAuth(request);
+    if (decoded.role !== "candidate") {
+      return json(
+        { message: "Seuls les candidats peuvent supprimer leur compte ici." },
+        { status: 403 },
+      );
+    }
+
+    const db = firestoreAdmin();
+    const submissions = await db
+      .collection(QUIZ_COLLECTION)
+      .where("userId", "==", decoded.uid)
+      .get();
+    const batch = db.batch();
+    submissions.docs.forEach((doc) => batch.delete(doc.ref));
+    batch.delete(db.collection(USERS_COLLECTION).doc(decoded.uid));
+    await batch.commit();
+
+    await authAdmin().deleteUser(decoded.uid);
+    return json({ ok: true });
   } catch (error) {
     const status = (error as { status?: number }).status ?? 500;
     return json({ message: error instanceof Error ? error.message : "Server error" }, { status });
@@ -976,8 +1055,12 @@ async function handleEventRegistrations(request: Request) {
       if (type === "job-dating") {
         requiredFormString(form, "technicalProfile");
         requiredFormString(form, "portfolioUrl");
-        if (!form.get("cv") || typeof form.get("cv") === "string") {
+        const cvFile = form.get("cv");
+        if (!cvFile || typeof cvFile === "string") {
           return json({ message: "Le CV est requis." }, { status: 400 });
+        }
+        if ("size" in cvFile && typeof cvFile.size === "number" && cvFile.size >= MAX_CV_BYTES) {
+          return json({ message: "Le CV doit peser strictement moins de 1 Mo." }, { status: 400 });
         }
         try {
           new URL(requiredFormString(form, "portfolioUrl"));
@@ -1117,10 +1200,9 @@ async function handleEventRegistrations(request: Request) {
   }
 }
 
-async function findPendingInvite(email: string, phone: string) {
+async function findPendingInvite(email: string) {
   const db = firestoreAdmin();
   const emailKey = normalizeEmail(email);
-  const phoneKey = normalizePhone(phone);
 
   const byEmail = emailKey
     ? await db
@@ -1130,17 +1212,7 @@ async function findPendingInvite(email: string, phone: string) {
         .limit(1)
         .get()
     : null;
-  if (byEmail && !byEmail.empty) return byEmail.docs[0];
-
-  const byPhone = phoneKey
-    ? await db
-        .collection(ROLE_INVITES_COLLECTION)
-        .where("phoneKey", "==", phoneKey)
-        .where("status", "==", "pending")
-        .limit(1)
-        .get()
-    : null;
-  return byPhone && !byPhone.empty ? byPhone.docs[0] : null;
+  return byEmail && !byEmail.empty ? byEmail.docs[0] : null;
 }
 
 async function handleFinalizeProfile(request: Request) {
@@ -1158,7 +1230,7 @@ async function handleFinalizeProfile(request: Request) {
     const linkedin = typeof body.linkedin === "string" ? body.linkedin.trim() : "";
     const provider = body.provider === "google" ? body.provider : "email";
 
-    const invite = await findPendingInvite(email, phone);
+    const invite = await findPendingInvite(email);
     const invitedRole = invite?.data().role as UserRole | undefined;
     const existingRole = decoded.role as UserRole | undefined;
     const role: UserRole =
@@ -1293,6 +1365,9 @@ export default {
 
       const userRolesResponse = await handleUserRoles(request);
       if (userRolesResponse) return userRolesResponse;
+
+      const currentUserDeletionResponse = await handleCurrentUserDeletion(request);
+      if (currentUserDeletionResponse) return currentUserDeletionResponse;
 
       const roleInviteResponse = await handleRoleInvites(request);
       if (roleInviteResponse) return roleInviteResponse;

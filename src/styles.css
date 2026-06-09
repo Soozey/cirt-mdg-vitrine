@@ -197,7 +197,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body[data-scroll-locked] {
@@ -211,7 +211,7 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    overflow-x: clip;
     scrollbar-gutter: stable;
   }
 }

@@ -37,7 +37,7 @@ VITE_FIREBASE_STORAGE_BUCKET=...
 7. Laisser `Facebook` désactivé.
 8. Aller dans `Settings > Authorized domains`.
 9. Ajouter le domaine public de production, par exemple `summit.example.com`.
-10. Ajouter aussi les domaines de préproduction si l'équipe les utilise.
+10. Ajouter aussi les domaines de préproduction si l'équipe les utilise. (comme le domaine de developpement "localhost")
 
 Le parcours quiz ne propose plus de connexion par email/mot de passe ni de connexion Facebook. Si Google n'est pas activé ou si le domaine public n'est pas autorisé, les utilisateurs ne pourront pas entrer dans le quiz.
 

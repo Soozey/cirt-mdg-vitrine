@@ -74,8 +74,7 @@ export async function listRoleInvites() {
 }
 
 export async function createRoleInvite(data: {
-  email?: string;
-  phone?: string;
+  email: string;
   role: "admin" | "juror" | "superadmin";
 }) {
   const response = await fetch("/api/role-invites", {
@@ -106,6 +105,14 @@ export async function listRoleUsers() {
 
 export async function removeUserRoles(uid: string) {
   const response = await fetch(`/api/users/${uid}/roles`, {
+    method: "DELETE",
+    headers: await authHeaders(),
+  });
+  return readResponse<{ ok: true }>(response);
+}
+
+export async function deleteCurrentUserAccount() {
+  const response = await fetch("/api/users/me", {
     method: "DELETE",
     headers: await authHeaders(),
   });

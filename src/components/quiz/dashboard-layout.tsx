@@ -1,6 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Crown, LayoutDashboard, LogOut, ScrollText, ShieldCheck } from "lucide-react";
+import { Crown, LayoutDashboard, LogOut, ScrollText, ShieldCheck, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import heroBanner from "@/assets/above-countdown.webp";
 import { BrandMark } from "@/components/brand-mark";
@@ -16,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteCurrentUserAccount } from "@/lib/firebase/server-api";
 import { useAuth } from "@/lib/quiz/auth-context";
 import { initials } from "@/lib/quiz/format";
 import { cn } from "@/lib/utils";
@@ -111,6 +113,50 @@ export function DashboardLayout({
             </nav>
 
             <div className="mx-4 mt-5 border-t border-border pb-4 pt-4">
+              {user?.role === "candidate" ? (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mb-2 w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="size-4" />
+                      Supprimer mon compte
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Supprimer votre compte ?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Cette action supprimera votre compte candidat et vos données de quiz. Elle
+                        est définitive.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={async () => {
+                          try {
+                            await deleteCurrentUserAccount();
+                            await logout();
+                            navigate({ to: "/login" });
+                          } catch (error) {
+                            toast.error(
+                              error instanceof Error
+                                ? error.message
+                                : "Suppression du compte impossible",
+                            );
+                          }
+                        }}
+                      >
+                        Supprimer mon compte
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              ) : null}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button

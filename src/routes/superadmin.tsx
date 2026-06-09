@@ -71,16 +71,12 @@ import {
   type RegistrationRecord,
   type RegistrationType,
 } from "@/lib/registrations";
-import {
-  PHONE_PREFIXES,
-  composePhone,
-  formatNationalPhone,
-  formatPhone,
-  type PhonePrefix,
-} from "@/lib/quiz/format";
+import { formatPhone } from "@/lib/quiz/format";
 import { getErrorMessage } from "@/lib/utils";
 
 const PER_PAGE = 8;
+const ROLE_INVITES_PER_PAGE = 5;
+const ROLE_USERS_PER_PAGE = 5;
 
 type SuperadminView =
   | "role-invites"
@@ -148,8 +144,6 @@ export const Route = createFileRoute("/superadmin")({
 function SuperadminPage() {
   const [items, setItems] = useState<RoleInvite[]>([]);
   const [email, setEmail] = useState("");
-  const [phonePrefix, setPhonePrefix] = useState<PhonePrefix>("+261");
-  const [phone, setPhone] = useState("");
   const [role, setRole] = useState<RoleInviteRole>("juror");
   const [roleUsers, setRoleUsers] = useState<UserDoc[]>([]);
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
@@ -163,6 +157,7 @@ function SuperadminPage() {
   const activeViewDetails =
     SUPERADMIN_VIEWS.find((view) => view.value === activeView) ?? SUPERADMIN_VIEWS[0];
   const [roleInvitePage, setRoleInvitePage] = useState(1);
+  const [roleUsersPage, setRoleUsersPage] = useState(1);
   const [partnershipPage, setPartnershipPage] = useState(1);
   const [registrationPage, setRegistrationPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -185,6 +180,7 @@ function SuperadminPage() {
       superadmin: roleUsers.filter((item) => item.role === "superadmin").length,
       admin: roleUsers.filter((item) => item.role === "admin").length,
       juror: roleUsers.filter((item) => item.role === "juror").length,
+      candidate: roleUsers.filter((item) => item.role === "candidate").length,
     };
   }, [roleUsers]);
 
@@ -236,10 +232,15 @@ function SuperadminPage() {
     });
   }, [partnershipLeads, partnershipQuery, partnershipStatus]);
 
-  const roleInvitePageCount = Math.max(1, Math.ceil(items.length / PER_PAGE));
+  const roleInvitePageCount = Math.max(1, Math.ceil(items.length / ROLE_INVITES_PER_PAGE));
   const roleInvitePageItems = items.slice(
-    (roleInvitePage - 1) * PER_PAGE,
-    roleInvitePage * PER_PAGE,
+    (roleInvitePage - 1) * ROLE_INVITES_PER_PAGE,
+    roleInvitePage * ROLE_INVITES_PER_PAGE,
+  );
+  const roleUsersPageCount = Math.max(1, Math.ceil(roleUsers.length / ROLE_USERS_PER_PAGE));
+  const roleUsersPageItems = roleUsers.slice(
+    (roleUsersPage - 1) * ROLE_USERS_PER_PAGE,
+    roleUsersPage * ROLE_USERS_PER_PAGE,
   );
   const partnershipPageCount = Math.max(1, Math.ceil(filteredPartnershipLeads.length / PER_PAGE));
   const partnershipPageItems = filteredPartnershipLeads.slice(
@@ -263,6 +264,10 @@ function SuperadminPage() {
   useEffect(() => {
     setRoleInvitePage((current) => Math.min(current, roleInvitePageCount));
   }, [roleInvitePageCount]);
+
+  useEffect(() => {
+    setRoleUsersPage((current) => Math.min(current, roleUsersPageCount));
+  }, [roleUsersPageCount]);
 
   useEffect(() => {
     setPartnershipPage((current) => Math.min(current, partnershipPageCount));
@@ -329,16 +334,14 @@ function SuperadminPage() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    const formattedPhone = composePhone(phonePrefix, phone);
-    if (!email.trim() && !formattedPhone) {
-      toast.error("Ajoutez au moins un email ou un téléphone");
+    if (!email.trim()) {
+      toast.error("Ajoutez un email");
       return;
     }
     setSubmitting(true);
     try {
-      await createRoleInvite({ email: email.trim(), phone: formattedPhone, role });
+      await createRoleInvite({ email: email.trim(), role });
       setEmail("");
-      setPhone("");
       toast.success("Invitation créée");
       await refresh();
     } catch (error) {
@@ -568,39 +571,13 @@ function SuperadminPage() {
 
           <form
             onSubmit={submit}
-            className="mb-6 grid gap-3 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:grid-cols-[1fr_8rem_1fr_180px_auto]"
+            className="mb-6 grid gap-3 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] lg:grid-cols-[1fr_220px_auto]"
           >
             <Input
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="email@domaine.com"
-              className="bg-background"
-            />
-            <Select
-              value={phonePrefix}
-              onValueChange={(value) => {
-                const nextPrefix = value as PhonePrefix;
-                setPhonePrefix(nextPrefix);
-                setPhone((current) => formatNationalPhone(nextPrefix, current));
-              }}
-            >
-              <SelectTrigger className="bg-background">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PHONE_PREFIXES.map((prefix) => (
-                  <SelectItem key={prefix.value} value={prefix.value}>
-                    {prefix.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="tel"
-              value={phone}
-              onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
-              placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
               className="bg-background"
             />
             <Select value={role} onValueChange={(value) => setRole(value as RoleInviteRole)}>
@@ -663,9 +640,6 @@ function SuperadminPage() {
                         <p className="font-medium text-foreground">
                           {invite.email || "Email non renseigné"}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {invite.phone ? formatPhone(invite.phone) : "Téléphone non renseigné"}
-                        </p>
                       </TableCell>
                       <TableCell>{ROLE_LABELS[invite.role]}</TableCell>
                       <TableCell>
@@ -703,11 +677,12 @@ function SuperadminPage() {
 
       {activeView === "role-users" ? (
         <>
-          <div className="mb-6 grid gap-4 sm:grid-cols-3">
+          <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: "Superadmins", value: roleUserStats.superadmin },
               { label: "Administrateurs", value: roleUserStats.admin },
               { label: "Jurés", value: roleUserStats.juror },
+              { label: "Candidats", value: roleUserStats.candidate },
             ].map((stat) => (
               <div
                 key={stat.label}
@@ -738,6 +713,7 @@ function SuperadminPage() {
               <TableHeader>
                 <TableRow className="bg-primary/[0.04]">
                   <TableHead>Utilisateur</TableHead>
+                  <TableHead>Téléphone</TableHead>
                   <TableHead>Rôle actuel</TableHead>
                   <TableHead>Profil</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -747,7 +723,7 @@ function SuperadminPage() {
                 {roleUsersLoading ? (
                   <TableRow>
                     <TableCell
-                      colSpan={4}
+                      colSpan={5}
                       className="py-10 text-center text-sm text-muted-foreground"
                     >
                       Chargement des utilisateurs...
@@ -756,14 +732,14 @@ function SuperadminPage() {
                 ) : roleUsers.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={4}
+                      colSpan={5}
                       className="py-10 text-center text-sm text-muted-foreground"
                     >
                       Aucun utilisateur à rôle.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  roleUsers.map((roleUser) => (
+                  roleUsersPageItems.map((roleUser) => (
                     <TableRow key={roleUser.uid}>
                       <TableCell>
                         <p className="font-medium text-foreground">
@@ -771,6 +747,9 @@ function SuperadminPage() {
                         </p>
                         <p className="text-xs text-muted-foreground">{roleUser.email}</p>
                         <p className="text-xs text-muted-foreground">{roleUser.uid}</p>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {roleUser.phone ? formatPhone(roleUser.phone) : "Non renseigné"}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline">{ROLE_LABELS[roleUser.role]}</Badge>
@@ -781,7 +760,11 @@ function SuperadminPage() {
                       <TableCell className="text-right">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={roleUser.role === "candidate"}
+                            >
                               <Trash2 className="size-4" />
                               Retirer les rôles
                             </Button>
@@ -812,6 +795,11 @@ function SuperadminPage() {
               </TableBody>
             </Table>
           </div>
+          <SimplePagination
+            page={roleUsersPage}
+            pageCount={roleUsersPageCount}
+            onChange={setRoleUsersPage}
+          />
         </>
       ) : null}
 
