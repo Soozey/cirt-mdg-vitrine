@@ -142,6 +142,8 @@ function SuperadminPage() {
   const [partnershipQuery, setPartnershipQuery] = useState("");
   const [partnershipStatus, setPartnershipStatus] = useState<PartnershipLeadStatus | "all">("all");
   const [activeView, setActiveView] = useState<SuperadminView>("role-invites");
+  const activeViewDetails =
+    SUPERADMIN_VIEWS.find((view) => view.value === activeView) ?? SUPERADMIN_VIEWS[0];
   const [roleInvitePage, setRoleInvitePage] = useState(1);
   const [partnershipPage, setPartnershipPage] = useState(1);
   const [registrationPage, setRegistrationPage] = useState(1);
@@ -466,8 +468,8 @@ function SuperadminPage() {
             value={activeView}
             onValueChange={(value) => setActiveView(value as SuperadminView)}
           >
-            <SelectTrigger className="h-12 w-full border-primary/20 bg-background text-left shadow-sm md:w-[360px]">
-              <SelectValue />
+            <SelectTrigger className="h-11 w-full border-primary/20 bg-background text-left leading-none shadow-sm md:w-[360px] [&>span]:block [&>span]:truncate">
+              <SelectValue>{activeViewDetails.label}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {SUPERADMIN_VIEWS.map((view) => (

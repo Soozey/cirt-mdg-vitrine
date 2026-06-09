@@ -9,7 +9,7 @@ export type QuizUser = {
   profile?: "Étudiant" | "Professionnel" | "Chercheur" | "Indépendant";
   linkedin?: string;
   role: UserRole;
-  provider: "google" | "facebook" | "email";
+  provider: "google" | "email";
   avatarColor?: string;
   registered?: boolean;
 };

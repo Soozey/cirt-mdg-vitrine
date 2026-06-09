@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 
+import { AuthModeSwitch } from "@/components/quiz/auth-mode-switch";
 import { AuthShell } from "@/components/quiz/auth-shell";
 import { FloatingInput } from "@/components/quiz/floating-input";
 import { OAuthButtons } from "@/components/quiz/oauth-buttons";
@@ -40,80 +40,53 @@ export const Route = createFileRoute("/register")({
 });
 
 function RegisterPage() {
-  const { user, signUp, completeProfile } = useAuth();
+  const { user, completeProfile } = useAuth();
   const navigate = useNavigate();
 
-  // If a user is already logged in but not registered (OAuth flow), skip to step 2.
-  const [step, setStep] = useState<1 | 2>(user && !user.registered ? 2 : 1);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [agree, setAgree] = useState(false);
-
   const [phonePrefix, setPhonePrefix] = useState<PhonePrefix>("+261");
   const [phone, setPhone] = useState("");
   const [profile, setProfile] = useState<
     "Étudiant" | "Professionnel" | "Chercheur" | "Indépendant"
   >("Étudiant");
   const [linkedin, setLinkedin] = useState("");
-
   const [err, setErr] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName ?? "");
-      setLastName(user.lastName ?? "");
-      setEmail(user.email ?? "");
-      const splitPhone = splitPhoneForInput(user.phone);
-      setPhonePrefix(splitPhone.prefix);
-      setPhone(splitPhone.national);
-      if (user.profile) setProfile(user.profile);
-      setLinkedin(user.linkedin ?? "");
-      if (!user.registered) setStep(2);
-      else navigate({ to: redirectForRole(user.role, true) });
-    }
+    if (!user) return;
+
+    setFirstName(user.firstName ?? "");
+    setLastName(user.lastName ?? "");
+    setEmail(user.email ?? "");
+    const splitPhone = splitPhoneForInput(user.phone);
+    setPhonePrefix(splitPhone.prefix);
+    setPhone(splitPhone.national);
+    if (user.profile) setProfile(user.profile);
+    setLinkedin(user.linkedin ?? "");
+
+    if (user.registered) navigate({ to: redirectForRole(user.role, true) });
   }, [navigate, user]);
 
-  function validateStep1() {
+  function validateProfile() {
     const e: Record<string, string> = {};
     if (!firstName.trim()) e.firstName = "Requis";
     if (!lastName.trim()) e.lastName = "Requis";
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Email invalide";
-    if (!user && password.length < 6) e.password = "6 caractères minimum";
+    if (!composePhone(phonePrefix, phone) || phone.replace(/\D/g, "").length < 8) {
+      e.phone = "Téléphone invalide";
+    }
     if (!agree) e.agree = "Vous devez accepter les conditions";
     setErr(e);
     return Object.keys(e).length === 0;
   }
 
-  function validateStep2() {
-    const e: Record<string, string> = {};
-    if (!composePhone(phonePrefix, phone) || phone.replace(/\D/g, "").length < 8) {
-      e.phone = "Téléphone invalide";
-    }
-    setErr(e);
-    return Object.keys(e).length === 0;
-  }
-
-  async function goNext() {
-    if (!validateStep1()) return;
-    setSubmitting(true);
-    try {
-      if (!user) {
-        await signUp({ firstName, lastName, email, password });
-      }
-      setStep(2);
-    } catch (error) {
-      setErr({ root: getErrorMessage(error, "Inscription impossible") });
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
   async function onSubmit(ev: React.FormEvent) {
     ev.preventDefault();
-    if (!validateStep2()) return;
+    if (!validateProfile()) return;
     setSubmitting(true);
     try {
       const nextUser = await completeProfile({
@@ -133,202 +106,145 @@ function RegisterPage() {
     }
   }
 
-  return (
-    <AuthShell
-      title={step === 1 ? "Create your account" : "Complétez votre profil"}
-      subtitle={
-        step === 1
-          ? "Étape 1 / 2 : vos informations de base"
-          : "Étape 2 / 2 : informations complémentaires"
-      }
-    >
-      {/* Stepper */}
-      <div className="mb-4 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest sm:text-[11px]">
-        <span className={step >= 1 ? "shrink-0 text-primary" : "shrink-0 text-slate-400"}>1. Identité</span>
-        <span className="h-px flex-1 bg-slate-200" />
-        <span className={step >= 2 ? "shrink-0 text-primary" : "shrink-0 text-slate-400"}>2. Profil</span>
-      </div>
-
-      {step === 1 ? (
-        <div className="grid gap-4">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <FloatingInput
-              label="Prénom"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              error={err.firstName}
-              placeholder="Jean"
-            />
-            <FloatingInput
-              label="Nom"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              error={err.lastName}
-              placeholder="Dupont"
-            />
-          </div>
-          <FloatingInput
-            type="email"
-            label="E-mail Adress"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={err.email}
-            disabled={!!user}
-            placeholder="Enter your email"
-          />
-          {!user && (
-            <FloatingInput
-              type="password"
-              label="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={err.password}
-              placeholder="Enter your password"
-            />
-          )}
-
-          <label className="flex cursor-pointer items-start gap-2 text-[11px] leading-snug text-slate-600 sm:text-xs">
-            <input
-              type="checkbox"
-              checked={agree}
-              onChange={(e) => setAgree(e.target.checked)}
-              className="mt-0.5 size-4 shrink-0 accent-[var(--primary)]"
-            />
-            <span>
-              En m'inscrivant, j'accepte les{" "}
-              <Link
-                to="/conditions-generales-utilisation"
-                className="font-semibold text-primary hover:underline"
-              >
-                conditions générales d'utilisation
-              </Link>
-            </span>
-          </label>
-          {err.agree ? <p className="-mt-2 text-[11px] text-destructive">{err.agree}</p> : null}
-          {err.root ? (
-            <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">
-              {err.root}
-            </p>
-          ) : null}
-
-          <div className="mt-1 grid gap-2 sm:grid-cols-2">
-            <Button
-              type="button"
-              onClick={goNext}
-              disabled={submitting}
-              className="h-10 w-full rounded-full bg-primary text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
-            >
-              {submitting ? "…" : "Sign Up"} <ArrowRight className="ml-1 size-4" />
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="h-10 w-full rounded-full border-2 border-primary/40 bg-transparent text-sm font-semibold text-primary hover:bg-primary/5 hover:text-primary"
-            >
-              <Link to="/login">Sign In</Link>
-            </Button>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="h-px flex-1 bg-slate-200" />
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-              ou
-            </span>
-            <span className="h-px flex-1 bg-slate-200" />
-          </div>
-
+  if (!user) {
+    return (
+      <AuthShell title="S'enregistrer" subtitle="Créez votre accès quiz avec Google.">
+        <AuthModeSwitch mode="register" />
+        <div className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <OAuthButtons mode="register" />
+          <p className="text-center text-xs leading-relaxed text-slate-500">
+            Après Google, vous compléterez votre profil avant de commencer le quiz.
+          </p>
         </div>
-      ) : (
-        <form onSubmit={onSubmit} className="grid gap-4">
-          <div className="w-full">
-            <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
-              Téléphone
-            </label>
-            <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
-              <Select
-                value={phonePrefix}
-                onValueChange={(value) => {
-                  const nextPrefix = value as PhonePrefix;
-                  setPhonePrefix(nextPrefix);
-                  setPhone((current) => formatNationalPhone(nextPrefix, current));
-                }}
-              >
-                <SelectTrigger className="h-9 border-slate-200 bg-white text-xs text-slate-700">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PHONE_PREFIXES.map((prefix) => (
-                    <SelectItem key={prefix.value} value={prefix.value}>
-                      {prefix.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="min-w-0">
-                <Input
-                  type="tel"
-                  value={phone}
-                  onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
-                  placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
-                  className="h-9 border-slate-200 bg-white text-xs text-slate-700"
-                />
-                {err.phone ? (
-                  <p className="mt-0.5 text-[11px] font-medium text-destructive">{err.phone}</p>
-                ) : null}
-              </div>
-            </div>
-          </div>
+      </AuthShell>
+    );
+  }
 
-          <div className="w-full">
-            <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
-              Profil professionnel
-            </label>
-            <Select value={profile} onValueChange={(v) => setProfile(v as typeof profile)}>
+  return (
+    <AuthShell title="Complétez votre profil" subtitle="Dernière étape avant le quiz.">
+      <AuthModeSwitch mode="register" />
+      <form onSubmit={onSubmit} className="grid gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FloatingInput
+            label="Prénom"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            error={err.firstName}
+            placeholder="Jean"
+          />
+          <FloatingInput
+            label="Nom"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            error={err.lastName}
+            placeholder="Dupont"
+          />
+        </div>
+        <FloatingInput
+          type="email"
+          label="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={err.email}
+          disabled
+          placeholder="email@domaine.com"
+        />
+
+        <div className="w-full">
+          <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
+            Téléphone
+          </label>
+          <div className="grid gap-2 sm:grid-cols-[7rem_1fr]">
+            <Select
+              value={phonePrefix}
+              onValueChange={(value) => {
+                const nextPrefix = value as PhonePrefix;
+                setPhonePrefix(nextPrefix);
+                setPhone((current) => formatNationalPhone(nextPrefix, current));
+              }}
+            >
               <SelectTrigger className="h-9 border-slate-200 bg-white text-xs text-slate-700">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Étudiant">Étudiant</SelectItem>
-                <SelectItem value="Professionnel">Professionnel</SelectItem>
-                <SelectItem value="Chercheur">Chercheur</SelectItem>
-                <SelectItem value="Indépendant">Indépendant</SelectItem>
+                {PHONE_PREFIXES.map((prefix) => (
+                  <SelectItem key={prefix.value} value={prefix.value}>
+                    {prefix.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            <div className="min-w-0">
+              <Input
+                type="tel"
+                value={phone}
+                onChange={(event) => setPhone(formatNationalPhone(phonePrefix, event.target.value))}
+                placeholder={phonePrefix === "+261" ? "34 12 345 67" : "Numéro"}
+                className="h-9 border-slate-200 bg-white text-xs text-slate-700"
+              />
+              {err.phone ? (
+                <p className="mt-0.5 text-[11px] font-medium text-destructive">{err.phone}</p>
+              ) : null}
+            </div>
           </div>
+        </div>
 
-          <FloatingInput
-            label="LinkedIn (optionnel)"
-            value={linkedin}
-            onChange={(e) => setLinkedin(e.target.value)}
-            placeholder="linkedin.com/in/votre-profil"
+        <div className="w-full">
+          <label className="mb-0.5 block text-[12px] font-semibold text-slate-900">
+            Profil professionnel
+          </label>
+          <Select value={profile} onValueChange={(v) => setProfile(v as typeof profile)}>
+            <SelectTrigger className="h-9 border-slate-200 bg-white text-xs text-slate-700">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Étudiant">Étudiant</SelectItem>
+              <SelectItem value="Professionnel">Professionnel</SelectItem>
+              <SelectItem value="Chercheur">Chercheur</SelectItem>
+              <SelectItem value="Indépendant">Indépendant</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <FloatingInput
+          label="LinkedIn (optionnel)"
+          value={linkedin}
+          onChange={(e) => setLinkedin(e.target.value)}
+          placeholder="linkedin.com/in/votre-profil"
+        />
+
+        <label className="flex cursor-pointer items-start gap-2 text-[11px] leading-snug text-slate-600 sm:text-xs">
+          <input
+            type="checkbox"
+            checked={agree}
+            onChange={(e) => setAgree(e.target.checked)}
+            className="mt-0.5 size-4 shrink-0 accent-[var(--primary)]"
           />
-
-          {err.root ? (
-            <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">
-              {err.root}
-            </p>
-          ) : null}
-
-          <div className="mt-1 grid gap-2 sm:grid-cols-[auto_1fr]">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setStep(1)}
-              className="h-10 w-full rounded-full border-2 border-slate-200 bg-transparent px-4 text-xs text-slate-600 hover:bg-slate-50 sm:w-auto"
+          <span>
+            En m'inscrivant, j'accepte les{" "}
+            <Link
+              to="/conditions-generales-utilisation"
+              className="font-semibold text-primary hover:underline"
             >
-              <ArrowLeft className="size-4" /> Retour
-            </Button>
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="h-10 w-full rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
-            >
-              {submitting ? "Enregistrement…" : "Continuer vers le quiz"}
-            </Button>
-          </div>
-        </form>
-      )}
+              conditions générales d'utilisation
+            </Link>
+          </span>
+        </label>
+        {err.agree ? <p className="-mt-2 text-[11px] text-destructive">{err.agree}</p> : null}
+        {err.root ? (
+          <p className="rounded-md bg-destructive/10 px-2 py-1.5 text-[11px] font-medium text-destructive">
+            {err.root}
+          </p>
+        ) : null}
+
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="mt-1 h-10 w-full rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+        >
+          {submitting ? "Enregistrement..." : "Continuer vers le quiz"}
+        </Button>
+      </form>
     </AuthShell>
   );
 }

@@ -182,7 +182,6 @@ function splitDisplayName(name: string, fallbackEmail: string) {
 function providerFromDecodedToken(decoded: admin.auth.DecodedIdToken) {
   const signInProvider = decoded.firebase?.sign_in_provider;
   if (signInProvider === "google.com") return "google";
-  if (signInProvider === "facebook.com") return "facebook";
   return "email";
 }
 
@@ -386,10 +385,7 @@ async function handleAuthSession(request: Request) {
     if (!email) {
       return json(
         {
-          message:
-            provider === "facebook"
-              ? "Facebook n'a pas fourni d'email pour ce compte. Utilisez Google ou l'inscription par email."
-              : "Account email is required",
+          message: "Google doit fournir une adresse email pour créer le compte.",
         },
         { status: 400 },
       );
@@ -1087,8 +1083,7 @@ async function handleFinalizeProfile(request: Request) {
     const phone = typeof body.phone === "string" ? body.phone.trim() : "";
     const profile = typeof body.profile === "string" ? body.profile : "";
     const linkedin = typeof body.linkedin === "string" ? body.linkedin.trim() : "";
-    const provider =
-      body.provider === "google" || body.provider === "facebook" ? body.provider : "email";
+    const provider = body.provider === "google" ? body.provider : "email";
 
     const invite = await findPendingInvite(email, phone);
     const invitedRole = invite?.data().role as UserRole | undefined;

@@ -4,12 +4,9 @@ import { auth } from "@/lib/firebase/config";
 import {
   getUserRole,
   getOAuthRedirectUser,
-  loginUser,
-  loginWithFacebook,
   loginWithGoogle,
   logoutUser,
   onAuthChange,
-  registerUser,
   type AuthUser,
 } from "@/lib/firebase/auth";
 import { usersApi, type UserDoc } from "@/lib/firebase/firestore";
@@ -23,15 +20,8 @@ import type { QuizUser, UserRole } from "./types";
 type Ctx = {
   user: QuizUser | null;
   ready: boolean;
-  loginWithEmail: (email: string, password: string) => Promise<QuizUser>;
-  loginWithProvider: (p: "google" | "facebook") => Promise<QuizUser>;
+  loginWithProvider: () => Promise<QuizUser>;
   bootstrapWithGoogle: () => Promise<QuizUser>;
-  signUp: (data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-  }) => Promise<QuizUser>;
   completeProfile: (patch: Partial<QuizUser>) => Promise<QuizUser | null>;
   logout: () => Promise<void>;
 };
@@ -41,7 +31,7 @@ const AuthCtx = createContext<Ctx | null>(null);
 async function hydrate(authUser: AuthUser): Promise<QuizUser> {
   const claimedRole = await getUserRole();
 
-  if (authUser.provider === "google" || authUser.provider === "facebook") {
+  if (authUser.provider === "google") {
     const session = await ensureAuthenticatedUser();
     return session.user;
   }
@@ -130,15 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const loginWithEmail = useCallback(async (email: string, password: string) => {
-    const authUser = await loginUser(email, password);
-    const next = await hydrate(authUser);
-    setUser(next);
-    return next;
-  }, []);
-
-  const loginWithProvider = useCallback(async (p: "google" | "facebook") => {
-    const authUser = p === "google" ? await loginWithGoogle() : await loginWithFacebook();
+  const loginWithProvider = useCallback(async () => {
+    const authUser = await loginWithGoogle();
     const next = await hydrate(authUser);
     setUser(next);
     return next;
@@ -151,30 +134,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(finalized.user);
     return finalized.user;
   }, []);
-
-  const signUp = useCallback(
-    async (data: { firstName: string; lastName: string; email: string; password: string }) => {
-      const authUser = await registerUser(
-        data.email,
-        data.password,
-        `${data.firstName} ${data.lastName}`,
-      );
-      await usersApi.upsert(authUser.uid, {
-        uid: authUser.uid,
-        email: authUser.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        provider: "email",
-        role: "candidate",
-        registered: false,
-        quizDone: false,
-      });
-      const next = await hydrate(authUser);
-      setUser(next);
-      return next;
-    },
-    [],
-  );
 
   const completeProfile = useCallback(
     async (patch: Partial<QuizUser>) => {
@@ -206,20 +165,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       user,
       ready,
-      loginWithEmail,
       loginWithProvider,
       bootstrapWithGoogle,
-      signUp,
       completeProfile,
       logout,
     }),
     [
       user,
       ready,
-      loginWithEmail,
       loginWithProvider,
       bootstrapWithGoogle,
-      signUp,
       completeProfile,
       logout,
     ],

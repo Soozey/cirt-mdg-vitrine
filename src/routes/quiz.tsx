@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -6,6 +6,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Circle,
+  Clock3,
   Dot,
   Loader2,
   Send,
@@ -23,6 +24,9 @@ import { AUTOSAVE_KEY, DOMAIN_COLORS, LEVEL_COLORS, QUIZ_LENGTH } from "@/lib/qu
 import { gradeAnswers, pickQuestions } from "@/lib/quiz/questions";
 import type { Question, Submission } from "@/lib/quiz/types";
 import { cn, getErrorMessage } from "@/lib/utils";
+
+const MS_PER_QUESTION = 60_000;
+const SECONDS_PER_QUESTION = MS_PER_QUESTION / 1000;
 
 export const Route = createFileRoute("/quiz")({
   head: () => ({
@@ -72,16 +76,31 @@ function createDraft(): Draft {
   };
 }
 
+function getRemainingSeconds(draft: Draft) {
+  const durationMs = draft.questions.length * MS_PER_QUESTION;
+  const deadline = draft.startedAt + durationMs;
+  return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+}
+
+function formatTime(totalSeconds: number) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
 function QuizPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [draft, setDraft] = useState<Draft | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(QUIZ_LENGTH * SECONDS_PER_QUESTION);
+  const autoSubmittedRef = useRef(false);
 
   useEffect(() => {
     const existing = loadDraft();
     const next = existing ?? createDraft();
     setDraft(next);
+    setRemainingSeconds(getRemainingSeconds(next));
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(next));
   }, []);
 
@@ -94,6 +113,7 @@ function QuizPage() {
 
   function persist(next: Draft) {
     setDraft(next);
+    setRemainingSeconds(getRemainingSeconds(next));
     localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(next));
   }
 
@@ -113,14 +133,15 @@ function QuizPage() {
 
   function restart() {
     const next = createDraft();
+    autoSubmittedRef.current = false;
     persist(next);
     toast.success("Nouveau QCM généré");
   }
 
-  async function submitAll() {
+  const submitAll = useCallback(async (force = false) => {
     if (!draft || !user) return;
     const empty = draft.questions.filter((question) => !draft.answers[question.id]);
-    if (empty.length) {
+    if (!force && empty.length) {
       toast.error(`Il reste ${empty.length} question(s) sans réponse`);
       return;
     }
@@ -149,14 +170,32 @@ function QuizPage() {
     } finally {
       setSubmitting(false);
     }
-  }
+  }, [draft, navigate, user]);
+
+  useEffect(() => {
+    if (!draft) return;
+
+    const tick = () => {
+      const nextRemaining = getRemainingSeconds(draft);
+      setRemainingSeconds(nextRemaining);
+
+      if (nextRemaining > 0 || autoSubmittedRef.current) return;
+      autoSubmittedRef.current = true;
+      toast.info("Temps écoulé : le quiz est soumis automatiquement.");
+      void submitAll(true);
+    };
+
+    tick();
+    const interval = window.setInterval(tick, 1000);
+    return () => window.clearInterval(interval);
+  }, [draft, submitAll]);
 
   if (!draft || !current) return null;
 
   return (
     <DashboardLayout
       title="QCM cybersécurité"
-      subtitle="Sélectionnez une réponse par question. Le score est calculé automatiquement."
+      subtitle={`Vous disposez d'une minute par question, soit ${draft.questions.length} minutes au total.`}
     >
       <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_auto]">
         <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
@@ -170,6 +209,21 @@ function QuizPage() {
           <p className="mt-3 text-xs text-muted-foreground">
             {answeredCount} réponse(s) sélectionnée(s) sur {draft.questions.length}
           </p>
+        </div>
+
+        <div
+          className={cn(
+            "flex min-w-[13rem] items-center justify-between gap-3 rounded-2xl border bg-card p-5 shadow-[var(--shadow-soft)]",
+            remainingSeconds <= 60 ? "border-destructive/40 text-destructive" : "border-border",
+          )}
+        >
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Temps restant</p>
+            <p className="mt-1 font-display text-2xl font-bold tabular-nums">
+              {formatTime(remainingSeconds)}
+            </p>
+          </div>
+          <Clock3 className="size-6 shrink-0" />
         </div>
 
         {/* <Button variant="outline" onClick={restart} className="self-stretch lg:self-auto">
@@ -257,7 +311,10 @@ function QuizPage() {
               Suivant <ArrowRight className="size-4" />
             </Button>
           ) : (
-            <Button onClick={submitAll} disabled={submitting || answeredCount < draft.questions.length}>
+            <Button
+              onClick={() => submitAll()}
+              disabled={submitting || answeredCount < draft.questions.length}
+            >
               {submitting ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
               Soumettre le QCM
             </Button>

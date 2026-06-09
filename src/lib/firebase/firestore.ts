@@ -92,7 +92,7 @@ export type UserDoc = {
   profile?: "Étudiant" | "Professionnel" | "Chercheur" | "Indépendant";
   linkedinUrl?: string;
   photoURL?: string | null;
-  provider: "google" | "facebook" | "email";
+  provider: "google" | "email";
   role: UserRole;
   registered?: boolean;
   quizDone?: boolean;

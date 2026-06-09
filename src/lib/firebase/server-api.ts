@@ -53,7 +53,7 @@ export async function finalizeUserProfile(data: {
   phone?: string;
   profile?: string;
   linkedin?: string;
-  provider: "google" | "facebook" | "email";
+  provider: "google" | "email";
 }) {
   const response = await fetch("/api/users/finalize-profile", {
     method: "POST",

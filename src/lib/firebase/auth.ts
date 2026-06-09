@@ -1,20 +1,15 @@
 import {
-  createUserWithEmailAndPassword,
-  FacebookAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
   getRedirectResult,
-  signInWithEmailAndPassword,
   signInWithPopup,
-  signInWithRedirect,
   signOut,
-  updateProfile,
   type User,
 } from "firebase/auth";
 
 import { auth } from "./config";
 
-export type AuthProviderId = "google" | "facebook" | "email";
+export type AuthProviderId = "google" | "email";
 
 export type AuthUser = {
   uid: string;
@@ -27,7 +22,6 @@ export type AuthUser = {
 function providerFromFirebaseUser(user: User): AuthProviderId {
   const providerId = user.providerData[0]?.providerId ?? "password";
   if (providerId.includes("google")) return "google";
-  if (providerId.includes("facebook")) return "facebook";
   return "email";
 }
 
@@ -48,47 +42,14 @@ const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope("email");
 googleProvider.addScope("profile");
 
-const facebookProvider = new FacebookAuthProvider();
-
-function isMobileBrowser() {
-  if (typeof window === "undefined") return false;
-  const userAgent = navigator.userAgent || navigator.vendor || "";
-  return /android|iphone|ipad|ipod|mobile/i.test(userAgent);
-}
-
 export async function loginWithGoogle(): Promise<AuthUser> {
   const result = await signInWithPopup(auth, googleProvider);
   return normalize(result.user, "google");
 }
 
-export async function loginWithFacebook(): Promise<AuthUser> {
-  if (isMobileBrowser()) {
-    await signInWithRedirect(auth, facebookProvider);
-    return new Promise<AuthUser>(() => undefined);
-  }
-
-  const result = await signInWithPopup(auth, facebookProvider);
-  return normalize(result.user, "facebook");
-}
-
 export async function getOAuthRedirectUser(): Promise<AuthUser | null> {
   const result = await getRedirectResult(auth);
   return result?.user ? normalize(result.user) : null;
-}
-
-export async function loginUser(email: string, password: string): Promise<AuthUser> {
-  const result = await signInWithEmailAndPassword(auth, email, password);
-  return normalize(result.user, "email");
-}
-
-export async function registerUser(
-  email: string,
-  password: string,
-  displayName?: string,
-): Promise<AuthUser> {
-  const result = await createUserWithEmailAndPassword(auth, email, password);
-  if (displayName) await updateProfile(result.user, { displayName });
-  return normalize(result.user, "email");
 }
 
 export async function logoutUser(): Promise<void> {
