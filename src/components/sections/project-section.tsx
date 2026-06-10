@@ -85,7 +85,7 @@ export function ProjectSection() {
                     défis sont devenus des priorités nationales.
                   </p>
                   <p>
-                    Ce Sommet est la première plateforme stratégique dédiée à y répondre
+                    Ce Symposium est la première plateforme stratégique dédiée à y répondre
                     collectivement.
                   </p>
                 </RevealItem>
@@ -120,7 +120,7 @@ export function ProjectSection() {
             />
             <img
               src={casquette}
-              alt="Casquette officielle Sommet de la Cybersécurité Madagascar"
+              alt="Casquette officielle Symposium de la Cybersécurité Madagascar"
               className="mx-auto w-full max-w-lg drop-shadow-[0_30px_60px_oklch(0.22_0.14_285_/_0.35)]"
             />
           </motion.div>

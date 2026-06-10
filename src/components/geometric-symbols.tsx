@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 type SymbolProps = { className?: string };
 
 /**
- * Symboles inspirés de la direction artistique du Sommet de la Cybersécurité Madagascar.
+ * Symboles inspirés de la direction artistique du Symposium de la Cybersécurité Madagascar.
  * Tracés au trait, prêts à recevoir un gradient iridescent (currentColor / stroke).
  */
 

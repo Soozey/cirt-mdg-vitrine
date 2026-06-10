@@ -275,11 +275,11 @@ function RichHero({
               variant="outline"
               className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
             >
-          <RegistrationDialog
-            type="ctf-hackathon"
-            label="S'inscrire"
-            className="ml-0 mt-3 sm:ml-3 sm:mt-0"
-          />
+              <RegistrationDialog
+                type="ctf-hackathon"
+                label="S'inscrire"
+                className="ml-0 mt-3 sm:ml-3 sm:mt-0"
+              />
             </Button>
           </div>
           {meta.length ? (
@@ -550,7 +550,7 @@ function ConferencesPage() {
           <SectionHeader
             eyebrow="Thèmes"
             title="Ce qui sera abordé"
-            description="Cybermenaces actuelles, IA & cybersécurité, régulations, protection des données : interventions structurées autour des cinq axes thématiques du Sommet."
+            description="Cybermenaces actuelles, IA & cybersécurité, régulations, protection des données : interventions structurées autour des cinq axes thématiques du symposium."
           />
           <div className="flex flex-wrap gap-2">
             {[
@@ -575,7 +575,7 @@ function ConferencesPage() {
 
       <section className="bg-surface-muted/50">
         <ContentContainer>
-          <SectionHeader eyebrow="Axes thématiques" title="Les 5 axes du Sommet" />
+          <SectionHeader eyebrow="Axes thématiques" title="Les 5 axes du symposium" />
           <RevealGroup className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {axes.map((axis) => (
               <RevealItem key={axis.n}>
@@ -919,7 +919,7 @@ function ExpositionNetworkingPage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Exposition%20%26%20Networking%20-%20CIRT%20MDG%202026">
+              <a href="mailto:contact@cirt.gov.mg?subject=Exposition%20%26%20Networking%20-%20CIRT%20MDG%202026">
                 <Mail className="size-4" /> Contacter l'organisation
               </a>
             </Button>
@@ -962,7 +962,7 @@ function ProgrammePage() {
     <>
       <RichHero
         badge="Programme · 2 jours"
-        title="Les deux journées du Sommet"
+        title="Les deux journées du Symposium"
         tagline="Cérémonies, conférences, ateliers techniques, CTF & Hackathon, networking et remise des prix : découvrez le programme complet."
         ctaLabel="Voir le programme"
         ctaHref="#programme"
@@ -970,7 +970,7 @@ function ProgrammePage() {
 
       <section id="programme" className="bg-background">
         <ContentContainer>
-          <SectionHeader eyebrow="Programme" title="Les deux journées du Sommet" />
+          <SectionHeader eyebrow="Programme" title="Les deux journées du Symposium" />
           <div className="grid gap-6 md:grid-cols-2">
             {days.map((day) => (
               <Card key={day.day} className="border-border/60 p-6">
@@ -994,7 +994,7 @@ function ProgrammePage() {
           <div className="mt-8">
             <RegistrationDialog
               type="newsletter"
-              label="Recevoir les informations du Sommet"
+              label="Recevoir les informations du Symposium"
               variant="outline"
             />
           </div>

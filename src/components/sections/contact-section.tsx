@@ -24,7 +24,7 @@ const CARDS: ContactCard[] = [
     body: "Veuillez contacter l'équipe à l'adresse e-mail en cliquant sur le bouton en bas.",
     cta: "Contacter",
     variant: "default",
-    href: "mailto:contact@cybersecurite-madagascar.mg?subject=Inscription%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026",
+    href: "mailto:contact@cirt.gov.mg?subject=Inscription%20-%20Symposium%20Cybers%C3%A9curit%C3%A9%20MDG%202026",
   },
   {
     id: "sponsor",
@@ -35,15 +35,15 @@ const CARDS: ContactCard[] = [
     variant: "secondary",
     to: "/partenaires",
   },
-{
-  id: "programme",
-  icon: FileText,
-  title: "Programme",
-  body: "2 jours de conférences, ateliers techniques, CTF, Hackathon, Jobdating,...",
-  cta: "Suivre le programme",
-  variant: "outline",
-  to: "/informations/programme",
-}
+  {
+    id: "programme",
+    icon: FileText,
+    title: "Programme",
+    body: "2 jours de conférences, ateliers techniques, CTF, Hackathon, Jobdating,...",
+    cta: "Suivre le programme",
+    variant: "outline",
+    to: "/informations/programme",
+  }
 
 ];
 
@@ -76,7 +76,7 @@ export function ContactSection() {
           <div className="h-1 w-16 bg-iris" />
           <p className="max-w-md text-base font-medium text-primary-deep/80">
             Pour toute demande d'information, de partenariat ou de sponsoring, contactez l'équipe
-            d'organisation du sommet.
+            d'organisation du Symposium.
           </p>
         </Reveal>
 

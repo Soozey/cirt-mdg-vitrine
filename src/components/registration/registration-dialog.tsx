@@ -85,18 +85,18 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
     if (type === "ctf-hackathon") return "Inscription aux épreuves du 22 juin.";
     if (type === "job-dating") return "Candidature au Job Dating Cyber du 23 juin.";
     if (type === "workshop") return "Réservation d'une session atelier ou masterclass.";
-    return "Ajout à la mailing list du Sommet.";
+    return "Ajout à la mailing list du Symposium.";
   }, [type]);
 
   const createdQrPayload = created
     ? JSON.stringify({
-        event: "SCM2026",
-        id: created.id,
-        type: created.type,
-        qrCode: created.qrCode,
-        nom: created.nom,
-        prenom: created.prenom ?? "",
-      })
+      event: "SCM2026",
+      id: created.id,
+      type: created.type,
+      qrCode: created.qrCode,
+      nom: created.nom,
+      prenom: created.prenom ?? "",
+    })
     : "";
 
   function setField(field: string, value: string) {
@@ -411,7 +411,7 @@ export function RegistrationDialog({ type, label, variant, className }: Props) {
               />
             ) : null}
             <CheckboxLine
-              label="Je souhaite recevoir les informations et la newsletter du Sommet."
+              label="Je souhaite recevoir les informations et la newsletter du Symposium."
               checked={newsletterConsent}
               onCheckedChange={setNewsletterConsent}
             />

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/conditions-generales-utilisation")({
       {
         name: "description",
         content:
-          "Conditions générales d'utilisation de la plateforme d'inscription au Sommet de la Cybersécurité Madagascar 2026.",
+          "Conditions générales d'utilisation de la plateforme d'inscription au Symposium de la Cybersécurité Madagascar 2026.",
       },
     ],
   }),
@@ -27,7 +27,7 @@ function TermsPage() {
     {
       title: "Objet",
       content:
-        "Ces conditions encadrent l'utilisation de la plateforme d'inscription et des espaces numériques associés au Sommet de la Cybersécurité Madagascar 2026.",
+        "Ces conditions encadrent l'utilisation de la plateforme d'inscription et des espaces numériques associés au Symposium de la Cybersécurité Madagascar 2026.",
     },
     {
       title: "Compte utilisateur",
@@ -37,12 +37,12 @@ function TermsPage() {
     {
       title: "Utilisation autorisée",
       content:
-        "La plateforme doit être utilisée uniquement pour l'inscription, la participation aux activités du Sommet et l'accès aux services liés à l'événement.",
+        "La plateforme doit être utilisée uniquement pour l'inscription, la participation aux activités du Symposium et l'accès aux services liés à l'événement.",
     },
     {
       title: "Données personnelles",
       content:
-        "Les informations transmises servent à gérer l'inscription, la participation, les communications utiles et l'organisation des activités liées au Sommet.",
+        "Les informations transmises servent à gérer l'inscription, la participation, les communications utiles et l'organisation des activités liées au Symposium.",
     },
     {
       title: "Sécurité",
@@ -112,10 +112,10 @@ function TermsPage() {
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-foreground/75">
                 Pour toute question relative aux conditions d'utilisation ou à vos données,
-                contactez l'organisation du Sommet.
+                contactez l'organisation du Symposium.
               </p>
               <Button asChild className="mt-4">
-                <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Conditions%20g%C3%A9n%C3%A9rales%20d'utilisation%20-%20CIRT%20MDG%202026">
+                <a href="mailto:contact@cirt.gov.mg?subject=Conditions%20g%C3%A9n%C3%A9rales%20d'utilisation%20-%20CIRT%20MDG%202026">
                   <Mail className="size-4" /> Contacter l'organisation
                 </a>
               </Button>

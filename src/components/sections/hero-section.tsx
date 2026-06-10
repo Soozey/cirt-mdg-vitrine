@@ -151,7 +151,7 @@ export function HeroSection() {
               className="inline-flex min-w-0 flex-col items-start"
             >
               <div className="flex flex-col">
-                {/* Ligne du haut : édition et Sommet/de la */}
+                {/* Ligne du haut : édition et Symposium/de la */}
                 <motion.div
                   variants={titleFromTop}
                   className="flex w-full justify-between items-baseline mb-3"
@@ -169,7 +169,7 @@ export function HeroSection() {
                     uppercase leading-[1.0] text-white/95 mt-2 md:mt-0"
                     style={{ fontFamily: "var(--font-enfonix)", letterSpacing: "0.06em" }}
                   >
-                    <span>Sommet</span>
+                    <span>Symposium</span>
                     <span>de la</span>
                   </motion.span>
                 </motion.div>

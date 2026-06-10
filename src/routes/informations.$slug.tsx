@@ -18,7 +18,7 @@ export const Route = createFileRoute("/informations/$slug")({
         { title: page ? `${page.title}, CIRT MDG 2026` : "Information, CIRT MDG 2026" },
         {
           name: "description",
-          content: page?.summary ?? "Informations du Sommet de la Cybersécurité Madagascar 2026.",
+          content: page?.summary ?? "Informations du Symposium de la Cybersécurité Madagascar 2026.",
         },
       ],
     };
@@ -136,80 +136,80 @@ function DetailPage() {
             }}
           />
           <div className="mx-auto max-w-5xl px-4 py-16 md:grid md:grid-cols-[2fr_1fr] md:gap-12 md:px-8">
-          <article className="space-y-6">
-            <p className="text-lg leading-relaxed text-white/82">{page.description}</p>
+            <article className="space-y-6">
+              <p className="text-lg leading-relaxed text-white/82">{page.description}</p>
 
-            <Card className="border-iris-cyan/25 bg-[#03124a]/75 p-6 text-white shadow-[0_18px_55px_-26px_rgba(34,211,238,0.65)] backdrop-blur-md">
+              <Card className="border-iris-cyan/25 bg-[#03124a]/75 p-6 text-white shadow-[0_18px_55px_-26px_rgba(34,211,238,0.65)] backdrop-blur-md">
+                <h2
+                  className="mb-4 text-sm uppercase tracking-[0.2em] text-iris-lime"
+                  style={{ fontFamily: "var(--font-barlow)" }}
+                >
+                  Ce qu'il faut retenir
+                </h2>
+                <ul className="space-y-3 text-sm text-white/82">
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
+                    Événement organisé par le CIRT MDG.
+                  </li>
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
+                    Les 22 et 23 juin 2026 au Novotel Convention, Alarobia (Antananarivo).
+                  </li>
+                  <li className="flex gap-2">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
+                    Détails complémentaires publiés dès validation officielle.
+                  </li>
+                </ul>
+              </Card>
+
+              <div className="flex flex-wrap gap-3 pt-2">
+                {page.externalPending ? (
+                  <Button asChild variant="outline">
+                    <Link to="/" hash="contact">Lien CTF à confirmer</Link>
+                  </Button>
+                ) : (
+                  <Button asChild>
+                    <Link to="/" hash="contact">Demander des informations</Link>
+                  </Button>
+                )}
+                <Button asChild variant="ghost">
+                  <a href={CIRT_WEBSITE} target="_blank" rel="noopener noreferrer">
+                    Site du CIRT <ArrowUpRight />
+                  </a>
+                </Button>
+              </div>
+            </article>
+
+            <aside className="mt-12 md:mt-0">
               <h2
-                className="mb-4 text-sm uppercase tracking-[0.2em] text-iris-lime"
+                className="mb-4 text-xs uppercase tracking-[0.22em] text-iris-lime"
                 style={{ fontFamily: "var(--font-barlow)" }}
               >
-                Ce qu'il faut retenir
+                Voir aussi
               </h2>
-              <ul className="space-y-3 text-sm text-white/82">
-                <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
-                  Événement organisé par le CIRT MDG.
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
-                  Les 22 et 23 juin 2026 au Novotel Convention, Alarobia (Antananarivo).
-                </li>
-                <li className="flex gap-2">
-                  <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-iris-lime" />
-                  Détails complémentaires publiés dès validation officielle.
-                </li>
+              <ul className="space-y-3">
+                {others.map((o) => (
+                  <li key={o.slug}>
+                    <Link
+                      to="/informations/$slug"
+                      params={{ slug: o.slug }}
+                      className="group flex items-start justify-between gap-3 rounded-lg border border-iris-cyan/25 bg-[#03124a]/75 p-4 text-white shadow-[0_18px_55px_-30px_rgba(34,211,238,0.55)] transition-colors hover:border-iris-lime/60"
+                    >
+                      <div>
+                        <p
+                          className="text-[11px] uppercase tracking-[0.22em] text-iris-lime/80"
+                          style={{ fontFamily: "var(--font-barlow)" }}
+                        >
+                          {o.kicker}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-white">{o.title}</p>
+                      </div>
+                      <ArrowUpRight className="size-4 shrink-0 text-iris-lime transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
+                  </li>
+                ))}
               </ul>
-            </Card>
-
-            <div className="flex flex-wrap gap-3 pt-2">
-              {page.externalPending ? (
-                <Button asChild variant="outline">
-                  <Link to="/" hash="contact">Lien CTF à confirmer</Link>
-                </Button>
-              ) : (
-                <Button asChild>
-                  <Link to="/" hash="contact">Demander des informations</Link>
-                </Button>
-              )}
-              <Button asChild variant="ghost">
-                <a href={CIRT_WEBSITE} target="_blank" rel="noopener noreferrer">
-                  Site du CIRT <ArrowUpRight />
-                </a>
-              </Button>
-            </div>
-          </article>
-
-          <aside className="mt-12 md:mt-0">
-            <h2
-              className="mb-4 text-xs uppercase tracking-[0.22em] text-iris-lime"
-              style={{ fontFamily: "var(--font-barlow)" }}
-            >
-              Voir aussi
-            </h2>
-            <ul className="space-y-3">
-              {others.map((o) => (
-                <li key={o.slug}>
-                  <Link
-                    to="/informations/$slug"
-                    params={{ slug: o.slug }}
-                    className="group flex items-start justify-between gap-3 rounded-lg border border-iris-cyan/25 bg-[#03124a]/75 p-4 text-white shadow-[0_18px_55px_-30px_rgba(34,211,238,0.55)] transition-colors hover:border-iris-lime/60"
-                  >
-                    <div>
-                      <p
-                        className="text-[11px] uppercase tracking-[0.22em] text-iris-lime/80"
-                        style={{ fontFamily: "var(--font-barlow)" }}
-                      >
-                        {o.kicker}
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-white">{o.title}</p>
-                    </div>
-                    <ArrowUpRight className="size-4 shrink-0 text-iris-lime transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </aside>
+            </aside>
           </div>
         </section>
       </main>

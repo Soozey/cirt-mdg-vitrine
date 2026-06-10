@@ -88,7 +88,7 @@ export function SiteFooter() {
           className="mx-auto max-w-7xl px-4 py-5 text-center text-[11px] uppercase leading-relaxed tracking-[0.08em] text-white sm:px-6 sm:text-xs sm:tracking-[0.12em] md:px-8"
           style={{ fontFamily: "var(--font-barlow)" }}
         >
-          © 2026 CIRT MDG, Sommet de la Cybersécurité Madagascar
+          © 2026 CIRT MDG, Symposium de la Cybersécurité Madagascar
         </div>
       </div>
     </footer>

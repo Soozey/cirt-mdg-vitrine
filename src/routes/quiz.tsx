@@ -181,7 +181,7 @@ function QuizPage() {
               Prêt à commencer
             </Badge>
             <h2 className="font-display text-2xl font-semibold text-foreground">
-              Lancez le quiz quand vous êtes disponible.
+              Lancez le quiz quand vous êtes prêt
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Après le clic sur le bouton, le minuteur démarre et la première question apparaît. Le

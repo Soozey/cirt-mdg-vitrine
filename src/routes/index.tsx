@@ -11,13 +11,13 @@ import { ContactSection } from "@/components/sections/contact-section";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sommet de la Cybersécurité Madagascar 2026, CIRT MDG" },
+      { title: "Symposium de la Cybersécurité Madagascar 2026, CIRT MDG" },
       {
         name: "description",
         content:
-          "1ère édition du Sommet de la Cybersécurité Madagascar. 22–23 Juin 2026, Novotel Convention & Spa, Antananarivo. Bâtir la confiance numérique pour un Madagascar cyber-résilient.",
+          "1ère édition du Symposium de la Cybersécurité Madagascar. 22–23 Juin 2026, Novotel Convention & Spa, Antananarivo. Bâtir la confiance numérique pour un Madagascar cyber-résilient.",
       },
-      { property: "og:title", content: "Sommet de la Cybersécurité Madagascar 2026" },
+      { property: "og:title", content: "Symposium de la Cybersécurité Madagascar 2026" },
       {
         property: "og:description",
         content: "1ère édition · 22–23 Juin 2026 · Antananarivo. Organisé par le CIRT MDG.",

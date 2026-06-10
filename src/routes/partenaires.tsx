@@ -47,17 +47,17 @@ import infoBg from "@/assets/info-section.webp";
 export const Route = createFileRoute("/partenaires")({
   head: () => ({
     meta: [
-      { title: "Devenir partenaire, Sommet Cybersécurité Madagascar 2026" },
+      { title: "Devenir partenaire, Symposium Cybersécurité Madagascar 2026" },
       {
         name: "description",
         content:
-          "Dossier de partenariat du Sommet de la Cybersécurité Madagascar, les 22 et 23 juin 2026 au Novotel Convention & Spa, Antananarivo.",
+          "Dossier de partenariat du Symposium de la Cybersécurité Madagascar, les 22 et 23 juin 2026 au Novotel Convention & Spa, Antananarivo.",
       },
-      { property: "og:title", content: "Devenir partenaire, Sommet Cybersécurité Madagascar 2026" },
+      { property: "og:title", content: "Devenir partenaire, Symposium Cybersécurité Madagascar 2026" },
       {
         property: "og:description",
         content:
-          "Packages de partenariat, profils ciblés et opportunités de visibilité pour la 1ère édition du Sommet.",
+          "Packages de partenariat, profils ciblés et opportunités de visibilité pour la 1ère édition du Symposium.",
       },
     ],
   }),
@@ -168,7 +168,7 @@ function PackageRequestDialog({ packageName }: { packageName?: string }) {
         {status === "success" ? (
           <div className="rounded-md border border-iris-lime/40 bg-iris-lime/10 p-4 text-sm text-primary-deep">
             <p>
-              Merci, votre demande a bien été enregistrée. L'équipe du Sommet vous recontactera pour
+              Merci, votre demande a bien été enregistrée. L'équipe du Symposium vous recontactera pour
               finaliser le package.
             </p>
             {createdLead ? (
@@ -360,7 +360,7 @@ function PartenairesPage() {
                 1ère édition · 2026
               </Badge>
               <h1 className="mt-5 font-display text-3xl font-bold leading-tight md:text-5xl">
-                Devenir partenaire du Sommet de la Cybersécurité Madagascar
+                Devenir partenaire du Symposium de la Cybersécurité Madagascar
               </h1>
               <p className="mt-4 max-w-2xl text-base text-nav-deep-foreground/80 md:text-lg">
                 Plateforme nationale de sensibilisation, d'innovation, de protection et de confiance
@@ -384,7 +384,7 @@ function PartenairesPage() {
                   size="lg"
                   className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90"
                 >
-                  <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
+                  <a href="mailto:contact@cirt.gov.mg?subject=Demande%20de%20partenariat%20-%20Symposium%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
                     <Mail className="size-4" /> Contacter l'organisation
                   </a>
                 </Button>
@@ -415,7 +415,7 @@ function PartenairesPage() {
                 À l'ère de la transformation numérique accélérée, Madagascar fait face à des enjeux
                 croissants en matière de cybersécurité. Protection des données, résilience des
                 infrastructures critiques, lutte contre la cybercriminalité : ces défis sont devenus
-                des priorités nationales. Ce Sommet est la première plateforme stratégique dédiée à
+                des priorités nationales. Ce Symposium est la première plateforme stratégique dédiée à
                 y répondre collectivement.
               </p>
               <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
@@ -450,7 +450,7 @@ function PartenairesPage() {
                 Partenaires & sponsors recherchés
               </h2>
               <p className="mt-3 text-sm text-foreground/75 md:text-base">
-                Au-delà du public attendu, le Sommet cible des organisations dont le positionnement,
+                Au-delà du public attendu, le Symposium cible des organisations dont le positionnement,
                 les enjeux et la stratégie de croissance s'alignent avec la cybersécurité.
               </p>
               <div className="mt-4 h-1 w-12 rounded-full bg-iris" />
@@ -539,8 +539,8 @@ function PartenairesPage() {
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="bg-iris-cyan text-nav-deep hover:bg-iris-cyan/90">
-                <a href="mailto:contact@cybersecurite-madagascar.mg?subject=Demande%20de%20partenariat%20-%20Sommet%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
-                  <Mail className="size-4" /> contact@cybersecurite-madagascar.mg
+                <a href="mailto:contact@cirt.gov.mg?subject=Demande%20de%20partenariat%20-%20Symposium%20Cybers%C3%A9curit%C3%A9%20MDG%202026">
+                  <Mail className="size-4" /> contact@cirt.gov.mg
                 </a>
               </Button>
               <Button

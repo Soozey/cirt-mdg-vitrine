@@ -48,7 +48,7 @@ export const INFO_PAGES: InfoPage[] = [
     slug: "programme",
     title: "Programme",
     kicker: "Agenda",
-    summary: "Les deux journées du Sommet, temps fort par temps fort.",
+    summary: "Les deux journées du Symposium, temps fort par temps fort.",
     description:
       "Le programme officiel réunit cérémonies, conférences, ateliers techniques, CTF, Hackathon, Job Dating, networking et remise des prix sur deux journées.",
   },
