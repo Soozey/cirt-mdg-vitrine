@@ -275,11 +275,14 @@ function RichHero({
               variant="outline"
               className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
             >
-              <RegistrationDialog
-                type="ctf-hackathon"
-                label="S'inscrire"
+              <a
+                href="https://test.scienceautrement.com/inscription/ctf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="ml-0 mt-3 sm:ml-3 sm:mt-0"
-              />
+              >
+                S'inscrire
+              </a>
             </Button>
           </div>
           {meta.length ? (
