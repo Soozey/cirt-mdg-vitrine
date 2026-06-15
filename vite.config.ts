@@ -26,6 +26,20 @@ const virtualHeadScriptsPlugin = () => {
 };
 
 export default defineConfig({
+  css: {
+    transformer: "lightningcss",
+    lightningcss: {
+      targets: {
+        chrome: (90 << 16),
+        firefox: (90 << 16),
+        safari: (14 << 16),
+        ios_saf: (14 << 16),
+      },
+    },
+  },
+  build: {
+    cssMinify: "lightningcss",
+  },
   plugins: [
     tsconfigPaths(),
     tailwindcss(),
