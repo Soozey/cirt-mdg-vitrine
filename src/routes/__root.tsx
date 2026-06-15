@@ -81,6 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Symposium de la Cybersécurité Madagascar, 1ère édition, 22–23 Juin 2026, Antananarivo.",
       },
       { name: "author", content: "CIRT MDG" },
+      { name: "google-site-verification", content: "FeDZUCjYycu576TCyJmYG4eTZ8rBGbH3qEdC0q-wLJI" },
       { property: "og:title", content: "Symposium de la Cybersécurité Madagascar 2026" },
       { property: "og:description", content: "1ère édition · 22–23 Juin 2026 · Antananarivo." },
       { property: "og:type", content: "website" },

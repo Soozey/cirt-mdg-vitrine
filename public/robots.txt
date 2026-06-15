@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /quiz
+
+Sitemap: https://symposium.cirt.gov.mg/sitemap.xml
