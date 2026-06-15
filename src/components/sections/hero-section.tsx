@@ -251,10 +251,10 @@ export function HeroSection() {
                   size="lg"
                   className="h-10 bg-iris-lime px-4 text-sm text-primary-deep hover:bg-iris-lime/90 shadow-[var(--shadow-iris)]"
                 >
-                  <Link to="/informations/$slug" params={{ slug: "ctf-hackathon" }}>
+                  <a href="https://test.scienceautrement.com/inscription/ctf" target="_blank" rel="noopener noreferrer">
                     Hackathon & CTF
                     <ArrowRight className="ml-1" />
-                  </Link>
+                  </a>
                 </Button>
                 <Button
                   asChild
