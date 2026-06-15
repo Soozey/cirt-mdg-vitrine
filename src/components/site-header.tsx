@@ -40,11 +40,11 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        {/* <div className="hidden md:block">
           <div className="flex items-center gap-2">
-            {/* <Button asChild size="sm" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
+            <Button asChild size="sm" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
               <Link to="/login">Quiz cybersécurité</Link>
-            </Button> */}
+            </Button>
             <Button
               asChild
               size="sm"
@@ -55,7 +55,7 @@ export function SiteHeader() {
               </Link>
             </Button>
           </div>
-        </div>
+        </div> */}
 
         <button
           type="button"
@@ -89,7 +89,7 @@ export function SiteHeader() {
           {/* <Button asChild size="sm" variant="outline" className="mt-2 border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10">
             <Link to="/login" onClick={() => setOpen(false)}>Connexion</Link>
           </Button> */}
-          <Button
+          {/* <Button
             asChild
             size="sm"
             className="mt-1 bg-iris-lime text-primary-deep hover:bg-iris-lime/90"
@@ -97,7 +97,7 @@ export function SiteHeader() {
             <Link to={quizEntryPath} onClick={() => setOpen(false)}>
               <ShieldCheck className="size-4" /> Quiz cybersécurité
             </Link>
-          </Button>
+          </Button> */}
         </nav>
       </div>
     </header>
