@@ -269,7 +269,7 @@ function RichHero({
             >
               <a href={ctaHref}>{ctaLabel}</a>
             </Button>
-            <Button
+            {/*<Button
               asChild
               size="lg"
               variant="outline"
@@ -283,7 +283,7 @@ function RichHero({
               >
                 S'inscrire
               </a>
-            </Button>
+            </Button>*/}
           </div>
           {meta.length ? (
             <div className="mt-8 flex flex-wrap gap-4 text-xs text-white/78">
