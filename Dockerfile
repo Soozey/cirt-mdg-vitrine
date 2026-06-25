@@ -26,6 +26,7 @@ RUN npm ci
 # Copy source and build
 COPY . .
 RUN npm run build
+RUN test "$(find dist/client/album-webp -type f -name '*.webp' | wc -l)" -eq 104
 
 # ─── Stage 2 : Runner ───────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
@@ -45,5 +46,5 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 2220
 
-# Run using npm start (which executes srvx with correct PATH resolution)
-CMD ["npm", "run", "start"]
+# Serve the SSR bundle and the Vite client assets copied from public/.
+CMD ["./node_modules/.bin/srvx", "serve", "--prod", "--entry", "./dist/server/server.js", "--static", "./dist/client"]
