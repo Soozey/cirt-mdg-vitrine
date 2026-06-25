@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, ShieldCheck, X } from "lucide-react";
+import { Images, Menu, X } from "lucide-react";
 
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
-import { redirectForRole } from "@/lib/access-control";
-import { useAuth } from "@/lib/quiz/auth-context";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -17,8 +15,6 @@ const NAV = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
-  const { user } = useAuth();
-  const quizEntryPath = user ? redirectForRole(user.role, user.registered) : "/login";
 
   return (
     <header className="fixed left-0 top-0 z-50 w-full border-b border-iris-cyan/25 bg-[#03124a]/95 text-white shadow-[0_18px_45px_-32px_rgba(34,211,238,0.75)] backdrop-blur-xl">
@@ -40,22 +36,20 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        {/* <div className="hidden md:block">
+        <div className="hidden md:block">
           <div className="flex items-center gap-2">
-            <Button asChild size="sm" variant="outline" className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime">
-              <Link to="/login">Quiz cybersécurité</Link>
-            </Button>
             <Button
               asChild
               size="sm"
-              className="bg-iris-lime text-primary-deep shadow-[0_14px_35px_-22px_rgba(214,255,87,0.85)] hover:bg-iris-lime/90"
+              variant="outline"
+              className="border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
             >
-              <Link to={quizEntryPath}>
-                <ShieldCheck className="size-4" /> Quiz cybersécurité
+              <Link to="/album">
+                <Images className="size-4" /> Album
               </Link>
             </Button>
           </div>
-        </div> */}
+        </div>
 
         <button
           type="button"
@@ -86,18 +80,16 @@ export function SiteHeader() {
               {item.label}
             </a>
           ))}
-          {/* <Button asChild size="sm" variant="outline" className="mt-2 border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10">
-            <Link to="/login" onClick={() => setOpen(false)}>Connexion</Link>
-          </Button> */}
-          {/* <Button
+          <Button
             asChild
             size="sm"
-            className="mt-1 bg-iris-lime text-primary-deep hover:bg-iris-lime/90"
+            variant="outline"
+            className="mt-2 border-iris-cyan/35 bg-transparent text-white hover:bg-iris-cyan/10 hover:text-iris-lime"
           >
-            <Link to={quizEntryPath} onClick={() => setOpen(false)}>
-              <ShieldCheck className="size-4" /> Quiz cybersécurité
+            <Link to="/album" onClick={() => setOpen(false)}>
+              <Images className="size-4" /> Album
             </Link>
-          </Button> */}
+          </Button>
         </nav>
       </div>
     </header>

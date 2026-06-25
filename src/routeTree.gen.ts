@@ -18,6 +18,7 @@ import { Route as JuryRouteImport } from './routes/jury'
 import { Route as DoneRouteImport } from './routes/done'
 import { Route as ConditionsGeneralesUtilisationRouteImport } from './routes/conditions-generales-utilisation'
 import { Route as BootstrapRouteImport } from './routes/bootstrap'
+import { Route as AlbumRouteImport } from './routes/album'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InformationsSlugRouteImport } from './routes/informations.$slug'
@@ -69,6 +70,11 @@ const BootstrapRoute = BootstrapRouteImport.update({
   path: '/bootstrap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlbumRoute = AlbumRouteImport.update({
+  id: '/album',
+  path: '/album',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -93,6 +99,7 @@ const DetailIdRoute = DetailIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/album': typeof AlbumRoute
   '/bootstrap': typeof BootstrapRoute
   '/conditions-generales-utilisation': typeof ConditionsGeneralesUtilisationRoute
   '/done': typeof DoneRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/album': typeof AlbumRoute
   '/bootstrap': typeof BootstrapRoute
   '/conditions-generales-utilisation': typeof ConditionsGeneralesUtilisationRoute
   '/done': typeof DoneRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/album': typeof AlbumRoute
   '/bootstrap': typeof BootstrapRoute
   '/conditions-generales-utilisation': typeof ConditionsGeneralesUtilisationRoute
   '/done': typeof DoneRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/album'
     | '/bootstrap'
     | '/conditions-generales-utilisation'
     | '/done'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/album'
     | '/bootstrap'
     | '/conditions-generales-utilisation'
     | '/done'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/album'
     | '/bootstrap'
     | '/conditions-generales-utilisation'
     | '/done'
@@ -187,6 +199,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AlbumRoute: typeof AlbumRoute
   BootstrapRoute: typeof BootstrapRoute
   ConditionsGeneralesUtilisationRoute: typeof ConditionsGeneralesUtilisationRoute
   DoneRoute: typeof DoneRoute
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BootstrapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/album': {
+      id: '/album'
+      path: '/album'
+      fullPath: '/album'
+      preLoaderRoute: typeof AlbumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -299,6 +319,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AlbumRoute: AlbumRoute,
   BootstrapRoute: BootstrapRoute,
   ConditionsGeneralesUtilisationRoute: ConditionsGeneralesUtilisationRoute,
   DoneRoute: DoneRoute,
