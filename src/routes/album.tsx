@@ -13,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ALBUM_PHOTO_PATHS } from "@/lib/album-manifest";
+import { ALBUM_PHOTOS } from "@/lib/album-manifest";
 import detailHeroBg from "@/assets/info-section.webp";
 
 export const Route = createFileRoute("/album")({
@@ -50,19 +50,17 @@ function formatDayTitle(title: string) {
   return title.replace(/^(Jour\s+\d+)\s+(.+)$/, "$1, $2");
 }
 
-function publicAlbumUrl(parts: string[]) {
-  return encodeURI(`/album-webp/${parts.join("/")}`);
+function publicAlbumUrl(path: string) {
+  return `/album-webp/${path}`;
 }
 
 function buildAlbum(): Day[] {
   const byDay = new Map<string, Map<string, Photo[]>>();
-  for (const path of ALBUM_PHOTO_PATHS) {
-    const parts = path.split("/");
-    if (parts.length < 3) continue;
-    const [day, section, file] = parts;
+  for (const item of ALBUM_PHOTOS) {
+    const { day, section, file, path } = item;
     const num = file.match(/^(\d+)/)?.[1] ?? "";
     const photo: Photo = {
-      url: publicAlbumUrl(parts),
+      url: publicAlbumUrl(path),
       file,
       caption: `${section.replace(/^\d+\s+/, "")} — #${num}`,
       day,

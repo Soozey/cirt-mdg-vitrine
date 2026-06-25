@@ -9,7 +9,7 @@
     "firebase:seed": "node scripts/firebase-seed-local.mjs",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "start": "srvx serve --prod --entry ./dist/server/server.js --static ../client",
+    "start": "srvx serve --prod --dir ./dist/server --entry ./server.js --static ../client",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."

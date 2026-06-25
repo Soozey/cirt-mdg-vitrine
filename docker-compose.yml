@@ -25,7 +25,7 @@ services:
       - ${FIREBASE_ADMINSDK_FILE:-./jobdating-cybersec-firebase-adminsdk-fbsvc-772b247bba.json}:/run/secrets/firebase-adminsdk.json:ro
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:2220/album-webp/Jour%201%2022%20juin%202026/1%20Accueil%20et%20enregistrement%20des%20participants/0017_Symposium%20de%20la%20Cyber-S%C3%A9curit%C3%A9.webp"]
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:2220/album-webp/jour-1-22-juin-2026/1-accueil-et-enregistrement-des-participants/0017-symposium-de-la-cyber-securite.webp"]
       interval: 30s
       timeout: 10s
       retries: 3
